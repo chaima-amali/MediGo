@@ -1,0 +1,648 @@
+{
+  "users": [
+    {
+      "user_id": "user_001",
+      "full_name": "Serine Naas",
+      "email": "serine.naas@email.com",
+      "phone_number": "+213794691377",
+      "date_of_birth": "1995-03-15",
+      "gender": "Female",
+      "subscription_type": "free",
+      "profile_image_url": "https://i.pravatar.cc/150?img=1",
+      "created_at": "2025-01-15T10:30:00Z"
+    },
+    {
+      "user_id": "user_002",
+      "full_name": "Mohamed Kecir",
+      "email": "mohamed.kecir@email.com",
+      "phone_number": "+213798543072",
+      "date_of_birth": "1992-08-20",
+      "gender": "Male",
+      "address": "123 sidi abdellah, Algiers",
+      "subscription_type": "free",
+      "profile_image_url": null,
+      "created_at": "2025-02-10T09:15:00Z"
+    }
+  ],
+
+  "medicines": [
+    {
+      "medicine_id": "med_001",
+      "name": "Aspirin",
+      "generic_name": "Acetylsalicylic Acid",
+      "medicine_type": "Tablet",
+      "manufacturer": "Bayer",
+      "description": "Pain reliever and anti-inflammatory",
+      "common_dosages": "100mg, 300mg, 500mg",
+      "active_ingredient": "Acetylsalicylic Acid"
+    },
+    {
+      "medicine_id": "med_002",
+      "name": "Telfast",
+      "generic_name": "Fexofenadine",
+      "medicine_type": "Tablet",
+      "manufacturer": "Sanofi",
+      "description": "Antihistamine for allergies",
+      "common_dosages": "120mg, 180mg",
+      "active_ingredient": "Fexofenadine HCl"
+    },
+    {
+      "medicine_id": "med_003",
+      "name": "Diclofenac",
+      "generic_name": "Diclofenac Sodium",
+      "medicine_type": "Tablet",
+      "manufacturer": "Novartis",
+      "description": "Non-steroidal anti-inflammatory drug",
+      "common_dosages": "50mg, 100mg",
+      "active_ingredient": "Diclofenac Sodium"
+    },
+    {
+      "medicine_id": "med_004",
+      "name": "Naproxen",
+      "generic_name": "Naproxen Sodium",
+      "medicine_type": "Tablet",
+      "manufacturer": "Generic",
+      "description": "Pain reliever and fever reducer",
+      "common_dosages": "250mg, 500mg",
+      "active_ingredient": "Naproxen Sodium"
+    },
+    {
+      "medicine_id": "med_005",
+      "name": "Vitamin C",
+      "generic_name": "Ascorbic Acid",
+      "medicine_type": "Tablet",
+      "manufacturer": "Various",
+      "description": "Essential vitamin supplement",
+      "common_dosages": "500mg, 1000mg",
+      "active_ingredient": "Ascorbic Acid"
+    },
+    {
+      "medicine_id": "med_006",
+      "name": "Ibuprofen",
+      "generic_name": "Ibuprofen",
+      "medicine_type": "Tablet",
+      "manufacturer": "Generic",
+      "description": "Pain reliever and anti-inflammatory",
+      "common_dosages": "200mg, 400mg, 600mg",
+      "active_ingredient": "Ibuprofen"
+    },
+    {
+      "medicine_id": "med_007",
+      "name": "Paracetamol",
+      "generic_name": "Acetaminophen",
+      "medicine_type": "Tablet",
+      "manufacturer": "Various",
+      "description": "Pain reliever and fever reducer",
+      "common_dosages": "500mg, 1000mg",
+      "active_ingredient": "Paracetamol"
+    },
+    {
+      "medicine_id": "med_008",
+      "name": "Amoxicillin",
+      "generic_name": "Amoxicillin",
+      "medicine_type": "Capsule",
+      "manufacturer": "GSK",
+      "description": "Antibiotic for bacterial infections",
+      "common_dosages": "250mg, 500mg",
+      "active_ingredient": "Amoxicillin"
+    },
+    {
+      "medicine_id": "med_009",
+      "name": "Metformin",
+      "generic_name": "Metformin HCl",
+      "medicine_type": "Tablet",
+      "manufacturer": "Various",
+      "description": "Diabetes medication",
+      "common_dosages": "500mg, 850mg, 1000mg",
+      "active_ingredient": "Metformin Hydrochloride"
+    },
+    {
+      "medicine_id": "med_010",
+      "name": "Lisinopril",
+      "generic_name": "Lisinopril",
+      "medicine_type": "Tablet",
+      "manufacturer": "Various",
+      "description": "Blood pressure medication",
+      "common_dosages": "5mg, 10mg, 20mg",
+      "active_ingredient": "Lisinopril"
+    }
+  ],
+
+  "user_medicines": [
+    {
+      "user_medicine_id": "user_med_001",
+      "user_id": "user_001",
+      "medicine_id": "med_002",
+      "dosage": "100",
+      "unit": "mg",
+      "frequency": "1 Pill",
+      "times_per_day": 1,
+      "importance": "Medium",
+      "start_date": "2025-09-01",
+      "end_date": "2025-10-01",
+      "additional_notes": "Before eat",
+      "is_active": true,
+      "color": "#FFF4D6"
+    },
+    {
+      "user_medicine_id": "user_med_002",
+      "user_id": "user_001",
+      "medicine_id": "med_001",
+      "dosage": "100",
+      "unit": "mg",
+      "frequency": "1 Pill",
+      "times_per_day": 2,
+      "importance": "High",
+      "start_date": "2025-09-10",
+      "end_date": null,
+      "additional_notes": "Before eat",
+      "is_active": true,
+      "color": "#FFE5E5"
+    },
+    {
+      "user_medicine_id": "user_med_003",
+      "user_id": "user_001",
+      "medicine_id": "med_003",
+      "dosage": "100",
+      "unit": "mg",
+      "frequency": "1 Pill",
+      "times_per_day": 2,
+      "importance": "Medium",
+      "start_date": "2025-09-12",
+      "end_date": null,
+      "additional_notes": "Before eat",
+      "is_active": true,
+      "color": "#D6F5F5"
+    },
+    {
+      "user_medicine_id": "user_med_004",
+      "user_id": "user_001",
+      "medicine_id": "med_004",
+      "dosage": "100",
+      "unit": "mg",
+      "frequency": "1 Pill",
+      "times_per_day": 1,
+      "importance": "Low",
+      "start_date": "2025-09-15",
+      "end_date": null,
+      "additional_notes": "",
+      "is_active": true,
+      "color": "#FFDDDE"
+    },
+    {
+      "user_medicine_id": "user_med_005",
+      "user_id": "user_001",
+      "medicine_id": "med_005",
+      "dosage": "100",
+      "unit": "mg",
+      "frequency": "1 Pill",
+      "times_per_day": 1,
+      "importance": "Low",
+      "start_date": "2025-09-01",
+      "end_date": null,
+      "additional_notes": "",
+      "is_active": true,
+      "color": "#E5E5FF"
+    }
+  ],
+
+  "reminders": [
+    {
+      "reminder_id": "rem_001",
+      "user_medicine_id": "user_med_001",
+      "reminder_time": "08:00:00",
+      "is_enabled": true
+    },
+    {
+      "reminder_id": "rem_002",
+      "user_medicine_id": "user_med_002",
+      "reminder_time": "08:00:00",
+      "is_enabled": true
+    },
+    {
+      "reminder_id": "rem_003",
+      "user_medicine_id": "user_med_002",
+      "reminder_time": "14:00:00",
+      "is_enabled": true
+    },
+    {
+      "reminder_id": "rem_004",
+      "user_medicine_id": "user_med_003",
+      "reminder_time": "08:00:00",
+      "is_enabled": true
+    },
+    {
+      "reminder_id": "rem_005",
+      "user_medicine_id": "user_med_003",
+      "reminder_time": "14:00:00",
+      "is_enabled": true
+    }
+  ],
+
+  "medicine_intake_log": [
+    {
+      "log_id": "log_001",
+      "user_medicine_id": "user_med_001",
+      "scheduled_time": "2025-10-27T08:00:00Z",
+      "actual_time": "2025-10-27T08:02:00Z",
+      "status": "taken",
+      "notes": ""
+    },
+    {
+      "log_id": "log_002",
+      "user_medicine_id": "user_med_002",
+      "scheduled_time": "2025-10-27T08:00:00Z",
+      "actual_time": "2025-10-27T08:00:00Z",
+      "status": "taken",
+      "notes": ""
+    },
+    {
+      "log_id": "log_003",
+      "user_medicine_id": "user_med_003",
+      "scheduled_time": "2025-10-27T08:00:00Z",
+      "actual_time": "2025-10-27T08:05:00Z",
+      "status": "taken",
+      "notes": ""
+    },
+    {
+      "log_id": "log_004",
+      "user_medicine_id": "user_med_002",
+      "scheduled_time": "2025-10-27T14:00:00Z",
+      "actual_time": null,
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "log_id": "log_005",
+      "user_medicine_id": "user_med_003",
+      "scheduled_time": "2025-10-27T14:00:00Z",
+      "actual_time": null,
+      "status": "pending",
+      "notes": ""
+    }
+  ],
+
+  "pharmacies": [
+    {
+      "pharmacy_id": "pharm_001",
+      "name": "PharmSync",
+      "address": "Rue de Didouch, Alger",
+      "latitude": 36.753769,
+      "longitude": 3.058756,
+      "phone_number": "+93 555 123 456",
+      "opening_hours": "Mon-Sat: 8:00 AM - 9:00 PM, Sun: 9:00 AM - 6:00 PM",
+      "rating": 4.7,
+      "total_reviews": 220,
+      "is_verified": true,
+      "distance_km": 0.9
+    },
+    {
+      "pharmacy_id": "pharm_002",
+      "name": "HealthPlus Pharmacy",
+      "address": "Boulevard Mohamed V, Alger",
+      "latitude": 36.763769,
+      "longitude": 3.048756,
+      "phone_number": "(+231)782758436",
+      "opening_hours": "Mon-Fri: 8:30 AM - 8:00 PM, Sat-Sun: 9:00 AM - 5:00 PM",
+      "rating": 4.5,
+      "total_reviews": 185,
+      "is_verified": true,
+      "distance_km": 0.5
+    },
+    {
+      "pharmacy_id": "pharm_003",
+      "name": "HealthCare Plus",
+      "address": "Boulevard Mohamed V, Alger",
+      "latitude": 36.768769,
+      "longitude": 3.055756,
+      "phone_number": "+91 555 789 012",
+      "opening_hours": "Open 24 hours",
+      "rating": 4.6,
+      "total_reviews": 310,
+      "is_verified": true,
+      "distance_km": 1.2
+    }
+  ],
+
+  "pharmacy_inventory": [
+    {
+      "inventory_id": "inv_001",
+      "pharmacy_id": "pharm_002",
+      "medicine_id": "med_001",
+      "in_stock": true,
+      "quantity": 150,
+      "price": 250.00
+    },
+    {
+      "inventory_id": "inv_002",
+      "pharmacy_id": "pharm_002",
+      "medicine_id": "med_002",
+      "in_stock": false,
+      "quantity": 0,
+      "price": 450.00
+    },
+    {
+      "inventory_id": "inv_003",
+      "pharmacy_id": "pharm_001",
+      "medicine_id": "med_001",
+      "in_stock": true,
+      "quantity": 80,
+      "price": 240.00
+    },
+    {
+      "inventory_id": "inv_004",
+      "pharmacy_id": "pharm_003",
+      "medicine_id": "med_006",
+      "in_stock": true,
+      "quantity": 200,
+      "price": 180.00
+    },
+    {
+      "inventory_id": "inv_005",
+      "pharmacy_id": "pharm_003",
+      "medicine_id": "med_007",
+      "in_stock": true,
+      "quantity": 120,
+      "price": 150.00
+    }
+  ],
+
+  "reservations": [
+    {
+      "reservation_id": "res_001",
+      "reservation_code": "831701",
+      "user_id": "user_002",
+      "pharmacy_id": "pharm_003",
+      "pharmacy_name": "HealthCare Plus",
+      "medicine_id": "med_009",
+      "medicine_name": "Ibuprofen",
+      "dosage": "400mg",
+      "quantity": 1,
+      "pickup_date": "2025-11-01",
+      "pickup_time": "10:10:00",
+      "status": "completed",
+      "qr_code_data": "RES831701",
+      "created_at": "2025-10-28T12:12:26Z"
+    },
+    {
+      "reservation_id": "res_002",
+      "reservation_code": "176165048710",
+      "user_id": "user_002",
+      "pharmacy_id": "pharm_001",
+      "pharmacy_name": "PharmSync",
+      "medicine_id": "med_007",
+      "medicine_name": "Paracetamol",
+      "dosage": "500mg",
+      "quantity": 1,
+      "pickup_date": "2025-11-15",
+      "pickup_time": "11:11:00",
+      "status": "pending",
+      "qr_code_data": "RES176165048710",
+      "created_at": "2025-10-26T16:24:26Z"
+    },
+    {
+      "reservation_id": "res_003",
+      "reservation_code": "176165048710",
+      "user_id": "user_002",
+      "pharmacy_id": "pharm_001",
+      "pharmacy_name": "PharmSync",
+      "medicine_id": "med_007",
+      "medicine_name": "Paracetamol",
+      "dosage": "500mg",
+      "quantity": 1,
+      "pickup_date": "2025-11-15",
+      "pickup_time": "11:11:00",
+      "status": "cancelled",
+      "qr_code_data": "RES176165048710",
+      "created_at": "2025-10-26T16:24:26Z"
+    }
+  ],
+
+  "notifications": [
+    {
+      "notification_id": "notif_001",
+      "user_id": "user_001",
+      "title": "Evening dose time",
+      "message": "take your medicine \"Aspirin\" — your health will thank you",
+      "type": "reminder",
+      "is_read": false,
+      "created_at": "2025-10-28T08:30:00Z",
+      "category": "Today"
+    },
+    {
+      "notification_id": "notif_002",
+      "user_id": "user_001",
+      "title": "Hey there!",
+      "message": "Don't forget your dose of \"Telfast\" small steps for a healthier you.",
+      "type": "reminder",
+      "is_read": false,
+      "created_at": "2025-10-28T06:30:00Z",
+      "category": "Today"
+    },
+    {
+      "notification_id": "notif_003",
+      "user_id": "user_001",
+      "title": "Evening dose time",
+      "message": "take your medicine \"Aspirin\" and rest easy tonight",
+      "type": "reminder",
+      "is_read": true,
+      "created_at": "2025-10-27T20:30:00Z",
+      "category": "Yesterday"
+    },
+    {
+      "notification_id": "notif_004",
+      "user_id": "user_001",
+      "title": "Time for your medicine \"Aspirin\"",
+      "message": "— your health will thank you",
+      "type": "reminder",
+      "is_read": true,
+      "created_at": "2025-10-27T08:30:00Z",
+      "category": "Yesterday"
+    },
+    {
+      "notification_id": "notif_005",
+      "user_id": "user_001",
+      "title": "Good morning!",
+      "message": "It's time to take your medicine and start your day right.",
+      "type": "reminder",
+      "is_read": true,
+      "created_at": "2025-10-27T08:30:00Z",
+      "category": "Yesterday"
+    },
+    {
+      "notification_id": "notif_006",
+      "user_id": "user_001",
+      "title": "Hey there!",
+      "message": "Don't forget your dose of \"Telfast\" small steps for a healthier you.",
+      "type": "reminder",
+      "is_read": true,
+      "created_at": "2025-10-27T06:30:00Z",
+      "category": "Yesterday"
+    }
+  ],
+
+  "reports": {
+    "weekly": {
+      "user_id": "user_001",
+      "period": "Last 7 Days",
+      "total_doses": 74,
+      "taken": 56,
+      "delayed": 10,
+      "missed": 8,
+      "by_medicine": [
+        {
+          "medicine_name": "Paracetamol",
+          "dosage": "500 mg",
+          "total_doses": 10
+        },
+        {
+          "medicine_name": "Amoxicillin",
+          "dosage": "250 mg",
+          "total_doses": 19
+        },
+        {
+          "medicine_name": "Ibuprofen",
+          "dosage": "400 mg",
+          "total_doses": 8
+        },
+        {
+          "medicine_name": "Metformin",
+          "dosage": "850 mg",
+          "total_doses": 12
+        },
+        {
+          "medicine_name": "Lisinopril",
+          "dosage": "10 mg",
+          "total_doses": 7
+        }
+      ]
+    },
+    "monthly": {
+      "user_id": "user_001",
+      "period": "Last 30 Days",
+      "total_doses": 272,
+      "taken": 213,
+      "delayed": 32,
+      "missed": 27,
+      "by_medicine": [
+        {
+          "medicine_name": "Paracetamol",
+          "dosage": "500 mg",
+          "total_doses": 45
+        },
+        {
+          "medicine_name": "Amoxicillin",
+          "dosage": "250 mg",
+          "total_doses": 72
+        },
+        {
+          "medicine_name": "Ibuprofen",
+          "dosage": "400 mg",
+          "total_doses": 24
+        },
+        {
+          "medicine_name": "Metformin",
+          "dosage": "850 mg",
+          "total_doses": 48
+        },
+        {
+          "medicine_name": "Lisinopril",
+          "dosage": "10 mg",
+          "total_doses": 24
+        }
+      ]
+    }
+  },
+
+  "subscription_plans": [
+    {
+      "plan_id": "plan_monthly",
+      "name": "Monthly",
+      "price": 350,
+      "currency": "DA",
+      "billing_period": "monthly",
+      "features": [
+        "All premium features",
+        "Cancel anytime"
+      ],
+      "is_popular": false
+    },
+    {
+      "plan_id": "plan_yearly",
+      "name": "Yearly",
+      "price": 250,
+      "currency": "DA",
+      "billing_period": "yearly",
+      "original_price": 300,
+      "discount_percentage": 16,
+      "features": [
+        "All premium features",
+        "8 months free",
+        "Priority customer support"
+      ],
+      "is_popular": true,
+      "badge": "Best deal"
+    }
+  ],
+
+  "premium_features": [
+    {
+      "icon": "⚡",
+      "title": "Medicine pre-order & reservation",
+      "description": "pre-order your medicine and reserve it then go for pick up when you are free"
+    },
+    {
+      "icon": "🔔",
+      "title": "Instant Restock Alerts",
+      "description": "Get notified immediately when out-of-stock medicines are available"
+    },
+    {
+      "icon": "✨",
+      "title": "Ad-Free Experience",
+      "description": "Enjoy a clean, distraction-free interface without any ads"
+    }
+  ],
+
+  "medicine_calendar": {
+    "october_2025": {
+      "27": {
+        "date": "2025-10-27",
+        "medicines": [
+          {
+            "medicine_name": "Telfast",
+            "dosage": "100 mg",
+            "frequency": "1 Pill, Before eat",
+            "status": "taken",
+            "color": "#4CAF50"
+          },
+          {
+            "medicine_name": "Aspirin",
+            "dosage": "100 mg",
+            "frequency": "1 Pill, Before eat",
+            "status": "delayed",
+            "color": "#FFA726"
+          },
+          {
+            "medicine_name": "Diclofenac",
+            "dosage": "100mg",
+            "frequency": "Before eat",
+            "status": "taken",
+            "color": "#4CAF50"
+          }
+        ]
+      },
+      "26": {
+        "date": "2025-10-26",
+        "medicines": []
+      }
+    }
+  },
+
+  "settings": {
+    "user_id": "user_002",
+    "notifications_enabled": true,
+    "dark_mode_enabled": false,
+    "language": "English (US)",
+    "reservations_count": 0
+  }
+}
