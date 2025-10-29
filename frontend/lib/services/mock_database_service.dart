@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class MockDataService {
   // Current logged-in user (change this to switch users)
   static const String currentUserId = "user_001"; // Serine
