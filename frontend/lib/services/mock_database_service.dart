@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class MockDataService {
   // Current logged-in user (change this to switch users)
   static const String currentUserId = "user_001"; // Serine
@@ -130,6 +128,11 @@ class MockDataService {
   static List<Map<String, dynamic>> getNearbyPharmacies({int limit = 2}) {
     final pharmacies = _getAllPharmacies();
     return pharmacies.take(limit).toList();
+  }
+
+  // Public helper to expose a small list of popular medicines
+  static List<Map<String, dynamic>> getPopularMedicines({int limit = 5}) {
+    return _getAllMedicines().take(limit).toList();
   }
 
   static Map<String, dynamic>? getPharmacyDetails(String pharmacyId) {
