@@ -143,7 +143,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                         Transform.rotate(
                           angle: -0.3,
                           child: Image.asset(
-                            'assets/images/logo_medicine.png',
+                            'assets/images/logo_signup.png',
                             width: 28,
                             height: 28,
                             fit: BoxFit.contain,

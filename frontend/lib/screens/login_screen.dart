@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Transform.rotate(
                           angle: -0.3,
                           child: Image.asset(
-                            'assets/images/logo_medicine.png',
+                            'assets/images/logo_signup.png',
                             width: 28,
                             height: 28,
                             fit: BoxFit.contain,
