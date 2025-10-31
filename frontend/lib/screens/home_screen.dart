@@ -155,13 +155,16 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Nearby Pharmacies',
-                  style: AppText.bold.copyWith(
-                    fontSize: 18,
-                    color: AppColors.darkBlue,
+                Expanded(
+                  child: Text(
+                    'Nearby Pharmacies',
+                    style: AppText.bold.copyWith(
+                      fontSize: 18,
+                      color: AppColors.darkBlue,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 TextButton(
@@ -195,13 +198,16 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Popular Medicines',
-                  style: AppText.bold.copyWith(
-                    fontSize: 18,
-                    color: AppColors.darkBlue,
+                Expanded(
+                  child: Text(
+                    'Popular Medicines',
+                    style: AppText.bold.copyWith(
+                      fontSize: 18,
+                      color: AppColors.darkBlue,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 TextButton(
