@@ -288,7 +288,7 @@ class MockDataService {
         "full_name": "Mohamed Kecir",
         "email": "mohamed.kecir@email.com",
         "phone_number": "+213798543072",
-        "date_of_birth": "1992-08-20",
+        "date_of_birth": "2005-01-08",
         "gender": "Male",
         "address": "123 sidi abdellah, Algiers",
         "subscription_type": "free",
