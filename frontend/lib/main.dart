@@ -22,7 +22,7 @@ class MediGoApp extends StatelessWidget {
       title: 'MediGo',
       theme: appTheme,
       debugShowCheckedModeBanner: false,
-      home:  const ProfilePage(),
+      home:  const ReservationDetailsScreen(reservationId: 'res_002',),
 
     );
   }

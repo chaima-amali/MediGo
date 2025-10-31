@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/theme/app_colors.dart';
+import 'package:frontend/theme/app_text.dart';
 import '../widgets/back_arrow.dart';
 import '../services/mock_database_service.dart';
 import 'subscription_page.dart';
 import 'edit_profile_page.dart';
+import 'splash_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -23,6 +25,61 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _loadUserData();
   }
+
+  void _showLogoutConfirmation(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text(
+          "Log Out",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: const Text(
+          "Are you sure you want to log out?",
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text(
+              "Cancel",
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              // Perform logout action
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SplashScreen(),
+                ),
+                (route) => false, // Remove all previous routes
+              );
+            },
+            child: const Text(
+              "Log Out",
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   void _loadUserData() {
     userData = MockDataService.getCurrentUser();
@@ -46,17 +103,13 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: const Color(0xFFB2EBF2),
+        backgroundColor: AppColors.lightBlue,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: CustomBackArrow(),
         title: const Text(
           'Profile',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppText.bold,
         ),
       ),
       body: SingleChildScrollView(
@@ -363,7 +416,9 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    _showLogoutConfirmation(context);
+                  },
                   icon: const Icon(Icons.logout, color: Colors.red),
                   label: const Text(
                     'Log Out',
@@ -471,6 +526,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+
+  
 
   Widget _buildSettingTileWithSwitch({
     required IconData icon,
