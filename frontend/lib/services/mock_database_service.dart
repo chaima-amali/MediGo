@@ -684,6 +684,47 @@ class MockDataService {
 
   static List<Map<String, dynamic>> _getAllReservations() {
     return [
+      // Reservations for current demo user (user_001)
+      {
+        "reservation_id": "res_u1_001",
+        "reservation_code": "U1001",
+        "user_id": "user_001",
+        "pharmacy_id": "pharm_001",
+        "pharmacy_name": "PharmSync",
+        "medicine_name": "Paracetamol",
+        "dosage": "500mg",
+        "quantity": 2,
+        "pickup_date": "2025-10-30",
+        "pickup_time": "09:30",
+        "status": "pending",
+      },
+      {
+        "reservation_id": "res_u1_002",
+        "reservation_code": "U1002",
+        "user_id": "user_001",
+        "pharmacy_id": "pharm_002",
+        "pharmacy_name": "PharmSync Branch",
+        "medicine_name": "Ibuprofen",
+        "dosage": "400mg",
+        "quantity": 1,
+        "pickup_date": "2025-10-25",
+        "pickup_time": "14:00",
+        "status": "completed",
+      },
+      {
+        "reservation_id": "res_u1_003",
+        "reservation_code": "U1003",
+        "user_id": "user_001",
+        "pharmacy_id": "pharm_001",
+        "pharmacy_name": "PharmSync",
+        "medicine_name": "Amoxicillin",
+        "dosage": "250mg",
+        "quantity": 1,
+        "pickup_date": "2025-10-20",
+        "pickup_time": "16:00",
+        "status": "cancelled",
+      },
+
       {
         "reservation_id": "res_001",
         "reservation_code": "831701",
