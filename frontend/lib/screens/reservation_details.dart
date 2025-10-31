@@ -190,7 +190,6 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
     final String status = reservationData!['status'];
     final bool isPending = status == 'pending';
     final bool isCancelled = status == 'cancelled';
-    final bool isCompleted = status == 'completed';
 
     // Extract data
     final String medicineName = reservationData!['medicine_name'] ?? 'Unknown';

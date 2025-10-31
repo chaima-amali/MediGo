@@ -62,41 +62,36 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.lightBlue,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: CustomBackArrow(),
         title: Text(
           'Reports',
-          style: AppText.bold.copyWith(fontSize: 20),
+          style: AppText.bold,
         ),
         centerTitle: false,
-        actions: [
-          Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[200]!),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.share, color: AppColors.darkBlue, size: 20),
-              onPressed: () {
-                _showShareDialog();
-              },
+       actions: [
+          IconButton(
+            icon: const Icon(Icons.share, color: AppColors.darkBlue, size: 18),
+            onPressed: () {
+              _showShareDialog();
+            },
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
             ),
           ),
-          Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[200]!),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.download, color: AppColors.darkBlue, size: 20),
-              onPressed: () {
-                _showDownloadDialog();
-              },
+          IconButton(
+            icon: const Icon(Icons.download, color: AppColors.darkBlue, size: 18),
+            onPressed: () {
+              _showDownloadDialog();
+            },
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
             ),
           ),
         ],
@@ -111,69 +106,84 @@ class _ReportsScreenState extends State<ReportsScreen> {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Row(
+              child: Stack(
                 children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => isWeekly = true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isWeekly ? AppColors.white : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: isWeekly
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : [],
+                  // Animated Background
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOutCubic,
+                    left: isWeekly ? 0 : MediaQuery.of(context).size.width / 2 - 40,
+                    right: isWeekly ? MediaQuery.of(context).size.width / 2 - 40 : 0,
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isWeekly 
+                              ? [const Color(0xFF37B7C3), const Color(0xFF5DD4DE)]
+                              : [const Color(0xFFEBABD3), const Color(0xFFF2C8E0)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        child: Center(
-                          child: Text(
-                            'Weekly',
-                            style: AppText.medium.copyWith(
-                              fontSize: 14,
-                              color: isWeekly ? AppColors.darkBlue : Colors.grey[600],
-                            ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (isWeekly ? const Color(0xFF37B7C3) : const Color(0xFFEBABD3)).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => isWeekly = false),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: !isWeekly ? AppColors.white : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: !isWeekly
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Monthly',
-                            style: AppText.medium.copyWith(
-                              fontSize: 14,
-                              color: !isWeekly ? AppColors.darkBlue : Colors.grey[600],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() => isWeekly = true);
+                          },
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 300),
+                              style: AppText.medium.copyWith(
+                                fontSize: 14,
+                                color: isWeekly ? AppColors.white : Colors.grey[600],
+                                fontWeight: isWeekly ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                              child: Center(
+                                child: Text('Weekly'),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() => isWeekly = false);
+                          },
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 300),
+                              style: AppText.medium.copyWith(
+                                fontSize: 14,
+                                color: !isWeekly ? AppColors.white : Colors.grey[600],
+                                fontWeight: !isWeekly ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                              child: Center(
+                                child: Text('Monthly'),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
