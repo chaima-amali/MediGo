@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
-import '../screens/onboarding_screen.dart';
+import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,23 +16,18 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // Preload the splash asset so it's ready when the widget builds.
-    rootBundle
-        .load('assets/images/logo_medicine.png')
-        .then((bd) {
-          debugPrint('logo_medicine.png loaded (${bd.lengthInBytes} bytes)');
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            precacheImage(
-              const AssetImage('assets/images/logo_medicine.png'),
-              context,
-            );
-          });
-        })
-        .catchError((e) {
-          debugPrint(
-            'Failed to load asset assets/images/logo_medicine.png: $e',
-          );
-        });
+    // Try to load the asset early and precache it
+    rootBundle.load('assets/images/logo_medicine.png').then((bd) {
+      debugPrint('logo_medicine.png loaded (${bd.lengthInBytes} bytes)');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        precacheImage(
+          const AssetImage('assets/images/logo_medicine.png'),
+          context,
+        );
+      });
+    }).catchError((e) {
+      debugPrint('Failed to load asset assets/images/logo_medicine.png: $e');
+    });
   }
 
   @override
@@ -93,6 +88,21 @@ class _SplashScreenState extends State<SplashScreen> {
                         width: 50,
                         height: 50,
                         fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.medication,
+                              size: 30,
+                              color: AppColors.primary,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -113,11 +123,11 @@ class _SplashScreenState extends State<SplashScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.lightBlue.withOpacity(0.95),
-                        foregroundColor: AppColors.darkBlue,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        elevation: 6,
-                        shadowColor: AppColors.darkBlue.withOpacity(0.12),
+                        backgroundColor: AppColors.lightBlue,
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -125,15 +135,14 @@ class _SplashScreenState extends State<SplashScreen> {
                       child: Text(
                         'Get Started',
                         style: AppText.medium.copyWith(
-                          fontSize: 16,
-                          color: AppColors.darkBlue,
+                          fontSize: 18,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
                 ),
-                // No on-screen fallback — we always render the raw asset.
                 const SizedBox(height: 50),
               ],
             ),
