@@ -110,7 +110,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               child: Stack(
                 children: [
-                  // Animated Background
                   AnimatedPositioned(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeInOutCubic,
