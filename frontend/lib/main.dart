@@ -6,8 +6,8 @@ import 'package:frontend/screens/reservation_details.dart';
 import 'package:frontend/screens/subscription_page.dart';
 import '../theme/app_theme.dart';
 import './screens/splash_screen.dart';
-
-
+import './screens/medicine_calendar.dart';
+import '../screens/my_reservations_screen.dart';
 
 void main() {
   runApp(const MediGoApp());
@@ -22,7 +22,8 @@ class MediGoApp extends StatelessWidget {
       title: 'MediGo',
       theme: appTheme,
       debugShowCheckedModeBanner: false,
-      home:  const ReservationDetailsScreen(reservationId: 'res_002',),
+      home:  const  MyReservationsScreen(),
+      //ReservationDetailsScreen(reservationId: 'res_002',),
 
     );
   }

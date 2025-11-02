@@ -251,8 +251,137 @@ class MockDataService {
   }
 
   static Map<String, dynamic> getMedicineCalendar(int month, int year) {
-    // Return calendar data for the specified month
-    return _getMedicineCalendarData()['october_2025'] ?? {};
+    // Return calendar data for the specified month/year.
+    // If there is explicit mock data for that month (e.g., october_2025), return it.
+    final key = '${_monthKey(month)}_${year}';
+    final all = _getMedicineCalendarData();
+    final Map<String, dynamic> explicit = all.containsKey(key)
+        ? Map<String, dynamic>.from(all[key])
+        : {};
+
+    // Synthesize day-level statuses from the monthly reports so the
+    // calendar reflects the 'taken', 'delayed' and 'missed' counts. If the
+    // explicit month dataset contains entries (e.g., day 27), we'll merge
+    // synthesized entries around it and avoid overriding explicit ones.
+    final reports = _getReportsData()['monthly'];
+    final int taken = reports['taken'] ?? 0;
+    final int delayed = reports['delayed'] ?? 0;
+    final int missed = reports['missed'] ?? 0;
+
+    // Get user's medicines (fall back to global medicines if empty)
+    final userMeds = getUserMedicines();
+    final meds = userMeds.isNotEmpty ? userMeds : _getAllMedicines();
+
+    // Number of days in the month
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+
+    // Determine the last day we should mark as "past". We only want to
+    // populate statuses for days that are in the past relative to today.
+    final now = DateTime.now();
+    int lastAvailableDay;
+    if (year < now.year || (year == now.year && month < now.month)) {
+      // Entire month is in the past
+      lastAvailableDay = daysInMonth;
+    } else if (year == now.year && month == now.month) {
+      // Current month: only fill up to today's day
+      lastAvailableDay = now.day.clamp(1, daysInMonth);
+    } else {
+      // Future month: don't populate any past data
+      lastAvailableDay = 0;
+    }
+
+    // Subtract any statuses already present in the explicit data so we don't
+    // double-count them.
+    int usedTaken = 0, usedDelayed = 0, usedMissed = 0;
+    explicit.forEach((day, data) {
+      try {
+        final meds = (data['medicines'] as List<dynamic>?) ?? [];
+        for (final m in meds) {
+          final s = (m['status'] ?? '').toString();
+          if (s == 'taken') usedTaken++;
+          if (s == 'delayed') usedDelayed++;
+          if (s == 'missed') usedMissed++;
+        }
+      } catch (e) {
+        // ignore malformed explicit entry
+      }
+    });
+
+    int remainingTaken = (taken - usedTaken).clamp(0, taken);
+    int remainingDelayed = (delayed - usedDelayed).clamp(0, delayed);
+    int remainingMissed = (missed - usedMissed).clamp(0, missed);
+
+    // Start result with explicit entries so they are preserved.
+    final Map<String, dynamic> result = Map<String, dynamic>.from(explicit);
+
+    // Decide how many days we will actually populate. We don't want to fill
+    // every past day — pick at most total events, but no more than lastAvailableDay.
+    final totalEvents = (remainingTaken + remainingDelayed + remainingMissed);
+    final toPlace = totalEvents == 0
+        ? 0
+        : totalEvents.clamp(0, lastAvailableDay);
+
+    if (toPlace > 0) {
+      // Build a deterministic list of distinct day positions spread across the
+      // available past days so events don't bunch up at the start.
+      final List<int> positions = [];
+      for (var i = 0; i < toPlace; i++) {
+        // Spread using integer arithmetic to keep it deterministic
+        final pos = 1 + ((i * lastAvailableDay) ~/ toPlace);
+        var day = pos;
+        // avoid duplicates by advancing if needed
+        while (positions.contains(day) && day <= lastAvailableDay) {
+          day++;
+        }
+        if (day > lastAvailableDay) {
+          // fallback: find first unused
+          day = 1;
+          while (positions.contains(day) && day <= lastAvailableDay) day++;
+          if (day > lastAvailableDay) break; // no space
+        }
+        positions.add(day);
+      }
+
+      // Build the ordered list of statuses to place according to their counts.
+      final List<String> statuses = [];
+      for (var i = 0; i < remainingTaken; i++) statuses.add('taken');
+      for (var i = 0; i < remainingDelayed; i++) statuses.add('delayed');
+      for (var i = 0; i < remainingMissed; i++) statuses.add('missed');
+
+      // Mix/shuffle statuses deterministically so we get a realistic mix
+      // rather than grouping all of one type together. Use a seeded LCG so
+      // the results are reproducible for the same month/year.
+      final seed = year * 100 + month;
+      _seededShuffle(statuses, seed);
+
+      // Trim statuses to the number of positions
+      final placeCount = positions.length;
+      final trimmedStatuses = statuses.take(placeCount).toList();
+
+      // Assign medicines and statuses to chosen positions, skipping explicit days
+      var idx = 0;
+      for (final day in positions) {
+        final keyDay = '$day';
+        if (result.containsKey(keyDay)) continue; // keep explicit
+        if (idx >= trimmedStatuses.length) break;
+        final status = trimmedStatuses[idx++];
+        final med = meds[(day - 1) % meds.length];
+        result[keyDay] = {
+          'medicines': [
+            {
+              'medicine_name':
+                  med['medicine_name'] ?? med['name'] ?? 'Medicine',
+              'dosage': med['dosage'] ?? '100 mg',
+              'frequency': med['frequency'] ?? '1 Pill',
+              'status': status,
+              'color': med['color'] ?? '#D6F5F5',
+            },
+          ],
+        };
+      }
+    }
+
+    return result;
   }
 
   // ==================== SUBSCRIPTION METHODS ====================
@@ -555,6 +684,47 @@ class MockDataService {
 
   static List<Map<String, dynamic>> _getAllReservations() {
     return [
+      // Reservations for current demo user (user_001)
+      {
+        "reservation_id": "res_u1_001",
+        "reservation_code": "U1001",
+        "user_id": "user_001",
+        "pharmacy_id": "pharm_001",
+        "pharmacy_name": "PharmSync",
+        "medicine_name": "Paracetamol",
+        "dosage": "500mg",
+        "quantity": 2,
+        "pickup_date": "2025-10-30",
+        "pickup_time": "09:30",
+        "status": "pending",
+      },
+      {
+        "reservation_id": "res_u1_002",
+        "reservation_code": "U1002",
+        "user_id": "user_001",
+        "pharmacy_id": "pharm_002",
+        "pharmacy_name": "PharmSync Branch",
+        "medicine_name": "Ibuprofen",
+        "dosage": "400mg",
+        "quantity": 1,
+        "pickup_date": "2025-10-25",
+        "pickup_time": "14:00",
+        "status": "completed",
+      },
+      {
+        "reservation_id": "res_u1_003",
+        "reservation_code": "U1003",
+        "user_id": "user_001",
+        "pharmacy_id": "pharm_001",
+        "pharmacy_name": "PharmSync",
+        "medicine_name": "Amoxicillin",
+        "dosage": "250mg",
+        "quantity": 1,
+        "pickup_date": "2025-10-20",
+        "pickup_time": "16:00",
+        "status": "cancelled",
+      },
+
       {
         "reservation_id": "res_001",
         "reservation_code": "831701",
@@ -629,6 +799,37 @@ class MockDataService {
         ],
       },
     };
+  }
+
+  static String _monthKey(int month) {
+    const months = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+    ];
+    if (month < 1 || month > 12) return 'unknown';
+    return months[month - 1];
+  }
+
+  // Deterministic seeded shuffle using a simple LCG for reproducibility
+  static void _seededShuffle<T>(List<T> list, int seed) {
+    if (list.length < 2) return;
+    final rnd = _LCGRng(seed);
+    for (var i = list.length - 1; i > 0; i--) {
+      final j = rnd.nextInt(i + 1);
+      final tmp = list[i];
+      list[i] = list[j];
+      list[j] = tmp;
+    }
   }
 
   static Map<String, dynamic> _getMedicineCalendarData() {
@@ -721,5 +922,15 @@ class MockDataService {
       "language": "English (US)",
       "reservations_count": 0,
     };
+  }
+}
+
+// Top-level deterministic LCG RNG used for seeded shuffles in the mock data.
+class _LCGRng {
+  int _state;
+  _LCGRng(int seed) : _state = seed & 0x7fffffff;
+  int nextInt(int max) {
+    _state = (1103515245 * _state + 12345) & 0x7fffffff;
+    return _state % max;
   }
 }
