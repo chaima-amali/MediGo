@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../screens/tracking_page.dart';
+import '../screens/edit_page.dart';
+import '../screens/statistics_page.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -11,8 +14,16 @@ class CustomBottomNavBar extends StatelessWidget {
     required this.onTap,
   });
 
+  bool _isCalendarActive(BuildContext context) {
+    return context.findAncestorWidgetOfExactType<TrackingPage>() != null ||
+        context.findAncestorWidgetOfExactType<EditPage>() != null ||
+        context.findAncestorWidgetOfExactType<StatisticsPage>() != null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool isCalendarActive = _isCalendarActive(context);
+
     return Container(
       height: 70,
       margin: const EdgeInsets.all(16),
@@ -31,21 +42,28 @@ class CustomBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(
+            context,
             index: 0,
             icon: Icons.home_outlined,
             activeIcon: Icons.home,
           ),
           _buildNavItem(
+            context,
             index: 1,
             icon: Icons.search,
             activeIcon: Icons.search,
           ),
+          // ✅ Calendar icon: navigates to TrackingPage and stays colored there / in related pages
           _buildNavItem(
+            context,
             index: 2,
             icon: Icons.calendar_month_outlined,
             activeIcon: Icons.calendar_month,
+            isCalendar: true,
+            isCalendarActive: isCalendarActive,
           ),
           _buildNavItem(
+            context,
             index: 3,
             icon: Icons.person_outline,
             activeIcon: Icons.person,
@@ -55,68 +73,38 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem({
+  Widget _buildNavItem(
+    BuildContext context, {
     required int index,
     required IconData icon,
     required IconData activeIcon,
+    bool isCalendar = false,
+    bool isCalendarActive = false,
   }) {
-    final isActive = currentIndex == index;
+    final isActive = isCalendar
+        ? isCalendarActive
+        : (currentIndex == index);
 
     return GestureDetector(
-      onTap: () => onTap(index),
+      onTap: () {
+        if (isCalendar) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const TrackingPage()),
+          );
+        } else {
+          onTap(index);
+        }
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Icon(
           isActive ? activeIcon : icon,
-          color: AppColors.primary,
+          color: isActive ? AppColors.primary : Colors.black54,
           size: 28,
         ),
       ),
     );
   }
 }
-
-// Example usage in your screen:
-/*
-class ExampleScreen extends StatefulWidget {
-  const ExampleScreen({super.key});
-
-  @override
-  State<ExampleScreen> createState() => _ExampleScreenState();
-}
-
-class _ExampleScreenState extends State<ExampleScreen> {
-  int _currentIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _getBody(),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _getBody() {
-    switch (_currentIndex) {
-      case 0:
-        return const Center(child: Text('Home'));
-      case 1:
-        return const Center(child: Text('Search'));
-      case 2:
-        return const Center(child: Text('Calendar'));
-      case 3:
-        return const Center(child: Text('Profile'));
-      default:
-        return const Center(child: Text('Home'));
-    }
-  }
-}
-*/
