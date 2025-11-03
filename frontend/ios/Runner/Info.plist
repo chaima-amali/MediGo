@@ -45,5 +45,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Allow querying for phone and maps schemes so the app can check if these URL schemes are available -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>maps</string>
+	</array>
 </dict>
 </plist>

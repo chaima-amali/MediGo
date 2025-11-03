@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import '../services/mock_database_service.dart';
+import 'pharmacy_details_screen.dart';
+import '../widgets/bottom_navbar.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -22,30 +24,22 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: _currentIndex == 0 ? _buildHomeContent() : _buildPlaceholder(),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.darkBlue.withOpacity(0.4),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Reminders',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
       ),
     );
   }
 
   Widget _buildHomeContent() {
+    // Fetch nearby pharmacies once so the list is stable and we don't
+    // call the getter repeatedly from inside builders (helps debug).
+    final nearbyPharmacies = MockDataService.getNearbyPharmacies(limit: 4);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,8 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 24,
                             color: AppColors.darkBlue,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -155,16 +147,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    'Nearby Pharmacies',
-                    style: AppText.bold.copyWith(
-                      fontSize: 18,
-                      color: AppColors.darkBlue,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                Text(
+                  'Nearby Pharmacies',
+                  style: AppText.bold.copyWith(
+                    fontSize: 18,
+                    color: AppColors.darkBlue,
                   ),
                 ),
                 TextButton(
@@ -186,9 +175,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: MockDataService.getNearbyPharmacies().length,
+              itemCount: nearbyPharmacies.length,
               itemBuilder: (context, index) {
-                final pharmacy = MockDataService.getNearbyPharmacies()[index];
+                final pharmacy = nearbyPharmacies[index];
                 return _buildPharmacyCard(pharmacy);
               },
             ),
@@ -198,16 +187,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    'Popular Medicines',
-                    style: AppText.bold.copyWith(
-                      fontSize: 18,
-                      color: AppColors.darkBlue,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                Text(
+                  'Popular Medicines',
+                  style: AppText.bold.copyWith(
+                    fontSize: 18,
+                    color: AppColors.darkBlue,
                   ),
                 ),
                 TextButton(
@@ -228,11 +214,47 @@ class _HomeScreenState extends State<HomeScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: MockDataService.getPopularMedicines(limit: 5).length,
+            itemCount: 5,
             itemBuilder: (context, index) {
-              final medicine = MockDataService.getPopularMedicines(
-                limit: 5,
-              )[index];
+              // Mock medicine data for display
+              final medicines = [
+                {
+                  'id': 1,
+                  'name': 'Aspirin',
+                  'type': 'Tablet',
+                  'price': 250.0,
+                  'inStock': true,
+                },
+                {
+                  'id': 2,
+                  'name': 'Telfast',
+                  'type': 'Tablet',
+                  'price': 450.0,
+                  'inStock': true,
+                },
+                {
+                  'id': 3,
+                  'name': 'Diclofenac',
+                  'type': 'Tablet',
+                  'price': 180.0,
+                  'inStock': true,
+                },
+                {
+                  'id': 4,
+                  'name': 'Naproxen',
+                  'type': 'Tablet',
+                  'price': 320.0,
+                  'inStock': false,
+                },
+                {
+                  'id': 5,
+                  'name': 'Vitamin C',
+                  'type': 'Capsule',
+                  'price': 150.0,
+                  'inStock': true,
+                },
+              ];
+              final medicine = medicines[index];
               return _buildMedicineCard(medicine);
             },
           ),
@@ -267,14 +289,11 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           Text(
             title,
-            textAlign: TextAlign.center,
             style: AppText.medium.copyWith(
               fontSize: 13,
               color: AppColors.darkBlue,
               height: 1.3,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -282,124 +301,141 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPharmacyCard(Map<String, dynamic> pharmacy) {
-    return Container(
-      width: 280,
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.darkBlue.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.darkBlue.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    // Normalize potentially-null fields from the mock data to safe Dart types
+    final bool isOpen = pharmacy['isOpen'] == true;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PharmacyDetailScreen(pharmacy: pharmacy),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+        );
+      },
+      child: Container(
+        width: 280,
+        margin: const EdgeInsets.only(right: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.darkBlue.withOpacity(0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.darkBlue.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.local_pharmacy,
+                    color: AppColors.primary,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.local_pharmacy,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        pharmacy['name'],
+                        style: AppText.bold.copyWith(
+                          fontSize: 16,
+                          color: AppColors.darkBlue,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            isOpen ? Icons.circle : Icons.cancel_outlined,
+                            size: 12,
+                            color: isOpen ? AppColors.success : AppColors.error,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isOpen ? 'Open' : 'Closed',
+                            style: AppText.regular.copyWith(
+                              fontSize: 12,
+                              color: isOpen
+                                  ? AppColors.success
+                                  : AppColors.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(
+                  Icons.location_on,
+                  size: 16,
                   color: AppColors.primary,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      pharmacy['name'],
-                      style: AppText.bold.copyWith(
-                        fontSize: 16,
-                        color: AppColors.darkBlue,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    pharmacy['address'],
+                    style: AppText.regular.copyWith(
+                      fontSize: 12,
+                      color: AppColors.darkBlue.withOpacity(0.6),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          pharmacy['isOpen']
-                              ? Icons.circle
-                              : Icons.cancel_outlined,
-                          size: 12,
-                          color: pharmacy['isOpen']
-                              ? AppColors.success
-                              : AppColors.error,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          pharmacy['isOpen'] ? 'Open' : 'Closed',
-                          style: AppText.regular.copyWith(
-                            fontSize: 12,
-                            color: pharmacy['isOpen']
-                                ? AppColors.success
-                                : AppColors.error,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(Icons.location_on, size: 16, color: AppColors.primary),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  pharmacy['address'],
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(
+                  Icons.access_time,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${pharmacy['distance_km']} km away',
                   style: AppText.regular.copyWith(
                     fontSize: 12,
                     color: AppColors.darkBlue.withOpacity(0.6),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 16, color: AppColors.primary),
-              const SizedBox(width: 4),
-              Text(
-                '${pharmacy['distance']} km away',
-                style: AppText.regular.copyWith(
-                  fontSize: 12,
-                  color: AppColors.darkBlue.withOpacity(0.6),
+                const Spacer(),
+                const Icon(Icons.star, size: 16, color: AppColors.warning),
+                const SizedBox(width: 4),
+                Text(
+                  pharmacy['rating'].toString(),
+                  style: AppText.medium.copyWith(
+                    fontSize: 12,
+                    color: AppColors.darkBlue,
+                  ),
                 ),
-              ),
-              const Spacer(),
-              const Icon(Icons.star, size: 16, color: AppColors.warning),
-              const SizedBox(width: 4),
-              Text(
-                pharmacy['rating'].toString(),
-                style: AppText.medium.copyWith(
-                  fontSize: 12,
-                  color: AppColors.darkBlue,
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -412,15 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
       AppColors.coralCard,
       AppColors.lavenderCard,
     ];
-    // medicine may not have a numeric 'id' field in the mock data (it uses
-    // 'medicine_id' like "med_001"), so compute a stable index from the
-    // medicine_id string instead of assuming medicine['id'] is present.
-    final keyString =
-        (medicine['medicine_id'] ?? medicine['id'] ?? medicine['name'])
-            .toString();
-    final idHash = keyString.hashCode;
-    final index = (idHash & 0x7fffffff) % colors.length; // ensure non-negative
-    final color = colors[index];
+    final color = colors[medicine['id'] % colors.length];
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -454,8 +482,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontSize: 16,
                     color: AppColors.darkBlue,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -464,8 +490,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontSize: 12,
                     color: AppColors.darkBlue.withOpacity(0.6),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -493,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const Spacer(),
                     Text(
-                      '\$${medicine['price'].toStringAsFixed(2)}',
+                      "\$${medicine['price']}",
                       style: AppText.bold.copyWith(
                         fontSize: 16,
                         color: AppColors.primary,
