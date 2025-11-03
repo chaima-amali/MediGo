@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-// Bottom nav is provided by the main scaffold; remove local import to avoid duplicate navbars
 import 'medicine_calendar.dart';
-// statistics and edit pages are no longer navigated to from here; we use
-// embedded subviews to keep the root bottom nav visible.
 import 'add_medicine_page.dart';
 import 'statistics_page.dart';
 import 'edit_page.dart';
+import 'notifications.dart'; // ✅ Added import
 
 class TrackingPage extends StatefulWidget {
   const TrackingPage({super.key});
@@ -19,8 +17,7 @@ class TrackingPage extends StatefulWidget {
 
 class _TrackingPageState extends State<TrackingPage> {
   int _selectedDateIndex = 16;
-  // Active subview inside the tracking tab: 'tracking'|'statistics'|'edit'
-  String _activeSub = 'tracking';
+  String _activeSub = 'tracking'; // tracking | statistics | edit
 
   final List<Map<String, dynamic>> morningMeds = [
     {
@@ -62,17 +59,21 @@ class _TrackingPageState extends State<TrackingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
-        onPressed: () {
-          // ✅ Navigate to AddMedicinePage
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddMedicinePage()),
-          );
-        },
-        child: const Icon(Icons.add, size: 32, color: Colors.white),
-      ),
+
+      // ✅ Only show the + button in Tracking view
+      floatingActionButton: _activeSub == 'tracking'
+          ? FloatingActionButton(
+              backgroundColor: AppColors.primary,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddMedicinePage()),
+                );
+              },
+              child: const Icon(Icons.add, size: 32, color: Colors.white),
+            )
+          : null,
+
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -101,7 +102,7 @@ class _TrackingPageState extends State<TrackingPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Month + Calendar
+                  // Month + Calendar icon
                   Row(
                     children: [
                       const Text(
@@ -152,52 +153,41 @@ class _TrackingPageState extends State<TrackingPage> {
                   _buildDateRow(),
                   const SizedBox(height: 15),
 
+                  // Tabs: Tracking | Statistics | Edit
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildButton(
                         "Tracking",
                         isPrimary: _activeSub == 'tracking',
-                        onTap: () {
-                          setState(() => _activeSub = 'tracking');
-                        },
+                        onTap: () => setState(() => _activeSub = 'tracking'),
                       ),
                       _buildButton(
                         "Statistics",
                         isPrimary: _activeSub == 'statistics',
-                        onTap: () {
-                          // Switch the tracking tab internal view to statistics so the
-                          // root bottom nav remains visible and functional.
-                          setState(() => _activeSub = 'statistics');
-                        },
+                        onTap: () => setState(() => _activeSub = 'statistics'),
                       ),
                       _buildButton(
                         "Edit",
                         isPrimary: _activeSub == 'edit',
-                        onTap: () {
-                          setState(() => _activeSub = 'edit');
-                        },
+                        onTap: () => setState(() => _activeSub = 'edit'),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 25),
 
-                  // Show either the tracking content or an embedded mini-view for
-                  // statistics/edit so we don't navigate away (keeps bottom nav visible).
+                  // ✅ Content switching
                   if (_activeSub == 'tracking') ...[
                     _buildMedicineSection("8:00 am Morning", morningMeds),
                     const SizedBox(height: 25),
                     _buildMedicineSection("2:00 pm Evening", eveningMeds),
                   ] else if (_activeSub == 'statistics') ...[
-                    // Embed the statistics content (no Scaffold) so the root
-                    // scaffold and bottom nav stay active and layout correctly.
                     const StatisticsContent(),
                   ] else if (_activeSub == 'edit') ...[
-                    // Embed the edit content (no Scaffold) for the same reason.
                     const EditContent(),
                   ],
 
-                  // ✅ Extra scroll space
                   const SizedBox(height: 120),
                 ],
               ),
@@ -207,6 +197,8 @@ class _TrackingPageState extends State<TrackingPage> {
       ),
     );
   }
+
+  // ---------------- UI Helper Widgets ----------------
 
   Widget _buildHeader() {
     return Row(
@@ -226,33 +218,42 @@ class _TrackingPageState extends State<TrackingPage> {
             Image.asset('assets/images/logo_medicine.png', height: 38),
           ],
         ),
-        Stack(
-          children: [
-            Container(
-              height: 38,
-              width: 38,
-              decoration: BoxDecoration(
-                color: AppColors.lightBlue,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.notifications_none,
-                color: AppColors.primary,
-              ),
-            ),
-            Positioned(
-              right: 10,
-              top: 10,
-              child: Container(
-                height: 8,
-                width: 8,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
+        // ✅ Notification icon now leads to notifications.dart
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationsPage()),
+            );
+          },
+          child: Stack(
+            children: [
+              Container(
+                height: 38,
+                width: 38,
+                decoration: BoxDecoration(
+                  color: AppColors.lightBlue,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.notifications_none,
+                  color: AppColors.primary,
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                right: 10,
+                top: 10,
+                child: Container(
+                  height: 8,
+                  width: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -343,7 +344,6 @@ class _TrackingPageState extends State<TrackingPage> {
                               const SizedBox(height: 3),
                               Align(
                                 alignment: Alignment.centerRight,
-                                // ✅ Toggle check icon on tap
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
