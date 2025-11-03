@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'Search_results_page.dart';
 import 'notifications.dart' as notif_page;
 import 'tracking_page.dart';
@@ -9,6 +10,11 @@ import '../services/navigation_helper.dart' as nav_helper;
 import '../widgets/Bottom_Navbar.dart';
 import 'pharmacy_details_screen.dart';
 import 'reservations_form.dart';
+=======
+import 'package:frontend/screens/reservation.dart';
+import 'package:frontend/screens/notifications.dart';
+
+>>>>>>> 354fa15 (Save my current work before rebase)
 
 void main() {
   runApp(const MediGoApp());
@@ -396,6 +402,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
 
           // Pre Order Button (only if in stock)
+<<<<<<< HEAD
           if (data['in_stock']) ...[
             const SizedBox(height: 16),
             SizedBox(
@@ -436,6 +443,40 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ],
+=======
+         if (data['in_stock']) ...[
+  const SizedBox(height: 16),
+  SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReserveMedicinePage(),
+          ),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.lightBlue,
+        foregroundColor: AppColors.primary,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+      ),
+      child: const Text(
+        'Pre Order',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      ),
+    ),
+  ),
+],
+>>>>>>> 354fa15 (Save my current work before rebase)
         ],
       ),
     );
@@ -480,6 +521,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                   GestureDetector(
+<<<<<<< HEAD
                     onTap: () {
                       Navigator.push(
                         context,
@@ -517,6 +559,45 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+=======
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NotificationsPage(),
+      ),
+    );
+  },
+  child: Container(
+    padding: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      color: AppColors.lightBlue.withOpacity(0.5),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Stack(
+      children: [
+        Icon(
+          Icons.notifications_outlined,
+          color: AppColors.primary,
+          size: 24,
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+>>>>>>> 354fa15 (Save my current work before rebase)
                 ],
               ),
               const SizedBox(height: 24),
@@ -666,6 +747,7 @@ class HomeScreen extends StatelessWidget {
                       '0.8km',
                       '4.7',
                       '1222 reviews',
+                       imagePath: 'assets/images/pharmacy1.jpg',
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -676,6 +758,7 @@ class HomeScreen extends StatelessWidget {
                       '0.8km',
                       '4.7',
                       '1222 reviews',
+                      imagePath: 'assets/images/pharmacy1.jpg',
                     ),
                   ),
                 ],
@@ -687,6 +770,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD
   Widget _buildNearbyPharmacyCard(
     BuildContext context,
     String name,
@@ -733,6 +817,72 @@ class HomeScreen extends StatelessWidget {
                   child: Icon(
                     Icons.local_pharmacy,
                     size: 50,
+=======
+  Widget _buildPharmacyCard(
+  String name,
+  String distance,
+  String rating,
+  String reviews,
+  {String? imagePath} // Add this optional parameter
+) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+         ClipRRect(
+  borderRadius: BorderRadius.circular(12),
+  child: Container(
+    height: 100,
+    width: double.infinity,
+    color: AppColors.lightBlue.withOpacity(0.3),
+    child: imagePath != null
+        ? Image.asset(
+            imagePath,
+            fit: BoxFit.cover,
+          )
+        : Center(
+            child: Icon(
+              Icons.local_pharmacy,
+              size: 50,
+              color: AppColors.primary,
+            ),
+          ),
+  ),
+),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.lightBlue.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  distance,
+                  style: const TextStyle(
+                    fontSize: 10,
+>>>>>>> 354fa15 (Save my current work before rebase)
                     color: AppColors.primary,
                   ),
                 ),
