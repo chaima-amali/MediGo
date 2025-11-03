@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ReservationComplete extends StatelessWidget {
-  const ReservationComplete
-({Key? key}) : super(key: key);
+  const ReservationComplete({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,7 @@ class ReservationComplete extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -34,11 +33,15 @@ class ReservationComplete extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Reservation Details',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: Text(
+                            'Reservation Details',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
                         Container(
@@ -61,9 +64,9 @@ class ReservationComplete extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     SizedBox(height: 20),
-                    
+
                     // Medicine Card
                     Container(
                       padding: EdgeInsets.all(16),
@@ -119,9 +122,9 @@ class ReservationComplete extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: 20),
-                    
+
                     // Pickup Information Card
                     Container(
                       padding: EdgeInsets.all(16),
@@ -140,7 +143,11 @@ class ReservationComplete extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.calendar_today, size: 20, color: Colors.grey),
+                              Icon(
+                                Icons.calendar_today,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
                               SizedBox(width: 12),
                               Expanded(
                                 child: Column(
@@ -148,12 +155,18 @@ class ReservationComplete extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Pickup Date',
-                                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                     SizedBox(height: 4),
                                     Text(
                                       'samedi 1 novembre 2025',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -163,7 +176,11 @@ class ReservationComplete extends StatelessWidget {
                           SizedBox(height: 16),
                           Row(
                             children: [
-                              Icon(Icons.access_time, size: 20, color: Colors.grey),
+                              Icon(
+                                Icons.access_time,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
                               SizedBox(width: 12),
                               Expanded(
                                 child: Column(
@@ -171,12 +188,18 @@ class ReservationComplete extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Pickup Time',
-                                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                     SizedBox(height: 4),
                                     Text(
                                       '10:10',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -186,9 +209,9 @@ class ReservationComplete extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: 20),
-                    
+
                     // Pharmacy Information
                     Text(
                       'Pharmacy Information',
@@ -197,9 +220,9 @@ class ReservationComplete extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    
+
                     SizedBox(height: 12),
-                    
+
                     Container(
                       padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -218,23 +241,34 @@ class ReservationComplete extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'HealthCare Plus',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                              Expanded(
+                                child: Text(
+                                  'HealthCare Plus',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 '1.2km away',
-                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ],
                           ),
                           SizedBox(height: 16),
                           Row(
                             children: [
-                              Icon(Icons.location_on_outlined, size: 20, color: Colors.grey),
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
                               SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -247,12 +281,19 @@ class ReservationComplete extends StatelessWidget {
                           SizedBox(height: 12),
                           Row(
                             children: [
-                              Icon(Icons.phone_outlined, size: 20, color: Colors.grey),
+                              Icon(
+                                Icons.phone_outlined,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
                               SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   '+93 555 768 012',
-                                  style: TextStyle(fontSize: 14, color: Color(0xFF00BCD4)),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF00BCD4),
+                                  ),
                                 ),
                               ),
                             ],
@@ -260,7 +301,11 @@ class ReservationComplete extends StatelessWidget {
                           SizedBox(height: 12),
                           Row(
                             children: [
-                              Icon(Icons.access_time_outlined, size: 20, color: Colors.grey),
+                              Icon(
+                                Icons.access_time_outlined,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
                               SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -273,9 +318,9 @@ class ReservationComplete extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: 20),
-                    
+
                     // Completed Status Card
                     Container(
                       padding: EdgeInsets.all(16),
@@ -313,7 +358,7 @@ class ReservationComplete extends StatelessWidget {
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  'You\'ve successfully picked up this medicine.\nThank you for using MediGo!',
+                                  'Picked up successfully.',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Color(0xFF1976D2),
@@ -325,9 +370,9 @@ class ReservationComplete extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: 20),
-                    
+
                     // Reservation Details
                     Container(
                       padding: EdgeInsets.all(16),
@@ -349,7 +394,10 @@ class ReservationComplete extends StatelessWidget {
                             children: [
                               Text(
                                 'Reservation ID',
-                                style: TextStyle(fontSize: 13, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                ),
                               ),
                               Text(
                                 '1761667440166',
@@ -363,7 +411,10 @@ class ReservationComplete extends StatelessWidget {
                             children: [
                               Text(
                                 'Created',
-                                style: TextStyle(fontSize: 13, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                ),
                               ),
                               Text(
                                 '28/10/2025 17:12:20',

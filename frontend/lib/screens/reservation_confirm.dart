@@ -125,10 +125,7 @@ class ReservationDetailsPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBlue.withOpacity(0.3),
-              Colors.white,
-            ],
+            colors: [AppColors.lightBlue.withOpacity(0.3), Colors.white],
           ),
         ),
         child: SafeArea(
@@ -209,7 +206,7 @@ class ReservationDetailsPage extends StatelessWidget {
                                 ),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Pickup Verification Code',
+                                  'Pickup Code',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
@@ -268,7 +265,7 @@ class ReservationDetailsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Present this code at the\npharmacy when collecting your\norder',
+                              'Show this code at pickup.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
@@ -342,7 +339,8 @@ class ReservationDetailsPage extends StatelessWidget {
                       _buildInfoCard(
                         icon: Icons.watch_later,
                         title: 'Ready for Pickup',
-                        subtitle: 'Your medicine will be ready around 1\nhour before the selected pickup time',
+                        subtitle:
+                            'Your medicine will be ready around 1\nhour before the selected pickup time',
                         color: AppColors.green,
                       ),
                       const SizedBox(height: 24),
@@ -387,7 +385,10 @@ class ReservationDetailsPage extends StatelessWidget {
                           ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.primary,
-                            side: BorderSide(color: AppColors.primary, width: 2),
+                            side: BorderSide(
+                              color: AppColors.primary,
+                              width: 2,
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -552,10 +553,7 @@ class ReservationDetailsPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textLight,
-                    ),
+                    style: TextStyle(fontSize: 12, color: AppColors.textLight),
                   ),
                 ],
               ],

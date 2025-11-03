@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
-import 'home_screen.dart';
+import 'Home_page.dart';
+import '../services/mock_database_service.dart';
 
 class SignUpScreen2 extends StatefulWidget {
   final String name;
@@ -50,12 +51,18 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
         return;
       }
 
-      // Navigate to home
+      // Add the new user to the mock service and make them the current user.
+      MockDataService.addUser(
+        fullName: widget.name,
+        email: widget.email,
+        phone: widget.phone,
+      );
+
+      // Navigate to the app's main screen so Home and Profile are wired to the
+      // same (mock) current user.
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(userName: widget.name),
-        ),
+        MaterialPageRoute(builder: (context) =>  MainScreen()),
       );
     }
   }

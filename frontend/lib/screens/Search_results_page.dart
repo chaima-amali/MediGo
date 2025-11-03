@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'notifications.dart' as notif_page;
 import '../services/mock_database_service.dart';
 import '../theme/app_colors.dart';
+import 'pharmacy_details_screen.dart';
+import 'reservations_form.dart';
+import 'reservation_details.dart';
 
 class SearchMedicineScreen extends StatefulWidget {
   @override
@@ -37,7 +41,14 @@ class _SearchMedicineScreenState extends State<SearchMedicineScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.notifications_outlined),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const notif_page.NotificationsPage(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -100,29 +111,81 @@ class SearchResultCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                pharmacy['name'],
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: inStock ? Color(0xFFE8F5E9) : Color(0xFFFFEBEE),
-                  borderRadius: BorderRadius.circular(12),
+          GestureDetector(
+            onTap: () {
+              final pid =
+                  pharmacy['pharmacy_id'] ?? pharmacy['pharmacyId'] ?? '';
+
+              // If the current user already has a reservation at this pharmacy,
+              // open the reservation details. Otherwise show the pharmacy page.
+              if (pid.isNotEmpty) {
+                try {
+                  final userReservations =
+                      MockDataService.getUserReservations();
+                  final match = userReservations.firstWhere(
+                    (r) => (r['pharmacy_id'] ?? '') == pid,
+                    orElse: () => {},
+                  );
+                  if (match.isNotEmpty) {
+                    // Open reservation details for the found reservation
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReservationDetailsScreen(
+                          reservationId: match['reservation_id'],
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                } catch (_) {
+                  // fall through to show pharmacy details
+                }
+
+                final details = MockDataService.getPharmacyDetails(pid);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PharmacyDetailScreen(pharmacy: details ?? pharmacy),
+                  ),
+                );
+                return;
+              }
+
+              // No pharmacy id available — fallback to details with the raw map
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PharmacyDetailScreen(pharmacy: pharmacy),
                 ),
-                child: Text(
-                  inStock ? 'In stock' : 'Out of stock',
-                  style: TextStyle(
-                    color: inStock ? AppColors.inStock : AppColors.outOfStock,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  pharmacy['name'] ?? '',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: inStock ? Color(0xFFE8F5E9) : Color(0xFFFFEBEE),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    inStock ? 'In stock' : 'Out of stock',
+                    style: TextStyle(
+                      color: inStock ? AppColors.inStock : AppColors.outOfStock,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           SizedBox(height: 8),
           Row(
@@ -147,34 +210,42 @@ class SearchResultCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 12),
-          if (inStock)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Navigate to ReservationFormScreen when created
+          // Always offer the Pre Order button (so users can open the reservation
+          // form even when an item is temporarily out of stock). The form will
+          // handle validation/availability as needed.
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                final pid =
+                    pharmacy['pharmacy_id'] ?? pharmacy['pharmacyId'] ?? '';
+                final pname =
+                    pharmacy['name'] ?? pharmacy['pharmacy_name'] ?? '';
+                if (pid.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Reservation feature coming soon!')),
+                    SnackBar(content: Text('Pharmacy identifier missing')),
                   );
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => ReservationFormScreen(
-                  //       pharmacyId: pharmacy['pharmacy_id'],
-                  //       pharmacyName: pharmacy['name'],
-                  //     ),
-                  //   ),
-                  // );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  return;
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReservationFormScreen(
+                      pharmacyId: pid,
+                      pharmacyName: pname,
+                    ),
                   ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text('Pre Order'),
               ),
+              child: Text('Pre Order'),
             ),
+          ),
         ],
       ),
     );
