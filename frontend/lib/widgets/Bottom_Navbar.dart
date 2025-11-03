@@ -14,14 +14,15 @@ class CustomBottomNavBar extends StatelessWidget {
     required this.onTap,
   });
 
-  bool _isCalendarActive(BuildContext context) {
-    return context.findAncestorWidgetOfExactType<TrackingPage>() != null ||
-        context.findAncestorWidgetOfExactType<EditPage>() != null ||
-        context.findAncestorWidgetOfExactType<StatisticsPage>() != null;
-  }
-
   @override
   Widget build(BuildContext context) {
+    // determine if we're inside the tracking-related pages (so calendar icon stays active)
+    bool _isCalendarActive(BuildContext ctx) {
+      return ctx.findAncestorWidgetOfExactType<TrackingPage>() != null ||
+          ctx.findAncestorWidgetOfExactType<EditPage>() != null ||
+          ctx.findAncestorWidgetOfExactType<StatisticsPage>() != null;
+    }
+
     final bool isCalendarActive = _isCalendarActive(context);
 
     return Container(
@@ -81,20 +82,12 @@ class CustomBottomNavBar extends StatelessWidget {
     bool isCalendar = false,
     bool isCalendarActive = false,
   }) {
-    final isActive = isCalendar
-        ? isCalendarActive
-        : (currentIndex == index);
+    final isActive = isCalendar ? isCalendarActive : (currentIndex == index);
 
     return GestureDetector(
       onTap: () {
-        if (isCalendar) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const TrackingPage()),
-          );
-        } else {
-          onTap(index);
-        }
+        // Use the provided callback to switch tabs in the MainScreen.
+        onTap(index);
       },
       behavior: HitTestBehavior.opaque,
       child: Container(

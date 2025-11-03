@@ -10,6 +10,10 @@ class AppColors {
   // Medicine card colors (from your design)
   static const Color yellowCard = Color(0xFFFFF4D6);
   static const Color pinkCard = Color(0xFFFFE5E5);
+  // legacy pink used by Home_page (kept for backwards compatibility)
+  static const Color pink = Color(0xFFFFB6C1);
+  // Home reminder box custom color requested: #DAA3B5
+  static const Color reminderBox = Color(0xFFDAA3B5);
   static const Color blueCard = Color(0xFFD6F5F5);
   static const Color coralCard = Color(0xFFFFDDD6);
   static const Color lavenderCard = Color(0xFFE5E5FF);

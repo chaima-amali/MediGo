@@ -1,13 +1,97 @@
 class MockDataService {
   // Current logged-in user (change this to switch users)
-  static const String currentUserId = "user_001"; // Serine
-  // static const String currentUserId = "user_002"; // Mohamed
+  // Made mutable so login/signup pages can change the active user at runtime.
+  //static String currentUserId = "user_001"; // serine
+  //static String currentUserId = "user_002"; // Mohamed
+  // Default demo user with existing reservations so My Reservations shows data
+  static String currentUserId = "user_001"; // serine
+
+  // Mutable in-memory users list so we can add new users during sign up in the demo.
+  static final List<Map<String, dynamic>> _users = [
+    {
+      "user_id": "user_001",
+      "full_name": "Serine Naas",
+      "email": "serine.naas@email.com",
+      "phone_number": "+213794691377",
+      "date_of_birth": "1995-03-15",
+      "gender": "Female",
+      "subscription_type": "free",
+      "profile_image_url": "https://i.pravatar.cc/150?img=1",
+    },
+    {
+      "user_id": "user_002",
+      "full_name": "Mohamed Kecir",
+      "email": "mohamed.kecir@email.com",
+      "phone_number": "+213798543072",
+      "date_of_birth": "2005-01-08",
+      "gender": "Male",
+      "address": "123 sidi abdellah, Algiers",
+      "subscription_type": "free",
+      "profile_image_url": "https://i.pravatar.cc/150?img=1",
+    },
+    {
+      "user_id": "user_003",
+      "full_name": "Chaima Amali",
+      "email": "chaima.amali@email.com",
+      "phone_number": "+213798543073",
+      "date_of_birth": "2005-06-15",
+      "gender": " Female",
+      "address": "akbou, bejaia",
+      "subscription_type": "free",
+      "profile_image_url": "https://i.pravatar.cc/150?img=1",
+    },
+  ];
+
+  /// Set the current active user id (used after login/signup in the demo).
+  static void setCurrentUserId(String id) => currentUserId = id;
+
+  /// Try to login by email. Returns true if a matching user was found and activated.
+  static bool loginWithEmail(String email) {
+    try {
+      final user = _users.firstWhere((u) => u['email'] == email);
+      currentUserId = user['user_id'];
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Add a new user to the in-memory store and make them the current user.
+  /// Returns the new user id.
+  static String addUser({
+    required String fullName,
+    required String email,
+    String? phone,
+  }) {
+    final newId = 'user_${(_users.length + 1).toString().padLeft(3, '0')}';
+    final user = {
+      'user_id': newId,
+      'full_name': fullName,
+      'email': email,
+      'phone_number': phone ?? '',
+      'date_of_birth': null,
+      'gender': null,
+      'subscription_type': 'free',
+      'profile_image_url': null,
+    };
+    _users.add(user);
+    currentUserId = newId;
+    return newId;
+  }
 
   // ==================== USER METHODS ====================
 
   static Map<String, dynamic> getCurrentUser() {
-    final users = _getAllUsers();
-    return users.firstWhere((user) => user['user_id'] == currentUserId);
+    // Prefer the mutable in-memory users list (used by login/signup). Fall
+    // back to the static `_getAllUsers()` if the in-memory list is empty.
+    final users = _users.isNotEmpty ? _users : _getAllUsers();
+    try {
+      return users.firstWhere((user) => user['user_id'] == currentUserId);
+    } catch (e) {
+      // If for some reason the currentUserId isn't present, return the first
+      // user as a safe fallback to avoid throwing a StateError in the UI.
+      return users.first;
+    }
   }
 
   static String getUserFirstName() {
@@ -147,22 +231,41 @@ class MockDataService {
   static List<Map<String, dynamic>> searchMedicineInPharmacies(
     String medicineName,
   ) {
-    final medicines = _getAllMedicines();
-    final medicine = medicines.firstWhere(
-      (m) => m['name'].toString().toLowerCase() == medicineName.toLowerCase(),
-      orElse: () => {},
-    );
+    final q = medicineName.trim().toLowerCase();
+    if (q.isEmpty) return [];
 
-    if (medicine.isEmpty) return [];
+    final medicines = _getAllMedicines();
+
+    // Match medicines where the name or generic_name contains the query
+    final matched = medicines.where((m) {
+      final name = (m['name'] ?? '').toString().toLowerCase();
+      final generic = (m['generic_name'] ?? '').toString().toLowerCase();
+      return name.contains(q) || generic.contains(q) || name == q;
+    }).toList();
+
+    if (matched.isEmpty) {
+      // Try a fuzzy startsWith match as a last resort
+      final starts = medicines.where((m) {
+        final name = (m['name'] ?? '').toString().toLowerCase();
+        return name.startsWith(q);
+      }).toList();
+      matched.addAll(starts);
+    }
+
+    if (matched.isEmpty) return [];
 
     final inventory = _getAllInventory();
     final pharmacies = _getAllPharmacies();
 
+    // Collect pharmacies that stock any of the matched medicine ids
+    final matchedIds = matched.map((m) => m['medicine_id']).toSet();
+
     return inventory
-        .where((inv) => inv['medicine_id'] == medicine['medicine_id'])
+        .where((inv) => matchedIds.contains(inv['medicine_id']))
         .map((inv) {
           final pharmacy = pharmacies.firstWhere(
             (p) => p['pharmacy_id'] == inv['pharmacy_id'],
+            orElse: () => {},
           );
 
           return {
@@ -174,6 +277,7 @@ class MockDataService {
             'full_address': pharmacy['address'],
           };
         })
+        .where((p) => p.isNotEmpty)
         .toList();
   }
 
@@ -203,9 +307,56 @@ class MockDataService {
   }
 
   static List<Map<String, dynamic>> getUserReservations({String? status}) {
-    final reservations = _getAllReservations()
+    // Debug: print current user and reservations filter result count
+    final all = _getAllReservations();
+    final reservations = all
         .where((r) => r['user_id'] == currentUserId)
         .toList();
+    try {
+      // Print small debug info to the console to aid troubleshooting in development
+      // (this is harmless in production but can be removed later)
+      // ignore: avoid_print
+      print(
+        'MockDataService.getUserReservations -> currentUserId=$currentUserId, found=${reservations.length}',
+      );
+    } catch (e) {
+      // ignore any logging error
+    }
+
+    // If no reservations exist for the active user, synthesize demo copies from
+    // the primary demo user's reservations so the UI shows sample data during development.
+    if (reservations.isEmpty) {
+      try {
+        final samples = all.where((r) => r['user_id'] == 'user_001').toList();
+        if (samples.isNotEmpty) {
+          final List<Map<String, dynamic>> clones = [];
+          for (var s in samples) {
+            final Map<String, dynamic> copy = Map<String, dynamic>.from(s);
+            // Generate a unique reservation id for the synthesized copy so it
+            // doesn't collide with the static dataset. Also update the user id
+            // and reservation code so the demo entry looks distinct.
+            final synthId = '${s['reservation_id']}_synth_${currentUserId}';
+            copy['reservation_id'] = synthId;
+            copy['reservation_code'] =
+                '${s['reservation_code']}_S${currentUserId.substring(currentUserId.length - 3)}';
+            copy['user_id'] = currentUserId;
+            clones.add(copy);
+          }
+          // ignore: avoid_print
+          print(
+            'MockDataService.getUserReservations -> synthesized ${clones.length} demo reservations for $currentUserId',
+          );
+          // Store synthesized clones so other lookups can find them by id.
+          _synthesizedReservations = clones;
+          if (status != null) {
+            return clones.where((r) => r['status'] == status).toList();
+          }
+          return clones;
+        }
+      } catch (e) {
+        // fall through and return empty
+      }
+    }
 
     if (status != null) {
       return reservations.where((r) => r['status'] == status).toList();
@@ -214,14 +365,34 @@ class MockDataService {
     return reservations;
   }
 
+  // In-memory store for synthesized reservations created at runtime so they
+  // can be looked up by id from other APIs (e.g., getReservationDetails).
+  static List<Map<String, dynamic>> _synthesizedReservations = [];
+
   static Map<String, dynamic>? getReservationDetails(String reservationId) {
+    // First check runtime synthesized reservations (they should have unique ids)
+    try {
+      final synthesized = _synthesizedReservations.firstWhere(
+        (r) => r['reservation_id'] == reservationId,
+      );
+      return synthesized;
+    } catch (_) {
+      // Not synthesized; check global static reservations
+    }
+
     final reservations = _getAllReservations();
     try {
       return reservations.firstWhere(
         (r) => r['reservation_id'] == reservationId,
       );
     } catch (e) {
-      return null;
+      // Not found in the global list: try the user-specific list as a last resort
+      try {
+        final userList = getUserReservations();
+        return userList.firstWhere((r) => r['reservation_id'] == reservationId);
+      } catch (e2) {
+        return null;
+      }
     }
   }
 
@@ -725,6 +896,47 @@ class MockDataService {
         "status": "cancelled",
       },
 
+      // Example reservations for demo user (user_003) so the UI shows content
+      {
+        "reservation_id": "res_u3_001",
+        "reservation_code": "U3001",
+        "user_id": "user_003",
+        "pharmacy_id": "pharm_001",
+        "pharmacy_name": "PharmSync",
+        "medicine_name": "Cetirizine",
+        "dosage": "10mg",
+        "quantity": 1,
+        "pickup_date": "2025-11-04",
+        "pickup_time": "10:00",
+        "status": "pending",
+      },
+      {
+        "reservation_id": "res_u3_002",
+        "reservation_code": "U3002",
+        "user_id": "user_003",
+        "pharmacy_id": "pharm_002",
+        "pharmacy_name": "PharmSync Branch",
+        "medicine_name": "Vitamin C",
+        "dosage": "500mg",
+        "quantity": 2,
+        "pickup_date": "2025-10-28",
+        "pickup_time": "14:30",
+        "status": "completed",
+      },
+      {
+        "reservation_id": "res_u3_003",
+        "reservation_code": "U3003",
+        "user_id": "user_003",
+        "pharmacy_id": "pharm_001",
+        "pharmacy_name": "PharmSync",
+        "medicine_name": "Aspirin",
+        "dosage": "100mg",
+        "quantity": 1,
+        "pickup_date": "2025-10-18",
+        "pickup_time": "09:00",
+        "status": "cancelled",
+      },
+
       {
         "reservation_id": "res_001",
         "reservation_code": "831701",
@@ -750,6 +962,20 @@ class MockDataService {
         "pickup_date": "2025-11-15",
         "pickup_time": "11:11",
         "status": "pending",
+      },
+      // Additional sample reservation for user_002 to match user_001 count
+      {
+        "reservation_id": "res_u2_003",
+        "reservation_code": "U2003",
+        "user_id": "user_002",
+        "pharmacy_id": "pharm_002",
+        "pharmacy_name": "PharmSync Branch",
+        "medicine_name": "Amoxicillin",
+        "dosage": "250mg",
+        "quantity": 2,
+        "pickup_date": "2025-10-22",
+        "pickup_time": "15:30",
+        "status": "cancelled",
       },
     ];
   }

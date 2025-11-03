@@ -145,15 +145,20 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                     // Total reservations
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '$totalReservations total reservations',
-                          style: AppText.regular.copyWith(
-                            fontSize: 14,
-                            color: AppColors.darkBlue.withOpacity(0.6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '$totalReservations total reservations',
+                              style: AppText.regular.copyWith(
+                                fontSize: 14,
+                                color: AppColors.darkBlue.withOpacity(0.6),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 12),

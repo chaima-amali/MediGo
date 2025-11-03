@@ -3,14 +3,14 @@ import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import '../services/mock_database_service.dart';
 import '../widgets/back_arrow.dart';
+import 'reservation_confirm.dart' show ReservationDetailsPage;
+import 'reservation_complete.dart' show ReservationComplete;
 
 class ReservationDetailsScreen extends StatefulWidget {
   final String reservationId;
 
-  const ReservationDetailsScreen({
-    Key? key,
-    required this.reservationId,
-  }) : super(key: key);
+  const ReservationDetailsScreen({Key? key, required this.reservationId})
+    : super(key: key);
 
   @override
   State<ReservationDetailsScreen> createState() =>
@@ -30,16 +30,49 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
 
   void _loadReservationData() {
     // Get reservation details
-    reservationData = MockDataService.getReservationDetails(widget.reservationId);
-    
+    reservationData = MockDataService.getReservationDetails(
+      widget.reservationId,
+    );
+
     if (reservationData != null) {
       // Get pharmacy details
-      pharmacyData = MockDataService.getPharmacyDetails(reservationData!['pharmacy_id']);
+      pharmacyData = MockDataService.getPharmacyDetails(
+        reservationData!['pharmacy_id'],
+      );
     }
-    
+
     setState(() {
       isLoading = false;
     });
+
+    // If the reservation is a confirmed/completed type, navigate to the
+    // dedicated page so the correct UI is shown (avoid overlapping pending UI).
+    if (reservationData != null) {
+      final status = (reservationData!['status'] ?? '').toString();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (status == 'confirmed') {
+          // Open the confirm-style page and replace this route.
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ReservationDetailsPage(
+                medicineName: reservationData!['medicine_name'] ?? 'Medicine',
+                pharmacyName: pharmacyData?['name'] ?? 'Pharmacy',
+                address: pharmacyData?['address'] ?? '',
+                distance: '${pharmacyData?['distance_km'] ?? 0.0}km',
+                phone: pharmacyData?['phone_number'] ?? '',
+                price: 0.0,
+              ),
+            ),
+          );
+        } else if (status == 'completed') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const ReservationComplete()),
+          );
+        }
+      });
+    }
   }
 
   void _showCancelDialog() {
@@ -77,14 +110,16 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                     onPressed: () {
                       // Close dialog and update status
                       Navigator.pop(context);
-                      
+
                       setState(() {
                         reservationData!['status'] = 'cancelled';
                       });
-                      
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text('Reservation cancelled successfully'),
+                          content: const Text(
+                            'Reservation cancelled successfully',
+                          ),
                           backgroundColor: AppColors.error,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
@@ -142,13 +177,8 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
     if (isLoading) {
       return Scaffold(
         backgroundColor: const Color(0xFFEBF8F9),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -165,8 +195,11 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new,
-                  color: AppColors.darkBlue, size: 20),
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: AppColors.darkBlue,
+                size: 20,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -187,9 +220,11 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
       );
     }
 
-    final String status = reservationData!['status'];
+    final String status = (reservationData!['status'] ?? '').toString();
     final bool isPending = status == 'pending';
     final bool isCancelled = status == 'cancelled';
+    final bool isCompleted = status == 'completed';
+    final bool isConfirmed = status == 'confirmed';
 
     // Extract data
     final String medicineName = reservationData!['medicine_name'] ?? 'Unknown';
@@ -198,7 +233,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
     final String pickupDate = reservationData!['pickup_date'] ?? '';
     final String pickupTime = reservationData!['pickup_time'] ?? '';
     final String reservationCode = reservationData!['reservation_code'] ?? '';
-    
+
     // Pharmacy data
     final String pharmacyName = pharmacyData?['name'] ?? 'Unknown Pharmacy';
     final double distanceKm = pharmacyData?['distance_km'] ?? 0.0;
@@ -214,11 +249,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
             // Custom AppBar
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                 CustomBackArrow(),
-                ],
-              ),
+              child: Row(children: [CustomBackArrow()]),
             ),
             // Content
             Expanded(
@@ -232,26 +263,62 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Reservation Details',
-                          style: AppText.bold.copyWith(fontSize: 22),
+                        // Use Flexible to avoid overflow on narrow screens
+                        Flexible(
+                          child: Text(
+                            'Reservation Details',
+                            style: AppText.bold.copyWith(fontSize: 20),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: isCancelled 
-                                ? const Color(0xFFFFE5E5) 
+                            color: isCancelled
+                                ? const Color(0xFFFFE5E5)
                                 : const Color(0xFFFFF4D6),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(
-                            isCancelled ? 'cancelled' : 'pending',
-                            style: AppText.medium.copyWith(
-                              fontSize: 12,
-                              color: isCancelled 
-                                  ? AppColors.error 
-                                  : const Color(0xFFFF9800),
-                            ),
+                          child: Builder(
+                            builder: (_) {
+                              String label = 'pending';
+                              Color textColor = const Color(0xFFFF9800);
+                              Color bg = const Color(0xFFFFF4D6);
+                              if (isCancelled) {
+                                label = 'cancelled';
+                                textColor = AppColors.error;
+                                bg = const Color(0xFFFFE5E5);
+                              } else if (isCompleted) {
+                                label = 'completed';
+                                textColor = Colors.blue;
+                                bg = const Color(0xFFE3F2FD);
+                              } else if (isConfirmed) {
+                                label = 'confirmed';
+                                textColor = AppColors.success;
+                                bg = const Color(0xFFD6F5F5);
+                              }
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: bg,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  label,
+                                  style: AppText.medium.copyWith(
+                                    fontSize: 12,
+                                    color: textColor,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -288,7 +355,9 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                   children: [
                                     Text(
                                       '$medicineName${dosage.isNotEmpty ? " $dosage" : ""}',
-                                      style: AppText.medium.copyWith(fontSize: 16),
+                                      style: AppText.medium.copyWith(
+                                        fontSize: 16,
+                                      ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -307,8 +376,11 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           // Pickup Date
                           Row(
                             children: [
-                              Icon(Icons.calendar_today_outlined, 
-                                  color: Colors.grey[600], size: 20),
+                              Icon(
+                                Icons.calendar_today_outlined,
+                                color: Colors.grey[600],
+                                size: 20,
+                              ),
                               const SizedBox(width: 12),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,7 +395,9 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                   const SizedBox(height: 2),
                                   Text(
                                     pickupDate,
-                                    style: AppText.medium.copyWith(fontSize: 14),
+                                    style: AppText.medium.copyWith(
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -333,8 +407,11 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           // Pickup Time
                           Row(
                             children: [
-                              Icon(Icons.access_time, 
-                                  color: Colors.grey[600], size: 20),
+                              Icon(
+                                Icons.access_time,
+                                color: Colors.grey[600],
+                                size: 20,
+                              ),
                               const SizedBox(width: 12),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +426,9 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                   const SizedBox(height: 2),
                                   Text(
                                     pickupTime,
-                                    style: AppText.medium.copyWith(fontSize: 14),
+                                    style: AppText.medium.copyWith(
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -378,10 +457,16 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                pharmacyName,
-                                style: AppText.medium.copyWith(fontSize: 15),
+                              // Wrap the pharmacy name so long names don't overflow
+                              Expanded(
+                                child: Text(
+                                  pharmacyName,
+                                  style: AppText.medium.copyWith(fontSize: 15),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 '${distanceKm}km away',
                                 style: AppText.regular.copyWith(
@@ -394,8 +479,11 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           const SizedBox(height: 16),
                           Row(
                             children: [
-                              Icon(Icons.location_on_outlined, 
-                                  color: Colors.grey[600], size: 18),
+                              Icon(
+                                Icons.location_on_outlined,
+                                color: Colors.grey[600],
+                                size: 18,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -408,14 +496,19 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              Icon(Icons.phone_outlined, 
-                                  color: Colors.grey[600], size: 18),
+                              Icon(
+                                Icons.phone_outlined,
+                                color: Colors.grey[600],
+                                size: 18,
+                              ),
                               const SizedBox(width: 12),
-                              Text(
-                                pharmacyPhone,
-                                style: AppText.regular.copyWith(
-                                  fontSize: 13,
-                                  color: AppColors.primary,
+                              Expanded(
+                                child: Text(
+                                  pharmacyPhone,
+                                  style: AppText.regular.copyWith(
+                                    fontSize: 13,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
                               ),
                             ],
@@ -423,8 +516,11 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              Icon(Icons.access_time_outlined, 
-                                  color: Colors.grey[600], size: 18),
+                              Icon(
+                                Icons.access_time_outlined,
+                                color: Colors.grey[600],
+                                size: 18,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -463,7 +559,9 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                 children: [
                                   Text(
                                     'Awaiting Confirmation',
-                                    style: AppText.medium.copyWith(fontSize: 14),
+                                    style: AppText.medium.copyWith(
+                                      fontSize: 14,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -493,7 +591,10 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                               ),
                             );
                           },
-                          icon: const Icon(Icons.location_on_outlined, size: 18),
+                          icon: const Icon(
+                            Icons.location_on_outlined,
+                            size: 18,
+                          ),
                           label: const Text('Get Directions'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,

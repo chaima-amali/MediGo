@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'notifications.dart' as notif_page;
+import 'pharmacy_details_screen.dart';
+import 'reservations_form.dart';
 
 // App Colors
 class AppColors {
@@ -96,6 +99,7 @@ class MockDatabase {
 
             results.add({
               'medicine_name': med['name'],
+              'pharmacy_id': pharmacy['pharmacy_id'],
               'pharmacy_name': pharmacy['name'],
               'address': pharmacy['address'],
               'distance': pharmacy['distance'],
@@ -144,10 +148,7 @@ class _SearchScreenState extends State<SearchScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBlue.withOpacity(0.3),
-              Colors.white,
-            ],
+            colors: [AppColors.lightBlue.withOpacity(0.3), Colors.white],
           ),
         ),
         child: SafeArea(
@@ -184,26 +185,37 @@ class _SearchScreenState extends State<SearchScreen> {
                         color: AppColors.lightBlue.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Stack(
-                        children: [
-                          Icon(
-                            Icons.notifications_outlined,
-                            color: AppColors.primary,
-                            size: 24,
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const notif_page.NotificationsPage(),
+                            ),
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            Icon(
+                              Icons.notifications_outlined,
+                              color: AppColors.primary,
+                              size: 24,
+                            ),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -308,37 +320,63 @@ class _SearchScreenState extends State<SearchScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Pharmacy Name and Stock Status
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                data['pharmacy_name'],
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textDark,
+          GestureDetector(
+            onTap: () {
+              // Open pharmacy detail page when the card header is tapped
+              final pid = data['pharmacy_id'] ?? '';
+              final pharmacyMap = {
+                'pharmacy_id': pid,
+                'name': data['pharmacy_name'],
+                'address': data['address'],
+                'distance_km': data['distance'],
+                'phone_number': data['phone'],
+              };
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PharmacyDetailScreen(pharmacy: pharmacyMap),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: data['in_stock'] 
-                      ? AppColors.green.withOpacity(0.3)
-                      : AppColors.red.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  data['in_stock'] ? 'In stock' : 'Out of stock',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: data['in_stock'] 
-                        ? Colors.green[700]
-                        : Colors.red[700],
+              );
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    data['pharmacy_name'] ?? '',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: data['in_stock']
+                        ? AppColors.green.withOpacity(0.3)
+                        : AppColors.red.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    data['in_stock'] ? 'In stock' : 'Out of stock',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: data['in_stock']
+                          ? Colors.green[700]
+                          : Colors.red[700],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
 
@@ -353,10 +391,7 @@ class _SearchScreenState extends State<SearchScreen> {
               const SizedBox(width: 8),
               Text(
                 '${data['distance']} ${data['address']}',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textLight,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.textLight),
               ),
             ],
           ),
@@ -365,11 +400,7 @@ class _SearchScreenState extends State<SearchScreen> {
           // Phone
           Row(
             children: [
-              Icon(
-                Icons.phone_outlined,
-                color: AppColors.primary,
-                size: 18,
-              ),
+              Icon(Icons.phone_outlined, color: AppColors.primary, size: 18),
               const SizedBox(width: 8),
               Text(
                 data['phone'],
@@ -389,7 +420,24 @@ class _SearchScreenState extends State<SearchScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle pre-order action
+                  // Open reservation form for this pharmacy
+                  final pid = data['pharmacy_id'] ?? '';
+                  final pname = data['pharmacy_name'] ?? '';
+                  if (pid.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Pharmacy id missing')),
+                    );
+                    return;
+                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ReservationFormScreen(
+                        pharmacyId: pid,
+                        pharmacyName: pname,
+                      ),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.lightBlue,
@@ -402,10 +450,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 child: const Text(
                   'Pre Order',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
             ),

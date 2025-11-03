@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'notifications.dart' as notif_page;
 import '../services/mock_database_service.dart';
 import '../theme/app_colors.dart';
 
@@ -22,7 +23,14 @@ class RemindersScreen extends StatelessWidget {
           actions: [
             IconButton(
               icon: Icon(Icons.notifications_outlined),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const notif_page.NotificationsPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),

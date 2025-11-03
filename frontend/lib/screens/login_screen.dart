@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import 'signup_screen1.dart';
-import 'home_screen.dart';
+import 'Home_page.dart';
 import '../services/mock_database_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,14 +20,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      // For demo purposes, accept any email/password and use mock data
-      final user = MockDataService.getCurrentUser();
+      // For demo: try to activate a user by email in the mock service.
+      final email = _emailController.text.trim();
+      final ok = MockDataService.loginWithEmail(email);
+      if (!ok) {
+        // No matching user in the mock DB — show a friendly message.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No account found for that email')),
+        );
+        return;
+      }
 
+      // Navigate to the app's main screen (keeps the bottom nav and profile in sync)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(userName: user['full_name']),
-        ),
+        MaterialPageRoute(builder: (context) =>  MainScreen()),
       );
     }
   }

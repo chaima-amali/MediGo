@@ -5,6 +5,7 @@ import '../theme/app_text.dart';
 import '../services/mock_database_service.dart';
 import 'reports_page.dart';
 import '../widgets/back_arrow.dart';
+import 'notifications.dart' as notif_page hide CustomBackArrow;
 
 class MedicineCalendarScreen extends StatefulWidget {
   const MedicineCalendarScreen({super.key});
@@ -156,7 +157,15 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                 size: 24,
                               ),
                               color: AppColors.primary,
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const notif_page.NotificationsPage(),
+                                  ),
+                                );
+                              },
                             ),
                             Positioned(
                               right: 8,

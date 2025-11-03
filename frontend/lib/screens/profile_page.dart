@@ -6,6 +6,7 @@ import '../services/mock_database_service.dart';
 import 'subscription_page.dart';
 import 'edit_profile_page.dart';
 import 'splash_screen.dart';
+import 'my_reservations_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -27,75 +28,73 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLogoutConfirmation(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text(
-          "Log Out",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Log Out",
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        ),
-        content: const Text(
-          "Are you sure you want to log out?",
-          style: TextStyle(
-            fontSize: 16,
+          content: const Text(
+            "Are you sure you want to log out?",
+            style: TextStyle(fontSize: 16),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: const Text(
-              "Cancel",
-              style: TextStyle(
-                color: Colors.grey,
-              ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-              // Perform logout action
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SplashScreen(),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Perform logout action
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SplashScreen()),
+                  (route) => false, // Remove all previous routes
+                );
+              },
+              child: const Text(
+                "Log Out",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
                 ),
-                (route) => false, // Remove all previous routes
-              );
-            },
-            child: const Text(
-              "Log Out",
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
-      );
-    },
-  );
-}
+          ],
+        );
+      },
+    );
+  }
 
   void _loadUserData() {
     userData = MockDataService.getCurrentUser();
     userSettings = MockDataService.getUserSettings();
     premiumFeatures = MockDataService.getPremiumFeatures();
-    
+
     // Get active reservations count
-    final activeReservations = MockDataService.getUserReservations(status: 'pending');
+    final activeReservations = MockDataService.getUserReservations(
+      status: 'pending',
+    );
     activeReservationsCount = activeReservations.length;
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isPremium = userData['subscription_type'] == 'premium';
-    final String displayName = userData['full_name'] ?? 'User';
-    final String initials = displayName.split(' ').map((word) => word[0]).join('').toUpperCase();
+    final String displayName = (userData['full_name'] ?? 'User').toString();
+    final words = displayName
+        .split(' ')
+        .map((w) => w.trim())
+        .where((w) => w.isNotEmpty)
+        .toList();
+    final String initials = words.isEmpty
+        ? 'U'
+        : words.map((word) => word[0]).join().toUpperCase();
     final String email = userData['email'] ?? '';
     final String phone = userData['phone_number'] ?? '';
     final String address = userData['address'] ?? 'Not specified';
@@ -107,10 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: CustomBackArrow(),
-        title: const Text(
-          'Profile',
-          style: AppText.bold,
-        ),
+        title: const Text('Profile', style: AppText.bold),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -162,8 +158,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               isPremium ? 'Premium Plan' : 'Free Plan',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: isPremium ? AppColors.premiumOrange : Colors.grey,
-                                fontWeight: isPremium ? FontWeight.w600 : FontWeight.normal,
+                                color: isPremium
+                                    ? AppColors.premiumOrange
+                                    : Colors.grey,
+                                fontWeight: isPremium
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
                               ),
                             ),
                           ],
@@ -199,10 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         child: const Text(
                           'Edit profile',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
+                          style: TextStyle(fontSize: 14, color: Colors.white),
                         ),
                       ),
                     ),
@@ -210,14 +207,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Premium Upgrade Card (only show if not premium)
               if (!isPremium) ...[
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [AppColors.premiumOrange, AppColors.premiumOrange],
+                      colors: [
+                        AppColors.premiumOrange,
+                        AppColors.premiumOrange,
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -228,7 +228,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.workspace_premium, color: Colors.white),
+                          const Icon(
+                            Icons.workspace_premium,
+                            color: Colors.white,
+                          ),
                           const SizedBox(width: 8),
                           const Text(
                             'Upgrade to Premium',
@@ -243,14 +246,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 12),
                       const Text(
                         'Get add-free experience, priority\nreservations and instant restock alerts',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                       const SizedBox(height: 16),
                       // Display features from mock data
-                      ...premiumFeatures.map((feature) => _buildFeature(feature['title'])),
+                      ...premiumFeatures.map(
+                        (feature) => _buildFeature(feature['title']),
+                      ),
                       const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
@@ -285,17 +287,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 24),
               ],
-              
+
               // Settings Title
               const Text(
                 'Settings',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              
+
               // Settings Options
               _buildSettingTile(
                 icon: Icons.calendar_today,
@@ -306,14 +305,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        appBar: AppBar(
-                          title: const Text('My Reservations'),
-                        ),
-                        body: const Center(
-                          child: Text('My Reservations Page'),
-                        ),
-                      ),
+                      builder: (context) => const MyReservationsScreen(),
                     ),
                   );
                 },
@@ -355,9 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
-                        appBar: AppBar(
-                          title: const Text('Language'),
-                        ),
+                        appBar: AppBar(title: const Text('Language')),
                         body: const Center(
                           child: Text('Language Selection Page'),
                         ),
@@ -377,9 +367,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
-                        appBar: AppBar(
-                          title: const Text('Privacy & Security'),
-                        ),
+                        appBar: AppBar(title: const Text('Privacy & Security')),
                         body: const Center(
                           child: Text('Privacy & Security Page'),
                         ),
@@ -399,19 +387,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
-                        appBar: AppBar(
-                          title: const Text('About MediGo'),
-                        ),
-                        body: const Center(
-                          child: Text('About MediGo Page'),
-                        ),
+                        appBar: AppBar(title: const Text('About MediGo')),
+                        body: const Center(child: Text('About MediGo Page')),
                       ),
                     ),
                   );
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Log Out Button
               SizedBox(
                 width: double.infinity,
@@ -453,10 +437,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ),
       ],
@@ -473,10 +454,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.white),
             ),
           ),
         ],
@@ -507,18 +485,12 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         title: Text(
           title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         subtitle: subtitle.isNotEmpty
             ? Text(
                 subtitle,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               )
             : null,
         trailing: const Icon(Icons.chevron_right, color: Colors.grey),
@@ -526,8 +498,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-  
 
   Widget _buildSettingTileWithSwitch({
     required IconData icon,
@@ -553,17 +523,11 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         title: Text(
           title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
         ),
         trailing: Switch(
           value: value,
