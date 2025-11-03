@@ -44,7 +44,6 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     }
   }
 
-  // Get icon for feature emoji
   IconData _getIconForFeature(String emoji) {
     switch (emoji) {
       case '⚡':
@@ -58,7 +57,6 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     }
   }
 
-  // Get color for feature icon
   Color _getColorForFeature(int index) {
     final colors = [
       const Color(0xFFFF9800),

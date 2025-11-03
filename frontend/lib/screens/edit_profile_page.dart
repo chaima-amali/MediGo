@@ -85,9 +85,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
       // In a real app, you would call an API here to update the user profile
-      // For now, we'll just show a success message
-      
-      // TODO: Update MockDataService with new values
+      // For now just show a success message
+
       // MockDataService.updateUser({
       //   'full_name': _nameController.text,
       //   'email': _emailController.text,
