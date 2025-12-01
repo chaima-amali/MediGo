@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/theme/app_colors.dart';
 import 'package:frontend/theme/app_text.dart';
-import '../widgets/back_arrow.dart';
-import '../services/mock_database_service.dart';
+import '../../widgets/back_arrow.dart';
+import '../../services/mock_database_service.dart';
 import 'subscription_page.dart';
 import 'edit_profile_page.dart';
 import 'splash_screen.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import '../../theme/app_colors.dart';
 import 'edit_medicine_page.dart';
 
 class EditPage extends StatefulWidget {
