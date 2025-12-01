@@ -122,7 +122,6 @@ class _SearchScreenState extends State<SearchScreen> {
     _searchController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -213,7 +212,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
               // Search Bar
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -280,7 +278,6 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
-
   Widget _buildPharmacyCard(Map<String, dynamic> data) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -394,7 +391,6 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ],
           ),
-
           // Pre Order Button (only if in stock)
           if (data['in_stock']) ...[
             const SizedBox(height: 16),
@@ -578,7 +574,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-
               // Medicine Reminder Card (uses requested color #DAA3B5)
               Container(
                 padding: const EdgeInsets.all(20),
@@ -686,7 +681,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildNearbyPharmacyCard(
     BuildContext context,
     String name,
