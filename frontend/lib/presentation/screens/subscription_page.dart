@@ -1,7 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../widgets/back_arrow.dart';
 import '../services/mock_database_service.dart';
+
+
+
+// static List<Map<String, dynamic>> _getPremiumFeatures() {
+    // return [
+      // {
+        // "icon": "⚡",
+        // "title": "Medicine pre-order & reservation",
+        // "description":
+            // "pre-order your medicine and reserve it then go for pick up when you are free",
+      // },
+      // {
+        // "icon": "🔔",
+        // "title": "Instant Restock Alerts",
+        // "description":
+            // "Get notified immediately when out-of-stock medicines are available",
+      // },
+      // {
+        // "icon": "✨",
+        // "title": "Ad-Free Experience",
+        // "description":
+            // "Enjoy a clean, distraction-free interface without any ads",
+      // },
+    // ];
+  // }
+
+
+
+
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({Key? key}) : super(key: key);
@@ -71,15 +101,18 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     final monthlyPlan = getPlanByPeriod('monthly');
     final yearlyPlan = getPlanByPeriod('yearly');
 
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
+      
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: const Color(0xFFB2EBF2),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: CustomBackArrow(),
-        title: const Text(
-          'Subscription',
+        title:  Text(
+          loc.subscription,
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
@@ -112,16 +145,16 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               ),
               const SizedBox(height: 20),
               // Title and Subtitle
-              const Text(
-                'Upgrade to Premium',
+               Text(
+                loc.upgradeToPremium,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Unlock exclusive features and enhance\nyour medicine management',
+               Text(
+                loc.premiumDescription,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -147,8 +180,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               
               const SizedBox(height: 32),
               // Choose Your Plan
-              const Text(
-                'Choose Your Plan',
+               Text(
+                loc.chooseYourPlan,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -175,8 +208,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               
               const SizedBox(height: 24),
               // Terms
-              const Text(
-                'By subscribing, you agree to our Terms of Service\nand Privacy Policy.\nSubscription auto-renews unless cancelled.',
+               Text(
+                loc.subscriptionAgreement,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
@@ -195,6 +228,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     final features = plan['features'] as List<dynamic>? ?? [];
     final price = plan['price'] ?? 0;
     final currency = plan['currency'] ?? 'DA';
+    final loc = AppLocalizations.of(context)!;
+
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -218,15 +253,15 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    plan['name'] ?? 'Monthly',
+                    plan['name'] ?? loc.monthly,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Billed monthly',
+                   Text(
+                    loc.billedMonthly,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey,
@@ -245,10 +280,10 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Padding(
+                   Padding(
                     padding: EdgeInsets.only(top: 8),
                     child: Text(
-                      '/month',
+                      loc.perMonth,
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
@@ -276,8 +311,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                   borderRadius: BorderRadius.circular(25),
                 ),
               ),
-              child: const Text(
-                'Subscribe Monthly',
+              child:  Text(
+                loc.subscribeMonthly,
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
@@ -297,6 +332,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     final currency = plan['currency'] ?? 'DA';
     final discountPercentage = plan['discount_percentage'] ?? 0;
     final badge = plan['badge'];
+    final loc = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -322,16 +358,16 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    plan['name'] ?? 'Yearly',
+                    plan['name'] ?? loc.yearly,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Billed annually',
+                  const SizedBox(height: 4), 
+                   Text(
+                    loc.billedAnnually,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.white,
@@ -373,10 +409,10 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 ),
               ),
               const SizedBox(width: 4),
-              const Padding(
+               Padding(
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
-                  '/month',
+                  loc.perMonth,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white,
@@ -387,7 +423,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  '${price * 12} $currency per year',
+                  loc.perYear,   //"perYear": "${price * 12} $currency per year",
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.white,
@@ -413,8 +449,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                   borderRadius: BorderRadius.circular(25),
                 ),
               ),
-              child: const Text(
-                'Subscribe Yearly (Best Value)',
+              child:  Text(
+                loc.subscribeYearly,
                 style: TextStyle(
                   fontSize: 16,
                   color: AppColors.premiumOrange,
@@ -451,7 +487,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
             ),
             child: Icon(icon, color: iconColor, size: 24),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 16),  
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -505,6 +541,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
   }
 
   void _showSubscriptionSuccess(String planName) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -515,11 +552,11 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
           children: [
             Icon(Icons.check_circle, color: AppColors.primary, size: 28),
             const SizedBox(width: 12),
-            const Text('Success!'),
+             Text(loc.success),
           ],
         ),
         content: Text(
-          'You\'ve successfully subscribed to the $planName plan!',
+          loc.subscriptionSuccessMessage,
           style: const TextStyle(fontSize: 15),
         ),
         actions: [
@@ -528,7 +565,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               Navigator.pop(context);
               Navigator.pop(context); // Go back to profile page
             },
-            child: const Text('OK'),
+            child:  Text(loc.ok),
           ),
         ],
       ),

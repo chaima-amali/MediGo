@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/theme/app_colors.dart';
-import 'package:frontend/theme/app_text.dart';
-import '../../widgets/back_arrow.dart';
-import '../../services/mock_database_service.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
+import 'package:frontend/presentation/services/mock_database_service.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'subscription_page.dart';
 import 'edit_profile_page.dart';
 import 'splash_screen.dart';
@@ -28,16 +29,17 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLogoutConfirmation(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            "Log Out",
+          title:  Text(
+            loc.logOut,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          content: const Text(
-            "Are you sure you want to log out?",
+          content:  Text(
+            loc.logoutConfirmation,
             style: TextStyle(fontSize: 16),
           ),
           actions: [
@@ -45,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+              child:  Text(loc.cancel, style: TextStyle(color: Colors.grey)),
             ),
             TextButton(
               onPressed: () {
@@ -57,8 +59,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   (route) => false, // Remove all previous routes
                 );
               },
-              child: const Text(
-                "Log Out",
+              child:  Text(
+                loc.logOut,
                 style: TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
@@ -99,6 +101,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final String phone = userData['phone_number'] ?? '';
     final String address = userData['address'] ?? 'Not specified';
 
+    final loc = AppLocalizations.of(context)!;  
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -106,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: CustomBackArrow(),
-        title: const Text('Profile', style: AppText.bold),
+        title:  Text(loc.profile, style: AppText.bold),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -155,7 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                             Text(
-                              isPremium ? 'Premium Plan' : 'Free Plan',
+                              isPremium ? loc.premiumPlan : loc.freePlan,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: isPremium
@@ -197,8 +201,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             borderRadius: BorderRadius.circular(25),
                           ),
                         ),
-                        child: const Text(
-                          'Edit profile',
+                        child:  Text(
+                          loc.editProfile,
                           style: TextStyle(fontSize: 14, color: Colors.white),
                         ),
                       ),
@@ -233,8 +237,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             color: Colors.white,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Upgrade to Premium',
+                           Text(
+                            loc.upgradeToPremium,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -244,8 +248,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Get add-free experience, priority\nreservations and instant restock alerts',
+                       Text(
+                        loc.premiumDescription,
                         style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                       const SizedBox(height: 16),
@@ -272,8 +276,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               borderRadius: BorderRadius.circular(25),
                             ),
                           ),
-                          child: const Text(
-                            'Upgrade Now - 3000DA/year',
+                          child:  Text(
+                            loc.upgradeNowPrice,
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.red,
@@ -289,8 +293,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
 
               // Settings Title
-              const Text(
-                'Settings',
+               Text(
+                loc.settings,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
@@ -299,8 +303,8 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSettingTile(
                 icon: Icons.calendar_today,
                 iconColor: const Color(0xFF4DD0E1),
-                title: 'My Reservations',
-                subtitle: '$activeReservationsCount active\nreservations',
+                title: loc.myReservations,
+                subtitle: loc.activeReservations,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -314,8 +318,8 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSettingTileWithSwitch(
                 icon: Icons.notifications_outlined,
                 iconColor: const Color(0xFF4DD0E1),
-                title: 'Notifications',
-                subtitle: 'Receive medicine reminders',
+                title: loc.notifications,
+                subtitle: loc.receiveMedicineReminders,
                 value: userSettings['notifications_enabled'],
                 onChanged: (val) {
                   setState(() {
@@ -327,8 +331,8 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSettingTileWithSwitch(
                 icon: Icons.dark_mode_outlined,
                 iconColor: const Color(0xFFBA68C8),
-                title: 'Dark Mode',
-                subtitle: 'Switch to dark theme',
+                title: loc.darkMode,
+                subtitle: loc.darkModeDescription,
                 value: userSettings['dark_mode_enabled'],
                 onChanged: (val) {
                   setState(() {
@@ -340,15 +344,15 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSettingTile(
                 icon: Icons.language,
                 iconColor: const Color(0xFF64B5F6),
-                title: 'Language',
+                title: loc.language,
                 subtitle: userSettings['language'],
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
-                        appBar: AppBar(title: const Text('Language')),
-                        body: const Center(
+                        appBar: AppBar(title:  Text(loc.language)),
+                        body:  Center(
                           child: Text('Language Selection Page'),
                         ),
                       ),
@@ -360,16 +364,16 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSettingTile(
                 icon: Icons.security_outlined,
                 iconColor: const Color(0xFF81C784),
-                title: 'Privacy & Security',
-                subtitle: 'Manage your data',
+                title: loc.privacySecurity,
+                subtitle: loc.privacySecurityDescription,
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
-                        appBar: AppBar(title: const Text('Privacy & Security')),
-                        body: const Center(
-                          child: Text('Privacy & Security Page'),
+                        appBar: AppBar(title:  Text(loc.privacySecurity)),
+                        body:  Center(
+                          child: Text(loc.privacySecurityPage),
                         ),
                       ),
                     ),
@@ -380,15 +384,15 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSettingTile(
                 icon: Icons.info_outline,
                 iconColor: const Color(0xFFE57373),
-                title: 'About MediGo',
+                title: loc.aboutMedigo,
                 subtitle: '',
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
-                        appBar: AppBar(title: const Text('About MediGo')),
-                        body: const Center(child: Text('About MediGo Page')),
+                        appBar: AppBar(title:  Text(loc.aboutMedigo)),
+                        body:  Center(child: Text(loc.aboutMedigoPage)),
                       ),
                     ),
                   );
@@ -404,8 +408,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     _showLogoutConfirmation(context);
                   },
                   icon: const Icon(Icons.logout, color: Colors.red),
-                  label: const Text(
-                    'Log Out',
+                  label:  Text(
+                    loc.logOut,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.red,

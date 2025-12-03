@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import 'onboarding_screen.dart';
@@ -32,6 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Stack(
@@ -133,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         ),
                       ),
                       child: Text(
-                        'Get Started',
+                        loc.getStarted,
                         style: AppText.medium.copyWith(
                           fontSize: 18,
                           color: AppColors.primary,

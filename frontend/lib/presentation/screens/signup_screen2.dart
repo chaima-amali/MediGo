@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import 'Home_page.dart';
@@ -29,12 +30,15 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
   String? _selectedGender;
   final _dateController = TextEditingController();
 
+  
+
   void _signUp() {
+    final loc = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       if (_selectedGender == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select your gender'),
+           SnackBar(
+            content: Text(loc.selectGenderPrompt),
             backgroundColor: AppColors.error,
           ),
         );
@@ -42,9 +46,10 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
       }
 
       if (_dateController.text.isEmpty) {
+        final loc = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select your date of birth'),
+           SnackBar(
+            content: Text(loc.selectDOBPrompt),
             backgroundColor: AppColors.error,
           ),
         );
@@ -91,6 +96,8 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
 
   @override
   Widget build(BuildContext context) {
+
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -132,7 +139,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                     const SizedBox(height: 60),
                     // Welcome text
                     Text(
-                      'Welcome To ',
+                      loc.welcomeTo,
                       style: AppText.bold.copyWith(
                         fontSize: 24,
                         color: AppColors.darkBlue,
@@ -165,7 +172,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Sign Up',
+                      loc.signUp,
                       style: AppText.bold.copyWith(
                         fontSize: 20,
                         color: AppColors.primary,
@@ -181,7 +188,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Gender',
+                                loc.gender,
                                 style: AppText.medium.copyWith(
                                   fontSize: 14,
                                   color: AppColors.darkBlue,
@@ -216,13 +223,13 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                                   ),
                                 ),
                                 hint: Text(
-                                  'select',
+                                  loc.select,
                                   style: AppText.regular.copyWith(
                                     color: AppColors.darkBlue.withOpacity(0.4),
                                     fontSize: 14,
                                   ),
                                 ),
-                                items: ['Male', 'Female', 'Other']
+                                items: [loc.male, loc.female, loc.other]
                                     .map(
                                       (gender) => DropdownMenuItem(
                                         value: gender,
@@ -251,7 +258,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Date Of Birth',
+                                loc.dateOfBirth,
                                 style: AppText.medium.copyWith(
                                   fontSize: 14,
                                   color: AppColors.darkBlue,
@@ -263,7 +270,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                                 readOnly: true,
                                 onTap: () => _selectDate(context),
                                 decoration: InputDecoration(
-                                  hintText: 'jj/dd/yyyy',
+                                  hintText: loc.dobFormat,
                                   hintStyle: AppText.regular.copyWith(
                                     color: AppColors.darkBlue.withOpacity(0.4),
                                     fontSize: 14,
@@ -306,7 +313,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                     const SizedBox(height: 20),
                     // Password field
                     Text(
-                      'Password',
+                      loc.password,
                       style: AppText.medium.copyWith(
                         fontSize: 14,
                         color: AppColors.darkBlue,
@@ -317,7 +324,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
-                        hintText: 'Create your password',
+                        hintText: loc.createPassword,
                         hintStyle: AppText.regular.copyWith(
                           color: AppColors.darkBlue.withOpacity(0.4),
                           fontSize: 14,
@@ -363,10 +370,10 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return loc.enterPassword;
                         }
                         if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
+                          return loc.passwordMinLength;
                         }
                         return null;
                       },
@@ -374,7 +381,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                     const SizedBox(height: 20),
                     // Confirm Password field
                     Text(
-                      'Confirm Password',
+                      loc.confirmPassword,
                       style: AppText.medium.copyWith(
                         fontSize: 14,
                         color: AppColors.darkBlue,
@@ -385,7 +392,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                       controller: _confirmPasswordController,
                       obscureText: _obscureConfirmPassword,
                       decoration: InputDecoration(
-                        hintText: 'Confirm your password',
+                        hintText: loc.confirmYourPassword,
                         hintStyle: AppText.regular.copyWith(
                           color: AppColors.darkBlue.withOpacity(0.4),
                           fontSize: 14,
@@ -432,10 +439,10 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please confirm your password';
+                          return loc.confirmPassword;
                         }
                         if (value != _passwordController.text) {
-                          return 'Passwords do not match';
+                          return loc.passwordsDoNotMatch;
                         }
                         return null;
                       },
@@ -453,7 +460,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                           ),
                         ),
                         child: Text(
-                          'Sign Up',
+                          loc.signUp,
                           style: AppText.medium.copyWith(
                             fontSize: 16,
                             color: AppColors.white,
@@ -473,7 +480,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            'Or sign up with',
+                            loc.orSignUpWith,
                             style: AppText.regular.copyWith(
                               fontSize: 14,
                               color: AppColors.darkBlue.withOpacity(0.6),
@@ -509,7 +516,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'You already have an account? ',
+                            loc.alreadyHaveAccount,
                             style: AppText.regular.copyWith(
                               fontSize: 14,
                               color: AppColors.darkBlue,
@@ -521,7 +528,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              'Log In',
+                              loc.logIn,
                               style: AppText.bold.copyWith(
                                 fontSize: 14,
                                 color: AppColors.primary,

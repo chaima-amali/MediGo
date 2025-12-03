@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'Search_results_page.dart';
 import 'notifications.dart' as notif_page;
 import 'tracking_page.dart';
@@ -19,6 +20,7 @@ class MediGoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'MediGo',
       debugShowCheckedModeBanner: false,
@@ -95,6 +97,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+     
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _searchResults = [];
 
@@ -124,6 +127,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -203,8 +207,8 @@ class _SearchScreenState extends State<SearchScreen> {
               const SizedBox(height: 30),
 
               // Title
-              const Text(
-                'Find your medicine',
+               Text(
+                loc.findYourMedicine,
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -236,7 +240,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         controller: _searchController,
                         onChanged: _performSearch,
                         decoration: InputDecoration(
-                          hintText: 'Search your medicine',
+                          hintText: loc.searchYourMedicine,
                           hintStyle: TextStyle(
                             color: const Color.fromARGB(255, 161, 161, 161),
                             fontSize: 13,
@@ -257,7 +261,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: Text(
                           _searchController.text.isEmpty
                               ? ''
-                              : 'No results found',
+                              : loc.noResultsFound,
                           style: TextStyle(
                             color: AppColors.darkBlue.withOpacity(0.6),
                             fontSize: 16,
@@ -279,6 +283,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
   Widget _buildPharmacyCard(Map<String, dynamic> data) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -341,7 +346,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    data['in_stock'] ? 'In stock' : 'Out of stock',
+                    data['in_stock'] ? loc.inStock : loc.outOfStock,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -402,7 +407,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   final pname = data['pharmacy_name'] ?? '';
                   if (pid.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Pharmacy id missing')),
+                       SnackBar(content: Text(loc.pharmacyIdMissing)),
                     );
                     return;
                   }
@@ -425,8 +430,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text(
-                  'Pre Order',
+                child:  Text(
+                  loc.preOrder,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
@@ -446,6 +451,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
@@ -525,7 +531,7 @@ class HomeScreen extends StatelessWidget {
                     color: AppColors.darkBlue,
                   ),
                   children: [
-                    const TextSpan(text: 'Hi '),
+                     TextSpan(text: loc.hi),
                     TextSpan(
                       text: userName,
                       style: const TextStyle(
@@ -533,7 +539,7 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const TextSpan(text: ' ,How are you\nfeeling Today?'),
+                     TextSpan(text: loc.howAreYouFeeling),
                   ],
                 ),
               ),
@@ -564,7 +570,7 @@ class HomeScreen extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: 'Search for your medicine ...',
+                          hintText: loc.searchMedicinePrompt,
                           hintStyle: TextStyle(color: Colors.grey[400]),
                           border: InputBorder.none,
                         ),
@@ -587,8 +593,8 @@ class HomeScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Medicine Remainder',
+                           Text(
+                            loc.medicineReminder,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -596,8 +602,8 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            'You want a Remainder to track\nyour treatment',
+                           Text(
+                            loc.reminderDescription,
                             style: TextStyle(fontSize: 12, color: Colors.white),
                           ),
                           const SizedBox(height: 16),
@@ -614,8 +620,8 @@ class HomeScreen extends StatelessWidget {
                                 vertical: 8,
                               ),
                             ),
-                            child: const Text(
-                              'Start Now',
+                            child:  Text(
+                              loc.startNow,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -641,8 +647,8 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Nearby Pharmacy Section
-              const Text(
-                'Nearby Pharmacy',
+               Text(
+                loc.nearbyPharmacy,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -688,7 +694,9 @@ class HomeScreen extends StatelessWidget {
     String rating,
     String reviews,
   ) {
+    final loc = AppLocalizations.of(context)!;
     return GestureDetector(
+      
       onTap: () {
         final pList = MockDataService.getNearbyPharmacies(limit: 1);
         final p = pList.isNotEmpty ? pList.first : <String, dynamic>{};
@@ -773,7 +781,7 @@ class HomeScreen extends StatelessWidget {
                 const Icon(Icons.star, color: Colors.amber, size: 16),
                 const SizedBox(width: 4),
                 Text(
-                  'Rating: $rating',
+                  loc.rating,
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.darkBlue,
@@ -781,9 +789,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+             SizedBox(height: 4),
             Text(
-              '($reviews)',
+              loc.reviews,
               style: const TextStyle(fontSize: 10, color: AppColors.darkBlue),
             ),
           ],
@@ -795,13 +803,15 @@ class HomeScreen extends StatelessWidget {
 
 // Placeholder Screens
 class CalendarScreen extends StatelessWidget {
+
   const CalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final loc = AppLocalizations.of(context)!;
+    return  Center(
       child: Text(
-        'Calendar Screen',
+        loc.calendarScreen,
         style: TextStyle(fontSize: 24, color: AppColors.primary),
       ),
     );
@@ -813,9 +823,10 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final loc = AppLocalizations.of(context)!;
+    return  Center(
       child: Text(
-        'Profile Screen',
+        loc.profileScreen,
         style: TextStyle(fontSize: 24, color: AppColors.primary),
       ),
     );

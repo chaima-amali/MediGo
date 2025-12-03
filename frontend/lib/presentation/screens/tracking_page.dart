@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
 import 'medicine_calendar.dart';
 import 'add_medicine_page.dart';
 import 'statistics_page.dart';
