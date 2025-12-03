@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/back_arrow.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import '../services/mock_database_service.dart';

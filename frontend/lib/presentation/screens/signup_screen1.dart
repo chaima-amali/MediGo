@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import 'signup_screen2.dart';
@@ -33,6 +34,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -74,7 +76,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                     const SizedBox(height: 60),
                     // Welcome text
                     Text(
-                      'Welcome To ',
+                      loc.welcomeTo,
                       style: AppText.bold.copyWith(
                         fontSize: 24,
                         color: AppColors.darkBlue,
@@ -107,7 +109,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Sign Up',
+                      loc.signUp,
                       style: AppText.bold.copyWith(
                         fontSize: 20,
                         color: AppColors.primary,
@@ -116,7 +118,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                     const SizedBox(height: 40),
                     // Full Name field
                     Text(
-                      'Full Name',
+                      loc.fullName,
                       style: AppText.medium.copyWith(
                         fontSize: 14,
                         color: AppColors.darkBlue,
@@ -126,7 +128,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        hintText: 'Enter your Full Name',
+                        hintText: loc.enterFullName,
                         hintStyle: AppText.regular.copyWith(
                           color: AppColors.darkBlue.withOpacity(0.4),
                           fontSize: 14,
@@ -159,7 +161,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
+                          return loc.pleaseEnterName;
                         }
                         return null;
                       },
@@ -167,7 +169,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                     const SizedBox(height: 20),
                     // Email field
                     Text(
-                      'Email',
+                      loc.email,
                       style: AppText.medium.copyWith(
                         fontSize: 14,
                         color: AppColors.darkBlue,
@@ -178,7 +180,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        hintText: 'Enter your Email',
+                        hintText: loc.enterEmail,
                         hintStyle: AppText.regular.copyWith(
                           color: AppColors.darkBlue.withOpacity(0.4),
                           fontSize: 14,
@@ -211,10 +213,10 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
+                          return loc.pleaseEnterEmail;
                         }
                         if (!value.contains('@')) {
-                          return 'Please enter a valid email';
+                          return loc.validEmail;
                         }
                         return null;
                       },
@@ -222,7 +224,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                     const SizedBox(height: 20),
                     // Phone field
                     Text(
-                      'Phone Number',
+                      loc.phoneNumber,
                       style: AppText.medium.copyWith(
                         fontSize: 14,
                         color: AppColors.darkBlue,
@@ -266,7 +268,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your phone number';
+                          return loc.enterPhoneNumber;
                         }
                         return null;
                       },
@@ -284,7 +286,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                           ),
                         ),
                         child: Text(
-                          'Next',
+                          loc.next,
                           style: AppText.medium.copyWith(
                             fontSize: 16,
                             color: AppColors.white,
@@ -304,7 +306,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            'Or sign up with',
+                            loc.orSignUpWith,
                             style: AppText.regular.copyWith(
                               fontSize: 14,
                               color: AppColors.darkBlue.withOpacity(0.6),
@@ -340,7 +342,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'You already have an account? ',
+                            loc.alreadyHaveAccount,
                             style: AppText.regular.copyWith(
                               fontSize: 14,
                               color: AppColors.darkBlue,
@@ -349,7 +351,7 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: Text(
-                              'Log In',
+                              loc.logIn,
                               style: AppText.bold.copyWith(
                                 fontSize: 14,
                                 color: AppColors.primary,
