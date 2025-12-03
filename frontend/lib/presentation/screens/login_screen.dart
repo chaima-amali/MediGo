@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import 'signup_screen1.dart';
@@ -19,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   void _login() {
+    final loc = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       // For demo: try to activate a user by email in the mock service.
       final email = _emailController.text.trim();
@@ -26,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!ok) {
         // No matching user in the mock DB — show a friendly message.
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No account found for that email')),
+           SnackBar(content: Text(loc.noAccountFound)),
         );
         return;
       }
@@ -41,6 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -82,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 60),
                     // Welcome text
                     Text(
-                      'Welcome To ',
+                      loc.welcomeTo,
                       style: AppText.bold.copyWith(
                         fontSize: 24,
                         color: AppColors.darkBlue,
@@ -115,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Log In',
+                      loc.logIn,
                       style: AppText.bold.copyWith(
                         fontSize: 20,
                         color: AppColors.primary,
@@ -124,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 40),
                     // Email field
                     Text(
-                      'Email',
+                      loc.email,
                       style: AppText.medium.copyWith(
                         fontSize: 14,
                         color: AppColors.darkBlue,
@@ -159,10 +163,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
+                          return loc.pleaseEnterEmail;
                         }
                         if (!value.contains('@')) {
-                          return 'Please enter a valid email';
+                          return loc.validEmail;
                         }
                         return null;
                       },
@@ -170,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     // Password field
                     Text(
-                      'Password',
+                      loc.password,
                       style: AppText.medium.copyWith(
                         fontSize: 14,
                         color: AppColors.darkBlue,
@@ -218,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return loc.enterPassword;
                         }
                         return null;
                       },
@@ -230,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextButton(
                         onPressed: () {},
                         child: Text(
-                          'Forget Password?',
+                          loc.forgetPassword,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
                             color: AppColors.primary,
@@ -251,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: Text(
-                          'Log In',
+                          loc.logIn,
                           style: AppText.medium.copyWith(
                             fontSize: 16,
                             color: AppColors.white,
@@ -271,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            'Or Log in with',
+                            loc.orLoginWith,
                             style: AppText.regular.copyWith(
                               fontSize: 14,
                               color: AppColors.darkBlue.withOpacity(0.6),
@@ -307,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "You don't have an account? ",
+                            loc.noAccount,
                             style: AppText.regular.copyWith(
                               fontSize: 14,
                               color: AppColors.darkBlue,
@@ -323,7 +327,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                             child: Text(
-                              'Sign Up',
+                              loc.signUp,
                               style: AppText.bold.copyWith(
                                 fontSize: 14,
                                 color: AppColors.primary,

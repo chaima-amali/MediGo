@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/back_arrow.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import '../services/mock_database_service.dart';
@@ -85,7 +86,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
       // In a real app, you would call an API here to update the user profile
-      // For now just show a success message
 
       // MockDataService.updateUser({
       //   'full_name': _nameController.text,
@@ -93,10 +93,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       //   'phone_number': _phoneController.text,
       //   'date_of_birth': _dateController.text,
       // });
-
+      final loc = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
+        
         SnackBar(
-          content: const Text('Profile updated successfully'),
+          
+          content:  Text(loc.profileUpdated),
           backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -114,6 +116,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.lightBlue,
       body: SafeArea(
@@ -128,7 +131,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Expanded(
                     child: Center(
                       child: Text(
-                        'Edit Profile',
+                        loc.editProfile,
                         style: AppText.bold.copyWith(
                           fontSize: 24,
                           color: AppColors.darkBlue,
@@ -162,7 +165,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: 10),
                         // Full Name field
                         Text(
-                          'Full Name',
+                          loc.fullName,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
                             color: AppColors.darkBlue,
@@ -172,7 +175,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         TextFormField(
                           controller: _nameController,
                           decoration: InputDecoration(
-                            hintText: 'Enter your Full Name',
+                            hintText: loc.enterFullName,
                             hintStyle: AppText.regular.copyWith(
                               color: AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
@@ -205,7 +208,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your name';
+                              return loc.pleaseEnterName;
                             }
                             return null;
                           },
@@ -213,7 +216,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: 20),
                         // Email field
                         Text(
-                          'Email',
+                          loc.email,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
                             color: AppColors.darkBlue,
@@ -224,7 +227,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            hintText: 'Enter your Email',
+                            hintText: loc.enterEmail,
                             hintStyle: AppText.regular.copyWith(
                               color: AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
@@ -257,10 +260,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return loc.pleaseEnterEmail;
                             }
                             if (!value.contains('@')) {
-                              return 'Please enter a valid email';
+                              return loc.validEmail;
                             }
                             return null;
                           },
@@ -268,7 +271,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: 20),
                         // Phone field
                         Text(
-                          'Phone Number',
+                          loc.phoneNumber,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
                             color: AppColors.darkBlue,
@@ -312,7 +315,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your phone number';
+                              return loc.enterPhoneNumber;
                             }
                             return null;
                           },
@@ -320,7 +323,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: 20),
                         // Date of Birth
                         Text(
-                          'Date Of Birth',
+                          loc.dateOfBirth,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
                             color: AppColors.darkBlue,
@@ -332,7 +335,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           readOnly: true,
                           onTap: () => _selectDate(context),
                           decoration: InputDecoration(
-                            hintText: 'dd/mm/yyyy',
+                            hintText: loc.dobFormat,
                             hintStyle: AppText.regular.copyWith(
                               color: AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
@@ -368,7 +371,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: 20),
                         // New Password field
                         Text(
-                          'New password',
+                          loc.newPassword,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
                             color: AppColors.darkBlue,
@@ -379,7 +382,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _newPasswordController,
                           obscureText: _obscureNewPassword,
                           decoration: InputDecoration(
-                            hintText: 'Enter your new password',
+                            hintText: loc.enterNewPassword,
                             hintStyle: AppText.regular.copyWith(
                               color: AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
@@ -427,7 +430,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             if (value != null &&
                                 value.isNotEmpty &&
                                 value.length < 6) {
-                              return 'Password must be at least 6 characters';
+                              return loc.passwordMinLength;
                             }
                             return null;
                           },
@@ -435,7 +438,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: 20),
                         // Confirm new password field
                         Text(
-                          'Confirm new password',
+                          loc.confirmNewPassword,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
                             color: AppColors.darkBlue,
@@ -446,7 +449,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
-                            hintText: 'Confirm your new password',
+                            hintText: loc.enterConfirmNewPassword,
                             hintStyle: AppText.regular.copyWith(
                               color: AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
@@ -494,10 +497,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           validator: (value) {
                             if (_newPasswordController.text.isNotEmpty) {
                               if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
+                                return loc.pleaseConfirmPassword;
                               }
                               if (value != _newPasswordController.text) {
-                                return 'Passwords do not match';
+                                return loc.passwordsDoNotMatch;
                               }
                             }
                             return null;
@@ -521,7 +524,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   elevation: 0,
                                 ),
                                 child: Text(
-                                  'cancel',
+                                  loc.cancel,
                                   style: AppText.medium.copyWith(
                                     fontSize: 16,
                                     color: AppColors.darkBlue,
@@ -543,7 +546,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   elevation: 0,
                                 ),
                                 child: Text(
-                                  'Edit Profile',
+                                  loc.editProfile,
                                   style: AppText.medium.copyWith(
                                     fontSize: 16,
                                     color: AppColors.darkBlue,
