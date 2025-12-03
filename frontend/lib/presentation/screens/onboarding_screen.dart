@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 import 'login_screen.dart';
@@ -11,42 +12,47 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  
 
-  final List<OnboardingData> _pages = [
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final List<OnboardingData> _pages = [
+    
     OnboardingData(
+      
       icon: Icons.location_on,
       iconColor: AppColors.primary,
-      title: 'Find Nearby Pharmacies',
+      title: loc.findNearbyPharmacies,
       description:
-          'Discover pharmacies near you with real-time distance tracking and easy navigation.',
+          loc.discoverPharmaciesDescription,
     ),
     OnboardingData(
       icon: Icons.search,
       iconColor: Color(0xFF9C27B0),
-      title: 'Search for Medicines',
+      title: loc.searchMedicines,
       description:
-          'Quickly find the medicines you need with our smart search feature.',
+          loc.searchMedicinesDescription,
     ),
     OnboardingData(
       icon: Icons.notifications,
       iconColor: Color(0xFFE91E63),
-      title: 'Medicine Reminders',
-      description:
-          'Never miss your medication with personalized reminders and treatment tracking.',
+      title: loc.medicineReminders,
+      description: 
+          loc.medicineRemindersDescription,
     ),
     OnboardingData(
       icon: Icons.phone,
       iconColor: Color(0xFF00BFA5),
-      title: 'Contact & Directions',
+      title: loc.contactDirections,
       description:
-          'Get detailed pharmacy information, directions, and contact them directly from the app.',
+          loc.contactDirectionsDescription,
     ),
   ];
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -58,7 +64,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: TextButton(
                 onPressed: () => _goToLogin(),
                 child: Text(
-                  'Skip',
+                  loc.skip,
                   style: AppText.medium.copyWith(
                     fontSize: 16,
                     color: AppColors.darkBlue.withOpacity(0.6),
@@ -120,7 +126,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: Text(
-                    _currentPage < _pages.length - 1 ? 'Next' : 'Get Started',
+                    _currentPage < _pages.length - 1 ? loc.next : loc.getStarted,
                     style: AppText.medium.copyWith(
                       fontSize: 16,
                       color: AppColors.white,
