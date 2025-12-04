@@ -9,8 +9,8 @@ class DBUserTable {
  password TEXT,
  gender TEXT,
  dob TEXT,
-latitude REAL,
-longitude REAL,
+ latitude REAL,
+ longitude REAL,
  premium TEXT
  )
  ''';
