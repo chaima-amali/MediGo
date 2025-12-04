@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'notifications.dart' as notif_page;
-import '../services/mock_database_service.dart';
-import '../theme/app_colors.dart';
+import '../notifications.dart' as notif_page;
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/services/mock_database_service.dart';
 
 class RemindersScreen extends StatelessWidget {
   @override

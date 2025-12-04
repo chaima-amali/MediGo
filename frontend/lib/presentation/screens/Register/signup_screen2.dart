@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text.dart';
-import 'Home_page.dart';
-import '../services/mock_database_service.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
+import '../../../data/models/user.dart';
+import '../../../data/repositories/user_repo.dart';
+import '../../../logic/cubits/user_cubit.dart';
+import 'localization.dart';
 
 class SignUpScreen2 extends StatefulWidget {
   final String name;
@@ -32,7 +35,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
 
   
 
-  void _signUp() {
+  void _signUp() async {
     final loc = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       if (_selectedGender == null) {
@@ -46,7 +49,6 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
       }
 
       if (_dateController.text.isEmpty) {
-        final loc = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
            SnackBar(
             content: Text(loc.selectDOBPrompt),
@@ -56,19 +58,35 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
         return;
       }
 
-      // Add the new user to the mock service and make them the current user.
-      MockDataService.addUser(
-        fullName: widget.name,
+      // Create user object (location will be added later)
+      final newUser = User(
+        name: widget.name,
         email: widget.email,
         phone: widget.phone,
+        password: _passwordController.text,
+        gender: _selectedGender!,
+        dob: _dateController.text,
+        latitude: null,
+        longitude: null,
+        premium: 'false',
       );
 
-      // Navigate to the app's main screen so Home and Profile are wired to the
-      // same (mock) current user.
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) =>  MainScreen()),
-      );
+      print('📝 User data collected: ${newUser.name}');
+      print('📧 Email: ${newUser.email}, Phone: ${newUser.phone}');
+      print('👤 Gender: ${newUser.gender}, DOB: ${newUser.dob}');
+
+      // Navigate to localization page with user data (don't save to DB yet)
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LocalizationPage(
+              email: widget.email,
+              userData: newUser,
+            ),
+          ),
+        );
+      }
     }
   }
 

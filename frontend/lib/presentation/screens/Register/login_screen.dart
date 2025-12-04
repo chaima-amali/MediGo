@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
+import '../../../logic/cubits/user_cubit.dart';
 import 'signup_screen1.dart';
-import 'Home_page.dart';
-import '../services/mock_database_service.dart';
+import 'localization.dart';
+import '../Home/home_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,25 +21,52 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  void _login() {
+  void _login() async {
     final loc = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
-      // For demo: try to activate a user by email in the mock service.
       final email = _emailController.text.trim();
-      final ok = MockDataService.loginWithEmail(email);
-      if (!ok) {
-        // No matching user in the mock DB — show a friendly message.
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text(loc.noAccountFound)),
-        );
-        return;
-      }
+      final password = _passwordController.text;
 
-      // Navigate to the app's main screen (keeps the bottom nav and profile in sync)
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) =>  MainScreen()),
-      );
+      // Login using BLoC
+      final userCubit = BlocProvider.of<UserCubit>(context);
+      await userCubit.loginUser(email, password);
+
+      // Listen to state and navigate
+      if (context.mounted) {
+        final state = userCubit.state;
+        if (state is UserAuthenticated) {
+          final user = state.user;
+          
+          print('🔍 Checking user location - Lat: ${user.latitude}, Lon: ${user.longitude}');
+          print('🔍 Location is null? Lat: ${user.latitude == null}, Lon: ${user.longitude == null}');
+          
+          // Check if user has location set
+          if (user.latitude != null && user.longitude != null) {
+            print('✅ User has location, navigating to main screen');
+            // Navigate to the app's main screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
+          } else {
+            print('📍 User location not set, redirecting to localization page');
+            // Navigate to localization page to set location
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LocalizationPage(email: email),
+              ),
+            );
+          }
+        } else if (state is UserError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
     }
   }
 

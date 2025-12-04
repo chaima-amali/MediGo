@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text.dart';
-import '../services/mock_database_service.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
+import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'reports_page.dart';
-import '../widgets/back_arrow.dart';
-import 'notifications.dart' as notif_page hide CustomBackArrow;
+import 'package:frontend/presentation/widgets/back_arrow.dart';
+import '../notifications.dart' as notif_page hide CustomBackArrow;
 
 class MedicineCalendarScreen extends StatefulWidget {
   const MedicineCalendarScreen({super.key});

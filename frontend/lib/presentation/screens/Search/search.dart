@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'notifications.dart' as notif_page;
+import '../notifications.dart' as notif_page;
 import 'pharmacy_details_screen.dart';
-import 'reservations_form.dart';
+import '../Reservations/reservations_form.dart';
 
 // App Colors
 class AppColors {

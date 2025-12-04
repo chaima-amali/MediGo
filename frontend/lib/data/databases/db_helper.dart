@@ -17,7 +17,7 @@ import 'db_reservation.dart';
 
 class DBHelper {
   static const _databaseName = "medic_app.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
   static Database? _database;
 
   // List all table create statements in order
@@ -51,7 +51,23 @@ class DBHelper {
         }
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // Handle schema migrations here if needed in future
+        if (oldVersion < 2) {
+          print('🔄 Migrating database from version $oldVersion to $newVersion');
+          try {
+            await db.execute('ALTER TABLE user ADD COLUMN latitude REAL');
+            await db.execute('ALTER TABLE user ADD COLUMN longitude REAL');
+            print('✅ Added latitude and longitude to user table');
+          } catch (e) {
+            print('⚠️ User table migration: $e');
+          }
+          try {
+            await db.execute('ALTER TABLE pharmacy ADD COLUMN latitude REAL');
+            await db.execute('ALTER TABLE pharmacy ADD COLUMN longitude REAL');
+            print('✅ Added latitude and longitude to pharmacy table');
+          } catch (e) {
+            print('⚠️ Pharmacy table migration: $e');
+          }
+        }
       },
     );
     return _database!;

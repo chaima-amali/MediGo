@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';
+import '../../../logic/cubits/user_cubit.dart';
+import '../../../data/models/user.dart';
+import '../Home/home_page.dart';
+import 'Enter_location.dart';
 
 class LocalizationPage extends StatelessWidget {
-  const LocalizationPage({Key? key}) : super(key: key);
+  final String email;
+  final User? userData;
+
+  const LocalizationPage({Key? key, required this.email, this.userData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -77,15 +86,10 @@ class LocalizationPage extends StatelessWidget {
                             color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
-                          child: Center(
-                            child: Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
+                          child: Icon(
+                            Icons.location_on,
+                            color: AppColors.white,
+                            size: 32,
                           ),
                         ),
                       ),
@@ -116,8 +120,106 @@ class LocalizationPage extends StatelessWidget {
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: trigger permission flow
+                        onPressed: () async {
+                          // Request location permission and get current location
+                          try {
+                            // Check if location services are enabled
+                            bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+                            if (!serviceEnabled) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Location services are disabled. Please enable them in settings.'),
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                                // Open location settings
+                                await Geolocator.openLocationSettings();
+                              }
+                              return;
+                            }
+
+                            LocationPermission permission = await Geolocator.checkPermission();
+                            if (permission == LocationPermission.denied) {
+                              permission = await Geolocator.requestPermission();
+                              if (permission == LocationPermission.denied) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Location permission denied')),
+                                  );
+                                }
+                                return;
+                              }
+                            }
+
+                            if (permission == LocationPermission.deniedForever) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Location permission permanently denied. Please enable it in app settings.'),
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                                // Open app settings
+                                await Geolocator.openAppSettings();
+                              }
+                              return;
+                            }
+
+                            // Get current position
+                            Position position = await Geolocator.getCurrentPosition(
+                              desiredAccuracy: LocationAccuracy.high,
+                            );
+
+                            print('🌍 GPS Location Retrieved: Latitude=${position.latitude}, Longitude=${position.longitude}');
+
+                            final userCubit = BlocProvider.of<UserCubit>(context);
+                            
+                            if (userData != null) {
+                              // New signup: Save user with location to database
+                              final userWithLocation = userData!.copyWith(
+                                latitude: position.latitude,
+                                longitude: position.longitude,
+                              );
+                              print('💾 Saving new user to database with location');
+                              await userCubit.registerUser(userWithLocation);
+                              
+                              if (context.mounted) {
+                                final state = userCubit.state;
+                                if (state is UserOperationSuccess) {
+                                  print('✅ User registered successfully');
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => MainScreen()),
+                                  );
+                                } else if (state is UserError) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(state.error)),
+                                  );
+                                }
+                              }
+                            } else {
+                              // Existing user login: Update location
+                              final user = await userCubit.userRepository.getUserByEmail(email);
+                              print('👤 Updating location for user: ID=${user?.userId}');
+                              if (user != null && context.mounted) {
+                                await userCubit.updateUserLocation(
+                                  user.userId!, 
+                                  position.latitude, 
+                                  position.longitude,
+                                );
+                                print('✅ Location updated for user ${user.userId}');
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MainScreen()),
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error getting location: $e')),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
@@ -141,7 +243,16 @@ class LocalizationPage extends StatelessWidget {
                       height: 48,
                       child: OutlinedButton(
                         onPressed: () {
-                          // TODO: navigate to manual entry
+                          // Navigate to manual location entry page
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EnterLocationPage(
+                                email: email,
+                                userData: userData,
+                              ),
+                            ),
+                          );
                         },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: AppColors.white,
