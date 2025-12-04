@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:frontend/presentation/screens/Home/splash_screen.dart';
 import 'package:frontend/presentation/theme/app_theme.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import 'presentation/screens/splash_screen.dart';
+
 
 
 void main() {

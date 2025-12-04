@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
 
 class ReservationFormScreen extends StatefulWidget {
   final String pharmacyId;
