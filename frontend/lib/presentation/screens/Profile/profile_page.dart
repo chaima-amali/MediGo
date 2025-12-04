@@ -5,7 +5,7 @@ import 'package:frontend/presentation/widgets/back_arrow.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'subscription_page.dart';
-import 'edit_profile_page.dart';
+import 'Profile/edit_profile_page.dart';
 import 'splash_screen.dart';
 import 'my_reservations_screen.dart';
 

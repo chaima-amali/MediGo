@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../widgets/back_arrow.dart';
-import 'tracking_page.dart';
+import '../../theme/app_colors.dart';
+import '../../widgets/back_arrow.dart';
+import '../tracking_page.dart';
 
 class AddMedicinePage extends StatefulWidget {
   const AddMedicinePage({super.key});
