@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'notifications.dart' as notif_page;
-import '../services/mock_database_service.dart';
-import '../theme/app_colors.dart';
+import '../notifications.dart' as notif_page;
+import 'package:frontend/presentation/theme/app_colors.dart';
+
+import 'package:frontend/presentation/services/mock_database_service.dart';
+
 import 'pharmacy_details_screen.dart';
-import 'reservations_form.dart';
-import 'reservation_details.dart';
+import '../Reservations/reservations_form.dart';
+import '../Reservations/reservation_details.dart';
 
 class SearchMedicineScreen extends StatefulWidget {
   @override

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import '../widgets/back_arrow.dart';
-import '../services/mock_database_service.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
+import 'package:frontend/presentation/services/mock_database_service.dart';
 
 
 
