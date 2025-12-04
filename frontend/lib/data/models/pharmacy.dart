@@ -1,7 +1,8 @@
 class Pharmacy {
   final int? pharmacyId;
   final String name;
-  final String location;
+  final double? latitude;
+  final double? longitude;
   final String phone;
   final String openingHours;
   final double rating;
@@ -9,7 +10,8 @@ class Pharmacy {
   Pharmacy({
     this.pharmacyId,
     required this.name,
-    required this.location,
+    this.latitude,
+    this.longitude,
     required this.phone,
     required this.openingHours,
     required this.rating,
@@ -18,7 +20,8 @@ class Pharmacy {
   Pharmacy copyWith({
     int? pharmacyId,
     String? name,
-    String? location,
+    double? latitude,
+    double? longitude,
     String? phone,
     String? openingHours,
     double? rating,
@@ -26,7 +29,8 @@ class Pharmacy {
     return Pharmacy(
       pharmacyId: pharmacyId ?? this.pharmacyId,
       name: name ?? this.name,
-      location: location ?? this.location,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       phone: phone ?? this.phone,
       openingHours: openingHours ?? this.openingHours,
       rating: rating ?? this.rating,
@@ -37,7 +41,8 @@ class Pharmacy {
     return Pharmacy(
       pharmacyId: map['pharmacy_id'] as int?,
       name: map['name'] as String,
-      location: map['location'] as String,
+      latitude: (map['latitude'] as num?)?.toDouble(),
+      longitude: (map['longitude'] as num?)?.toDouble(),
       phone: map['phone'] as String,
       openingHours: map['opening_hours'] as String,
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
@@ -48,7 +53,8 @@ class Pharmacy {
     return {
       'pharmacy_id': pharmacyId,
       'name': name,
-      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
       'phone': phone,
       'opening_hours': openingHours,
       'rating': rating,
