@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../screens/tracking_page.dart';
-import '../screens/statistics_page.dart';
+import '../screens/reminders/statistics_page.dart';
 import '../screens/edit_medicine_page.dart';
 
 class CommonTopSection extends StatelessWidget {

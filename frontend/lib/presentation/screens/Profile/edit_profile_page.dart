@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text.dart';
-import '../services/mock_database_service.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text.dart';
+import '../../services/mock_database_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
