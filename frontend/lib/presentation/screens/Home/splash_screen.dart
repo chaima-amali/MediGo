@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
 import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {

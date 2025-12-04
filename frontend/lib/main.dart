@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/presentation/screens/Home/splash_screen.dart';
 import 'package:frontend/presentation/theme/app_theme.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import 'presentation/screens/splash_screen.dart';
+import 'package:frontend/data/repositories/user_repo.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
 
 
 void main() {
@@ -14,7 +17,9 @@ class MediGoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return BlocProvider(
+      create: (context) => UserCubit(UserRepository()),
+      child: MaterialApp(
       
       title: 'MediGo',
       theme: appTheme,
@@ -32,6 +37,7 @@ class MediGoApp extends StatelessWidget {
 
 
       //ReservationDetailsScreen(reservationId: 'res_002',),
+      ),
     );
   }
 }

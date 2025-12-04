@@ -6,7 +6,8 @@ class User {
   final String password;
   final String gender;
   final String dob;
-  final String location;
+  final double? latitude;
+  final double? longitude;
   final String premium;
 
   User({
@@ -17,7 +18,8 @@ class User {
     required this.password,
     required this.gender,
     required this.dob,
-    required this.location,
+    this.latitude,
+    this.longitude,
     required this.premium,
   });
 
@@ -29,7 +31,8 @@ class User {
     String? password,
     String? gender,
     String? dob,
-    String? location,
+    double? latitude,
+    double? longitude,
     String? premium,
   }) {
     return User(
@@ -40,7 +43,8 @@ class User {
       password: password ?? this.password,
       gender: gender ?? this.gender,
       dob: dob ?? this.dob,
-      location: location ?? this.location,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       premium: premium ?? this.premium,
     );
   }
@@ -54,7 +58,8 @@ class User {
       password: map['password'] as String,
       gender: map['gender'] as String,
       dob: map['dob'] as String,
-      location: map['location'] as String,
+      latitude: (map['latitude'] as num?)?.toDouble(),
+      longitude: (map['longitude'] as num?)?.toDouble(),
       premium: map['premium'] as String,
     );
   }
@@ -68,7 +73,8 @@ class User {
       'password': password,
       'gender': gender,
       'dob': dob,
-      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
       'premium': premium,
     };
   }
