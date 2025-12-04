@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() {
-  runApp(const MediGoApp());
-}
 
 class MediGoApp extends StatelessWidget {
   const MediGoApp({Key? key}) : super(key: key);

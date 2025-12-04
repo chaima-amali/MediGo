@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import '../theme/app_colors.dart';
+import '../../theme/app_colors.dart';
 
 
 
