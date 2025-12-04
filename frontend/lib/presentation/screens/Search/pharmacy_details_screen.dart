@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text.dart';
-import '../widgets/back_arrow.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
 
 class PharmacyDetailScreen extends StatefulWidget {
   final Map<String, dynamic> pharmacy;

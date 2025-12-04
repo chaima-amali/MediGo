@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text.dart';
-import '../services/mock_database_service.dart';
-import '../widgets/back_arrow.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
+import 'package:frontend/presentation/services/mock_database_service.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
 import 'reservation_confirm.dart' show ReservationDetailsPage;
 import 'reservation_complete.dart' show ReservationComplete;
 
