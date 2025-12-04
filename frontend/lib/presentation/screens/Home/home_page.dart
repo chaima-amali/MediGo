@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/presentation/services/mock_database_service.dart';
+import 'package:frontend/presentation/services/navigation_helper.dart' as nav_helper;
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/widgets/Bottom_Navbar.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import 'Search_results_page.dart';
-import 'notifications.dart' as notif_page;
-import 'tracking_page.dart';
-import 'profile_page.dart';
-import '../services/mock_database_service.dart';
-import '../theme/app_colors.dart';
-import '../services/navigation_helper.dart' as nav_helper;
-import '../widgets/Bottom_Navbar.dart';
-import 'pharmacy_details_screen.dart';
-import 'reservations_form.dart';
+import '../Search/Search_results_page.dart';
+import '../notifications.dart' as notif_page;
+import '../reminders/tracking_page.dart';
+import '../Profile/profile_page.dart';
+import '../Search/pharmacy_details_screen.dart';
+import '../Reservations/reservations_form.dart';
 
 void main() {
   runApp(const MediGoApp());
