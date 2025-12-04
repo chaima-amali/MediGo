@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'medicine_calendar.dart';
-import 'add_medicine_page.dart';
-import 'statistics_page.dart';
-import 'edit_page.dart';
+import 'reminders/add_medicine_page.dart';
+import 'reminders/statistics_page.dart';
+import 'reminders/edit_page.dart';
 import 'notifications.dart'; 
 
 class TrackingPage extends StatefulWidget {
