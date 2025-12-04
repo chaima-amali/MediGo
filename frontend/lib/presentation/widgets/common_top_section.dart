@@ -5,7 +5,6 @@ import '../theme/app_colors.dart';
 
 import '../screens/reminders/statistics_page.dart';
 
-
 class CommonTopSection extends StatelessWidget {
   final String activeTab;
   const CommonTopSection({super.key, required this.activeTab});
