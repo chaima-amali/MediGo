@@ -203,5 +203,17 @@
   "pickupTimeDuringHours": "Veuillez sélectionner une heure de retrait pendant les heures d'ouverture de la pharmacie",
   "reservationConfirmed": "Réservation confirmée !",
   "selectDateAndTime": "Veuillez sélectionner la date et l'heure",
-  "securePickupProcess": "Processus de retrait sécurisé"
+  "securePickupProcess": "Processus de retrait sécurisé",
+  "completeForm": "Complétez le formulaire pour réserver votre médicament",
+  "openHours": "Heures d'ouverture",
+  "showQrCode": "Afficher le code QR pour scanner",
+  "reservationInstructions1": "Votre ID de réservation et code QR avec un code de vérification unique à 6 chiffres",
+  "reservationInstructions2": "À votre arrivée à la pharmacie, montrez votre code. Notre personnel vérifiera votre code ou le code QR dans le texte",
+  "reservationInstructions3": "La pharmacie vérifiera votre code et votre identité (une pièce d'identité peut être requise)",
+  "reservationInstructions4": "Une fois vérifié, le personnel vous donnera votre médicament et vous pourrez marquer la commande comme complétée",
+  "verificationNote": "Note : votre code de vérification est valide. Ne partagez jamais votre code avec qui que ce soit. Gardez ce code en sécurité.",
+  "confirmReservation": "Confirmer la réservation",
+  "reserveCancelQuestion": "Annuler la réservation ?",
+  "reservationCancelledSuccess": "Réservation annulée avec succès",
+  "pharmacyWillConfirm": "La pharmacie confirmera votre réservation sous peu. Vous serez notifié une fois qu'elle sera prête."
 }

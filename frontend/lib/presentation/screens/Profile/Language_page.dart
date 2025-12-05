@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../../../main.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';

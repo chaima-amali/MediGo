@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/presentation/screens/Home/splash_screen.dart';
 import 'package:frontend/presentation/theme/app_theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/data/repositories/user_repo.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/data/databases/db_helper.dart';

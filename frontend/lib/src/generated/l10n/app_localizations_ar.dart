@@ -548,10 +548,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get completeFormMessage => 'أكمل النموذج لحجز دوائك';
 
   @override
+  String get completeForm => 'أكمل النموذج لحجز دوائك';
+
+  @override
   String get medicineName => 'اسم الدواء';
 
   @override
   String get pharmacyHoursInfo => 'ساعات عمل الصيدلية';
+
+  @override
+  String get openHours => 'ساعات العمل';
 
   @override
   String get nextButton => 'التالي';
@@ -564,6 +570,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get showQRCode => 'عرض رمز QR للمسح';
+
+  @override
+  String get showQrCode => 'عرض رمز QR للمسح';
 
   @override
   String get showCodeAtPickup => 'أظهر هذا الرمز عند الاستلام.';
@@ -582,6 +591,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reservationInstructions => 'تعليمات الحجز';
 
   @override
+  String get reservationInstructions1 =>
+      'معرف الحجز ورمز QR الخاص بك مع رمز تحقق فريد مكون من 6 أرقام';
+
+  @override
+  String get reservationInstructions2 =>
+      'عند وصولك إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز QR في النص';
+
+  @override
+  String get reservationInstructions3 =>
+      'ستتحقق الصيدلية من رمزك وهويتك (قد يلزم إبراز الهوية)';
+
+  @override
+  String get reservationInstructions4 =>
+      'بمجرد التحقق، سيعطيك الموظف دواءك ويمكنك وضع علامة على الطلب كمكتمل';
+
+  @override
   String get step1 => 'معرف حجزك ورمز QR مع رمز تحقق فريد من 6 أرقام';
 
   @override
@@ -597,6 +622,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get securityNote =>
+      'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص. احتفظ بهذا الرمز آمنًا.';
+
+  @override
+  String get verificationNote =>
       'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص. احتفظ بهذا الرمز آمنًا.';
 
   @override
@@ -622,8 +651,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reservationConfirmed => 'تم تأكيد الحجز!';
 
   @override
+  String get confirmReservation => 'تأكيد الحجز';
+
+  @override
   String get selectDateAndTime => 'يرجى اختيار التاريخ والوقت';
 
   @override
   String get securePickupProcess => 'عملية الاستلام الآمنة';
+
+  @override
+  String get reserveCancelQuestion => 'إلغاء الحجز؟';
+
+  @override
+  String get reservationCancelledSuccess => 'تم إلغاء الحجز بنجاح';
+
+  @override
+  String get pharmacyWillConfirm =>
+      'ستقوم الصيدلية بتأكيد حجزك قريبًا. سيتم إعلامك بمجرد أن يصبح جاهزًا.';
 }

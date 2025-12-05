@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
 
 C:\Users\dell\Desktop\3rd Year\semester1\Mobile dev\MediGo\frontend>flutter run

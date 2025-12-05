@@ -203,5 +203,17 @@
   "pickupTimeDuringHours": "يرجى اختيار وقت الاستلام خلال ساعات عمل الصيدلية",
   "reservationConfirmed": "تم تأكيد الحجز!",
   "selectDateAndTime": "يرجى اختيار التاريخ والوقت",
-  "securePickupProcess": "عملية الاستلام الآمنة"
+  "securePickupProcess": "عملية الاستلام الآمنة",
+  "completeForm": "أكمل النموذج لحجز دوائك",
+  "openHours": "ساعات العمل",
+  "showQrCode": "عرض رمز QR للمسح",
+  "reservationInstructions1": "معرف الحجز ورمز QR الخاص بك مع رمز تحقق فريد مكون من 6 أرقام",
+  "reservationInstructions2": "عند وصولك إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز QR في النص",
+  "reservationInstructions3": "ستتحقق الصيدلية من رمزك وهويتك (قد يلزم إبراز الهوية)",
+  "reservationInstructions4": "بمجرد التحقق، سيعطيك الموظف دواءك ويمكنك وضع علامة على الطلب كمكتمل",
+  "verificationNote": "ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص. احتفظ بهذا الرمز آمنًا.",
+  "confirmReservation": "تأكيد الحجز",
+  "reserveCancelQuestion": "إلغاء الحجز؟",
+  "reservationCancelledSuccess": "تم إلغاء الحجز بنجاح",
+  "pharmacyWillConfirm": "ستقوم الصيدلية بتأكيد حجزك قريبًا. سيتم إعلامك بمجرد أن يصبح جاهزًا."
 }

@@ -553,10 +553,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Complete the form to reserve your medicine';
 
   @override
+  String get completeForm => 'Complete the form to reserve your medicine';
+
+  @override
   String get medicineName => 'Medicine Name';
 
   @override
   String get pharmacyHoursInfo => 'Pharmacy Hours';
+
+  @override
+  String get openHours => 'Open Hours';
 
   @override
   String get nextButton => 'Next';
@@ -569,6 +575,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showQRCode => 'Show QR Code for Scanning';
+
+  @override
+  String get showQrCode => 'Show QR Code for Scanning';
 
   @override
   String get showCodeAtPickup => 'Show this code at pickup.';
@@ -585,6 +594,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reservationInstructions => 'Reservation Instructions';
+
+  @override
+  String get reservationInstructions1 =>
+      'Your reservation ID and QR code with a unique 6-digit verification code';
+
+  @override
+  String get reservationInstructions2 =>
+      'When you arrive at the pharmacy, show your code. Our staff will verify your code or QR code in the text';
+
+  @override
+  String get reservationInstructions3 =>
+      'The pharmacy will verify your code and your identity (ID may be required)';
+
+  @override
+  String get reservationInstructions4 =>
+      'Once verified the staff will give your medicine and you can mark the order as completed';
 
   @override
   String get step1 =>
@@ -604,6 +629,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get securityNote =>
+      'Note: your verification code is valid. Never share your code with anyone. Keep this code secure.';
+
+  @override
+  String get verificationNote =>
       'Note: your verification code is valid. Never share your code with anyone. Keep this code secure.';
 
   @override
@@ -629,8 +658,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservationConfirmed => 'Reservation confirmed!';
 
   @override
+  String get confirmReservation => 'Confirm Reservation';
+
+  @override
   String get selectDateAndTime => 'Please select date and time';
 
   @override
   String get securePickupProcess => 'Secure Pickup Process';
+
+  @override
+  String get reserveCancelQuestion => 'Cancel Reservation?';
+
+  @override
+  String get reservationCancelledSuccess =>
+      'Reservation cancelled successfully';
+
+  @override
+  String get pharmacyWillConfirm =>
+      'The pharmacy will confirm your reservation shortly. You will be notified once it\'s ready.';
 }

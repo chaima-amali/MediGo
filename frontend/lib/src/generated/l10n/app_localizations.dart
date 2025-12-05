@@ -1138,6 +1138,12 @@ abstract class AppLocalizations {
   /// **'Complete the form to reserve your medicine'**
   String get completeFormMessage;
 
+  /// No description provided for @completeForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the form to reserve your medicine'**
+  String get completeForm;
+
   /// No description provided for @medicineName.
   ///
   /// In en, this message translates to:
@@ -1149,6 +1155,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pharmacy Hours'**
   String get pharmacyHoursInfo;
+
+  /// No description provided for @openHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Hours'**
+  String get openHours;
 
   /// No description provided for @nextButton.
   ///
@@ -1173,6 +1185,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show QR Code for Scanning'**
   String get showQRCode;
+
+  /// No description provided for @showQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Show QR Code for Scanning'**
+  String get showQrCode;
 
   /// No description provided for @showCodeAtPickup.
   ///
@@ -1204,6 +1222,30 @@ abstract class AppLocalizations {
   /// **'Reservation Instructions'**
   String get reservationInstructions;
 
+  /// No description provided for @reservationInstructions1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reservation ID and QR code with a unique 6-digit verification code'**
+  String get reservationInstructions1;
+
+  /// No description provided for @reservationInstructions2.
+  ///
+  /// In en, this message translates to:
+  /// **'When you arrive at the pharmacy, show your code. Our staff will verify your code or QR code in the text'**
+  String get reservationInstructions2;
+
+  /// No description provided for @reservationInstructions3.
+  ///
+  /// In en, this message translates to:
+  /// **'The pharmacy will verify your code and your identity (ID may be required)'**
+  String get reservationInstructions3;
+
+  /// No description provided for @reservationInstructions4.
+  ///
+  /// In en, this message translates to:
+  /// **'Once verified the staff will give your medicine and you can mark the order as completed'**
+  String get reservationInstructions4;
+
   /// No description provided for @step1.
   ///
   /// In en, this message translates to:
@@ -1233,6 +1275,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Note: your verification code is valid. Never share your code with anyone. Keep this code secure.'**
   String get securityNote;
+
+  /// No description provided for @verificationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note: your verification code is valid. Never share your code with anyone. Keep this code secure.'**
+  String get verificationNote;
 
   /// No description provided for @reservedOn.
   ///
@@ -1276,6 +1324,12 @@ abstract class AppLocalizations {
   /// **'Reservation confirmed!'**
   String get reservationConfirmed;
 
+  /// No description provided for @confirmReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Reservation'**
+  String get confirmReservation;
+
   /// No description provided for @selectDateAndTime.
   ///
   /// In en, this message translates to:
@@ -1287,6 +1341,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Secure Pickup Process'**
   String get securePickupProcess;
+
+  /// No description provided for @reserveCancelQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Reservation?'**
+  String get reserveCancelQuestion;
+
+  /// No description provided for @reservationCancelledSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation cancelled successfully'**
+  String get reservationCancelledSuccess;
+
+  /// No description provided for @pharmacyWillConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'The pharmacy will confirm your reservation shortly. You will be notified once it\'s ready.'**
+  String get pharmacyWillConfirm;
 }
 
 class _AppLocalizationsDelegate

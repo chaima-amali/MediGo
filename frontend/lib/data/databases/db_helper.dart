@@ -17,7 +17,7 @@ import 'db_reservation.dart';
 
 class DBHelper {
   static const _databaseName = "medic_app.db";
-  static const _databaseVersion = 3;
+  static const _databaseVersion = 4;
   static Database? _database;
 
   // List all table create statements in order
@@ -85,6 +85,16 @@ class DBHelper {
         // Future upgrades can be added here
         if (oldVersion < 3) {
           print('✅ Database upgraded to version 3');
+        }
+        
+        // Version 4: Ensure location_name column exists
+        if (oldVersion < 4) {
+          try {
+            await db.execute('ALTER TABLE user ADD COLUMN location_name TEXT');
+            print('✅ Added location_name to user table (v4)');
+          } catch (e) {
+            print('⚠️ Column location_name already exists: $e');
+          }
         }
       },
     );
