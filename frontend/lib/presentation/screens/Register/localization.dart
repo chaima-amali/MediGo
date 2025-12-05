@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import '../../../src/generated/l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';
@@ -174,6 +175,22 @@ class LocalizationPage extends StatelessWidget {
 
                             print('🌍 GPS Location Retrieved: Latitude=${position.latitude}, Longitude=${position.longitude}');
 
+                            // Get location name from coordinates
+                            String locationName = 'Unknown Location';
+                            try {
+                              List<Placemark> placemarks = await placemarkFromCoordinates(
+                                position.latitude,
+                                position.longitude,
+                              );
+                              if (placemarks.isNotEmpty) {
+                                final place = placemarks.first;
+                                locationName = '${place.locality ?? place.subAdministrativeArea ?? place.administrativeArea ?? "Unknown"}';
+                                print('📍 Location Name: $locationName');
+                              }
+                            } catch (e) {
+                              print('⚠️ Error getting location name: $e');
+                            }
+
                             final userCubit = BlocProvider.of<UserCubit>(context);
                             
                             if (userData != null) {
@@ -181,6 +198,7 @@ class LocalizationPage extends StatelessWidget {
                               final userWithLocation = userData!.copyWith(
                                 latitude: position.latitude,
                                 longitude: position.longitude,
+                                locationName: locationName,
                               );
                               print('💾 Saving new user to database with location');
                               await userCubit.registerUser(userWithLocation);
