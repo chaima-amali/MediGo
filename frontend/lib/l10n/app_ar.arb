@@ -112,14 +112,25 @@
   "subscribeYearly": "اشتراك سنوي (أفضل قيمة)",
   "success": "نجاح!",
   "ok": "موافق",
-  "subscriptionSuccessMessage": "لقد اشتركت بنجاح في خطة $planName!",
+  "subscriptionSuccessMessage": "لقد اشتركت بنجاح في خطe!",
   "medicinePreOrderReservation": "الحجز والطلب المسبق للأدوية",
   "medicinePreOrderDescription": "قم بطلب دوائك مسبقًا وحجزه ثم توجه للاستلام عندما تكون متفرغًا",
   "instantRestockAlerts": "تنبيهات إعادة التوفير الفورية",
   "instantRestockDescription": "احصل على إشعار فور توفر الأدوية غير المتوفرة",
   "adFreeExperience": "تجربة خالية من الإعلانات",
-  "adFreeDescription": "استمتع بواجهة نظيفة وخالية من الإزعاج دون أي إعلانات"
-  
-
-  
+  "adFreeDescription": "استمتع بواجهة نظيفة وخالية من الإزعاج دون أي إعلانات",
+  "yourLocation": "موقعك؟",
+  "locationRequiredMessage": "يتطلب هذا التطبيق موقعك للعمل بشكل صحيح. يرجى السماح بالوصول إلى الموقع.",
+  "allowLocationAccess": "السماح بالوصول إلى الموقع",
+  "enterLocationManually": "إدخال الموقع يدويًا",
+  "locationServicesDisabled": "خدمات الموقع معطلة. يرجى تفعيلها في الإعدادات.",
+  "locationPermissionDenied": "تم رفض إذن الموقع",
+  "locationPermissionPermanentlyDenied": "تم رفض إذن الموقع بشكل دائم. يرجى تفعيله في إعدادات التطبيق.",
+  "errorGettingLocation": "خطأ في الحصول على الموقع",
+  "searchYourLocation": "ابحث عن موقعك",
+  "searchLocationHint": "مثال: الجزائر، الجزائر",
+  "useCurrentLocation": "استخدام موقعي الحالي",
+  "searchResults": "نتائج البحث",
+  "errorSavingLocation": "خطأ في حفظ الموقع",
+  "pleaseEnterEmail": "الرجاء إدخال بريدك الإلكتروني"
 }

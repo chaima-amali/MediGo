@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../../src/generated/l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';
 import '../../../logic/cubits/user_cubit.dart';
@@ -279,7 +280,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Search your location',
+                    AppLocalizations.of(context)!.searchYourLocation,
                     style: AppText.bold.copyWith(
                       fontSize: 20,
                       color: AppColors.darkBlue,
@@ -304,7 +305,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
                   controller: _searchController,
                   onChanged: _searchLocation,
                   decoration: InputDecoration(
-                    hintText: 'eg: Algiers,Algeria',
+                    hintText: AppLocalizations.of(context)!.searchLocationHint,
                     hintStyle: AppText.regular.copyWith(
                       color: AppColors.darkBlue.withOpacity(0.4),
                       fontSize: 14,
@@ -337,7 +338,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Use my current location',
+                      AppLocalizations.of(context)!.useCurrentLocation,
                       style: AppText.medium.copyWith(
                         fontSize: 15,
                         color: AppColors.darkBlue,
@@ -358,7 +359,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
                 ),
               if (_isSearching && searchResults.isNotEmpty && !_isLoading) ...[
                 Text(
-                  'Search results',
+                  AppLocalizations.of(context)!.searchResults,
                   style: AppText.regular.copyWith(
                     fontSize: 13,
                     color: AppColors.darkBlue.withOpacity(0.5),
@@ -390,7 +391,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
               if (_isSearching && searchResults.isEmpty && !_isLoading)
                 Center(
                   child: Text(
-                    'No results found',
+                    AppLocalizations.of(context)!.noResultsFound,
                     style: AppText.regular.copyWith(
                       fontSize: 14,
                       color: AppColors.darkBlue.withOpacity(0.5),

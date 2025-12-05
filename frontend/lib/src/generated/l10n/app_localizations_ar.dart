@@ -61,7 +61,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get email => 'البريد الإلكتروني';
 
   @override
-  String get pleaseEnterEmail => 'Please enter your email';
+  String get pleaseEnterEmail => 'الرجاء إدخال بريدك الإلكتروني';
 
   @override
   String get validEmail => 'الرجاء إدخال بريد إلكتروني صحيح';
@@ -338,8 +338,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ok => 'موافق';
 
   @override
-  String get subscriptionSuccessMessage =>
-      'لقد اشتركت بنجاح في خطة \$planName!';
+  String get subscriptionSuccessMessage => 'لقد اشتركت بنجاح في خطe!';
 
   @override
   String get medicinePreOrderReservation => 'الحجز والطلب المسبق للأدوية';
@@ -361,4 +360,46 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get adFreeDescription =>
       'استمتع بواجهة نظيفة وخالية من الإزعاج دون أي إعلانات';
+
+  @override
+  String get yourLocation => 'موقعك؟';
+
+  @override
+  String get locationRequiredMessage =>
+      'يتطلب هذا التطبيق موقعك للعمل بشكل صحيح. يرجى السماح بالوصول إلى الموقع.';
+
+  @override
+  String get allowLocationAccess => 'السماح بالوصول إلى الموقع';
+
+  @override
+  String get enterLocationManually => 'إدخال الموقع يدويًا';
+
+  @override
+  String get locationServicesDisabled =>
+      'خدمات الموقع معطلة. يرجى تفعيلها في الإعدادات.';
+
+  @override
+  String get locationPermissionDenied => 'تم رفض إذن الموقع';
+
+  @override
+  String get locationPermissionPermanentlyDenied =>
+      'تم رفض إذن الموقع بشكل دائم. يرجى تفعيله في إعدادات التطبيق.';
+
+  @override
+  String get errorGettingLocation => 'خطأ في الحصول على الموقع';
+
+  @override
+  String get searchYourLocation => 'ابحث عن موقعك';
+
+  @override
+  String get searchLocationHint => 'مثال: الجزائر، الجزائر';
+
+  @override
+  String get useCurrentLocation => 'استخدام موقعي الحالي';
+
+  @override
+  String get searchResults => 'نتائج البحث';
+
+  @override
+  String get errorSavingLocation => 'خطأ في حفظ الموقع';
 }
