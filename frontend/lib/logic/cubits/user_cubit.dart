@@ -89,7 +89,14 @@ class UserCubit extends Cubit<UserState> {
 
       // Insert user
       await userRepository.insertUser(user);
-      emit(const UserOperationSuccess('User registered successfully'));
+      
+      // After successful registration, load the user to set authenticated state
+      final registeredUser = await userRepository.getUserByEmail(user.email);
+      if (registeredUser != null) {
+        emit(UserAuthenticated(registeredUser));
+      } else {
+        emit(const UserOperationSuccess('User registered successfully'));
+      }
     } catch (e) {
       emit(UserError('Failed to register user: $e'));
     }

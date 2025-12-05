@@ -11,10 +11,7 @@ class UserRepository {
   Future<int> insertUser(User user) async {
     final db = await _db;
     final userData = user.toMap();
-    // Remove location_name if null to avoid column errors on older databases
-    if (userData['location_name'] == null) {
-      userData.remove('location_name');
-    }
+    
     return await db.insert(
       DBUserTable.table,
       userData,

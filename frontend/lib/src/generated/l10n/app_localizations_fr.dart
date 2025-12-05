@@ -560,10 +560,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Complétez le formulaire pour réserver votre médicament';
 
   @override
+  String get completeForm =>
+      'Complétez le formulaire pour réserver votre médicament';
+
+  @override
   String get medicineName => 'Nom du médicament';
 
   @override
   String get pharmacyHoursInfo => 'Horaires de la pharmacie';
+
+  @override
+  String get openHours => 'Heures d\'ouverture';
 
   @override
   String get nextButton => 'Suivant';
@@ -576,6 +583,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get showQRCode => 'Afficher le code QR pour scanner';
+
+  @override
+  String get showQrCode => 'Afficher le code QR pour scanner';
 
   @override
   String get showCodeAtPickup => 'Montrez ce code lors du retrait.';
@@ -592,6 +602,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reservationInstructions => 'Instructions de réservation';
+
+  @override
+  String get reservationInstructions1 =>
+      'Votre ID de réservation et code QR avec un code de vérification unique à 6 chiffres';
+
+  @override
+  String get reservationInstructions2 =>
+      'À votre arrivée à la pharmacie, montrez votre code. Notre personnel vérifiera votre code ou le code QR dans le texte';
+
+  @override
+  String get reservationInstructions3 =>
+      'La pharmacie vérifiera votre code et votre identité (une pièce d\'identité peut être requise)';
+
+  @override
+  String get reservationInstructions4 =>
+      'Une fois vérifié, le personnel vous donnera votre médicament et vous pourrez marquer la commande comme complétée';
 
   @override
   String get step1 =>
@@ -612,6 +638,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get securityNote =>
       'Remarque : votre code de vérification est valide. Ne partagez jamais votre code avec qui que ce soit. Gardez ce code en sécurité.';
+
+  @override
+  String get verificationNote =>
+      'Note : votre code de vérification est valide. Ne partagez jamais votre code avec qui que ce soit. Gardez ce code en sécurité.';
 
   @override
   String get reservedOn => 'Réservé le';
@@ -636,8 +666,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reservationConfirmed => 'Réservation confirmée !';
 
   @override
+  String get confirmReservation => 'Confirmer la réservation';
+
+  @override
   String get selectDateAndTime => 'Veuillez sélectionner la date et l\'heure';
 
   @override
   String get securePickupProcess => 'Processus de retrait sécurisé';
+
+  @override
+  String get reserveCancelQuestion => 'Annuler la réservation ?';
+
+  @override
+  String get reservationCancelledSuccess => 'Réservation annulée avec succès';
+
+  @override
+  String get pharmacyWillConfirm =>
+      'La pharmacie confirmera votre réservation sous peu. Vous serez notifié une fois qu\'elle sera prête.';
 }
