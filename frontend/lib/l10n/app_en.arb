@@ -118,8 +118,19 @@
   "instantRestockAlerts": "Instant Restock Alerts",
   "instantRestockDescription": "Get notified immediately when out-of-stock medicines are available",
   "adFreeExperience": "Ad-Free Experience",
-  "adFreeDescription": "Enjoy a clean, distraction-free interface without any ads"
-
-
+  "adFreeDescription": "Enjoy a clean, distraction-free interface without any ads",
+  "yourLocation": "Your Location?",
+  "locationRequiredMessage": "This app requires your location to function properly. Please allow location access.",
+  "allowLocationAccess": "Allow Location Access",
+  "enterLocationManually": "Enter Location Manually",
+  "locationServicesDisabled": "Location services are disabled. Please enable them in settings.",
+  "locationPermissionDenied": "Location permission denied",
+  "locationPermissionPermanentlyDenied": "Location permission permanently denied. Please enable it in app settings.",
+  "errorGettingLocation": "Error getting location",
+  "searchYourLocation": "Search your location",
+  "searchLocationHint": "eg: Algiers,Algeria",
+  "useCurrentLocation": "Use my current location",
+  "searchResults": "Search results",
+  "errorSavingLocation": "Error saving location"
 }
 

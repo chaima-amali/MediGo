@@ -362,4 +362,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adFreeDescription =>
       'Enjoy a clean, distraction-free interface without any ads';
+
+  @override
+  String get yourLocation => 'Your Location?';
+
+  @override
+  String get locationRequiredMessage =>
+      'This app requires your location to function properly. Please allow location access.';
+
+  @override
+  String get allowLocationAccess => 'Allow Location Access';
+
+  @override
+  String get enterLocationManually => 'Enter Location Manually';
+
+  @override
+  String get locationServicesDisabled =>
+      'Location services are disabled. Please enable them in settings.';
+
+  @override
+  String get locationPermissionDenied => 'Location permission denied';
+
+  @override
+  String get locationPermissionPermanentlyDenied =>
+      'Location permission permanently denied. Please enable it in app settings.';
+
+  @override
+  String get errorGettingLocation => 'Error getting location';
+
+  @override
+  String get searchYourLocation => 'Search your location';
+
+  @override
+  String get searchLocationHint => 'eg: Algiers,Algeria';
+
+  @override
+  String get useCurrentLocation => 'Use my current location';
+
+  @override
+  String get searchResults => 'Search results';
+
+  @override
+  String get errorSavingLocation => 'Error saving location';
 }
