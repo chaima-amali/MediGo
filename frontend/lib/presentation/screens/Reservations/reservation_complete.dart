@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ReservationComplete extends StatelessWidget {
   const ReservationComplete({Key? key}) : super(key: key);
@@ -35,7 +36,7 @@ class ReservationComplete extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            'Reservation Details',
+                            AppLocalizations.of(context)!.reservationDetails,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -54,7 +55,7 @@ class ReservationComplete extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            'completed',
+                            AppLocalizations.of(context)!.completed,
                             style: TextStyle(
                               color: Color(0xFF1976D2),
                               fontSize: 12,
@@ -110,7 +111,7 @@ class ReservationComplete extends StatelessWidget {
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  'Quantity: 1',
+                                  '${AppLocalizations.of(context)!.quantity}: 1',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
@@ -154,7 +155,7 @@ class ReservationComplete extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Pickup Date',
+                                      AppLocalizations.of(context)!.pickupDate,
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.grey,
@@ -187,7 +188,7 @@ class ReservationComplete extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Pickup Time',
+                                      AppLocalizations.of(context)!.pickupTime,
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.grey,
@@ -214,7 +215,7 @@ class ReservationComplete extends StatelessWidget {
 
                     // Pharmacy Information
                     Text(
-                      'Pharmacy Information',
+                      AppLocalizations.of(context)!.pharmacyInformation,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -349,7 +350,7 @@ class ReservationComplete extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Completed',
+                                  AppLocalizations.of(context)!.completed,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -358,7 +359,7 @@ class ReservationComplete extends StatelessWidget {
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  'Picked up successfully.',
+                                  AppLocalizations.of(context)!.pickedUpSuccessfully,
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Color(0xFF1976D2),
@@ -393,7 +394,7 @@ class ReservationComplete extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Reservation ID',
+                                AppLocalizations.of(context)!.reservationId,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey,
@@ -410,7 +411,7 @@ class ReservationComplete extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Created',
+                                AppLocalizations.of(context)!.created,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey,

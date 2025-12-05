@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
+C:\Users\dell\Desktop\3rd Year\semester1\Mobile dev\MediGo\frontend>flutter run
+Launching lib\main.dart on SM A127F in debug mode...
+Running Gradle task 'assembleDebug'...                              3,9s
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...          61,2s
+D/FlutterJNI(14530): Beginning load of flutter...
+D/FlutterJNI(14530): flutter (null) was loaded normally!
+I/flutter (14530): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).       
+
+C:\Users\dell\Desktop\3rd Year\semester1\Mobile dev\MediGo\frontend>       
 class MediGoApp extends StatelessWidget {
   const MediGoApp({Key? key}) : super(key: key);
 
@@ -130,8 +141,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                             },
                             color: Colors.black87,
                           ),
-                          const Text(
-                            'Reserve Medicine',
+                          Text(
+                            AppLocalizations.of(context)!.reserveMedicine,
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -143,8 +154,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                       const SizedBox(height: 10),
                       
                       // Subtitle
-                      const Text(
-                        'Complete the form to reserve your medicine',
+                      Text(
+                        AppLocalizations.of(context)!.completeForm,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
@@ -211,8 +222,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                       const SizedBox(height: 25),
                       
                       // Medicine Name
-                      const Text(
-                        'Medicine Name',
+                      Text(
+                        AppLocalizations.of(context)!.medicineName,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -235,7 +246,7 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                         child: TextField(
                           
                           decoration: InputDecoration(
-                            hintText: 'Enter medicine name',
+                            hintText: AppLocalizations.of(context)!.enterMedicineName,
                             hintStyle: TextStyle(color: Colors.grey[400]),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
@@ -245,8 +256,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                       const SizedBox(height: 20),
                       
                       // Quantity
-                      const Text(
-                        'Quantity',
+                      Text(
+                        AppLocalizations.of(context)!.quantity,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -273,7 +284,7 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           decoration: InputDecoration(
-                            hintText: 'Enter quantity',
+                            hintText: AppLocalizations.of(context)!.enterQuantity,
                             hintStyle: TextStyle(color: Colors.grey[400]),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
@@ -290,8 +301,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Pickup Date',
+                                Text(
+                                  AppLocalizations.of(context)!.pickupDate,
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
@@ -325,7 +336,7 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                                         Text(
                                           _selectedDate != null
                                               ? _formatDate(_selectedDate!)
-                                              : 'Select',
+                                              : AppLocalizations.of(context)!.select,
                                           style: TextStyle(
                                             color: _selectedDate != null
                                                 ? Colors.black87
@@ -347,8 +358,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Pickup Time',
+                                Text(
+                                  AppLocalizations.of(context)!.pickupTime,
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
@@ -382,7 +393,7 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                                         Text(
                                           _selectedTime != null
                                               ? _formatTime(_selectedTime!)
-                                              : 'Select',
+                                              : AppLocalizations.of(context)!.select,
                                           style: TextStyle(
                                             color: _selectedTime != null
                                                 ? Colors.black87
@@ -411,8 +422,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Pharmacy Hours',
+                            Text(
+                              AppLocalizations.of(context)!.openHours,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -429,7 +440,7 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              'Please select a pickup time during pharmacy hours',
+                              AppLocalizations.of(context)!.pickupTimeDuringHours,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -448,15 +459,15 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                             // Handle reservation confirmation
                             if (_selectedDate != null && _selectedTime != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Reservation confirmed!'),
+                                SnackBar(
+                                  content: Text(AppLocalizations.of(context)!.reservationConfirmed),
                                   backgroundColor: Color(0xFF4DD0E1),
                                 ),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please select date and time'),
+                                SnackBar(
+                                  content: Text(AppLocalizations.of(context)!.selectDateAndTime),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -471,8 +482,8 @@ class _ReserveMedicinePageState extends State<ReserveMedicinePage> {
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          child: const Text(
-                            'Confirm Reservation',
+                          child: Text(
+                            AppLocalizations.of(context)!.confirmReservation,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

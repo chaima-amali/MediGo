@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 
 class ReservationFormScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
       appBar: AppBar(
         backgroundColor: Colors.grey[50],
         elevation: 0,
-        title: Text('Reserve Medicine', style: TextStyle(color: Colors.black)),
+        title: Text(AppLocalizations.of(context)!.reserveMedicine, style: TextStyle(color: Colors.black)),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -35,7 +36,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Complete the form to reserve your medicine',
+                AppLocalizations.of(context)!.completeForm,
                 style: TextStyle(color: Colors.grey),
               ),
               SizedBox(height: 20),
@@ -84,7 +85,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
 
               // Medicine Name
               Text(
-                'Medicine Name',
+                AppLocalizations.of(context)!.medicineName,
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 8),
@@ -103,7 +104,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
               SizedBox(height: 16),
 
               // Quantity
-              Text('Quantity', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(AppLocalizations.of(context)!.quantity, style: TextStyle(fontWeight: FontWeight.w600)),
               SizedBox(height: 8),
               TextFormField(
                 initialValue: '1',
@@ -128,7 +129,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Pickup Date',
+                          AppLocalizations.of(context)!.pickupDate,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         SizedBox(height: 8),
@@ -163,7 +164,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Pickup Time',
+                          AppLocalizations.of(context)!.pickupTime,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         SizedBox(height: 8),
@@ -203,7 +204,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pharmacy Hours',
+                      AppLocalizations.of(context)!.openHours,
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     SizedBox(height: 4),
@@ -254,7 +255,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                     ),
                   ),
                   child: Text(
-                    'Confirm Reservation',
+                    AppLocalizations.of(context)!.confirmReservation,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),

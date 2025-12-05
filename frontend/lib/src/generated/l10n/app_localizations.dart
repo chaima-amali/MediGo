@@ -310,10 +310,16 @@ abstract class AppLocalizations {
   /// **'Gender'**
   String get gender;
 
+  /// No description provided for @selectGender.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Gender'**
+  String get selectGender;
+
   /// No description provided for @select.
   ///
   /// In en, this message translates to:
-  /// **'select'**
+  /// **'Select'**
   String get select;
 
   /// No description provided for @male.
@@ -333,6 +339,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get other;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
 
   /// No description provided for @dateOfBirth.
   ///
@@ -861,6 +873,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error saving location'**
   String get errorSavingLocation;
+
+  /// No description provided for @oldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Old password'**
+  String get oldPassword;
+
+  /// No description provided for @enterOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your old password'**
+  String get enterOldPassword;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// No description provided for @incorrectOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect old password'**
+  String get incorrectOldPassword;
+
+  /// No description provided for @passwordChangedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully'**
+  String get passwordChangedSuccessfully;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @confirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get confirmed;
+
+  /// No description provided for @statusGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Status Guide'**
+  String get statusGuide;
+
+  /// No description provided for @quantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get quantity;
+
+  /// No description provided for @pickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup'**
+  String get pickup;
+
+  /// No description provided for @at.
+  ///
+  /// In en, this message translates to:
+  /// **'at'**
+  String get at;
+
+  /// No description provided for @noActiveReservations.
+  ///
+  /// In en, this message translates to:
+  /// **'No active reservations'**
+  String get noActiveReservations;
+
+  /// No description provided for @noCompletedReservations.
+  ///
+  /// In en, this message translates to:
+  /// **'No completed reservations'**
+  String get noCompletedReservations;
+
+  /// No description provided for @noCancelledReservations.
+  ///
+  /// In en, this message translates to:
+  /// **'No cancelled reservations'**
+  String get noCancelledReservations;
+
+  /// No description provided for @yourReservationsWillAppearHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reservations will appear here'**
+  String get yourReservationsWillAppearHere;
+
+  /// No description provided for @pendingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation request submitted and waiting for pharmacy confirmation. You\'ll be notified once confirmed.'**
+  String get pendingDescription;
+
+  /// No description provided for @confirmedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy has confirmed your reservation. Medicine is ready for pickup at the scheduled date and time.'**
+  String get confirmedDescription;
+
+  /// No description provided for @completedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve successfully picked up the medicine from the pharmacy. Reservation is now complete.'**
+  String get completedDescription;
+
+  /// No description provided for @cancelledDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation was cancelled either by you, the pharmacy, or due to expiration. Medicine is no longer reserved.'**
+  String get cancelledDescription;
+
+  /// No description provided for @reservationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation Details'**
+  String get reservationDetails;
+
+  /// No description provided for @cancelReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Reservation'**
+  String get cancelReservation;
+
+  /// No description provided for @cancelReservationQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Reservation?'**
+  String get cancelReservationQuestion;
+
+  /// No description provided for @cancelReservationConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this reservation? This action cannot be undone.'**
+  String get cancelReservationConfirmation;
+
+  /// No description provided for @yesCancelReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Cancel'**
+  String get yesCancelReservation;
+
+  /// No description provided for @keepReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Reservation'**
+  String get keepReservation;
+
+  /// No description provided for @reservationCancelledSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation cancelled successfully'**
+  String get reservationCancelledSuccessfully;
+
+  /// No description provided for @reservationNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation not found'**
+  String get reservationNotFound;
+
+  /// No description provided for @unknownPharmacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Pharmacy'**
+  String get unknownPharmacy;
+
+  /// No description provided for @pickupDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup Date'**
+  String get pickupDate;
+
+  /// No description provided for @pickupTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup Time'**
+  String get pickupTime;
+
+  /// No description provided for @pharmacyInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy Information'**
+  String get pharmacyInformation;
+
+  /// No description provided for @awaitingConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting Confirmation'**
+  String get awaitingConfirmation;
+
+  /// No description provided for @awaitingConfirmationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The pharmacy will confirm your reservation shortly. You will be notified once it\'s ready.'**
+  String get awaitingConfirmationMessage;
+
+  /// No description provided for @getDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Directions'**
+  String get getDirections;
+
+  /// No description provided for @openingDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening directions...'**
+  String get openingDirections;
+
+  /// No description provided for @contactPharmacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Pharmacy'**
+  String get contactPharmacy;
+
+  /// No description provided for @calling.
+  ///
+  /// In en, this message translates to:
+  /// **'Calling'**
+  String get calling;
+
+  /// No description provided for @reservationId.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation ID'**
+  String get reservationId;
+
+  /// No description provided for @created.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get created;
+
+  /// No description provided for @reserveMedicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve Medicine'**
+  String get reserveMedicine;
+
+  /// No description provided for @completeFormMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the form to reserve your medicine'**
+  String get completeFormMessage;
+
+  /// No description provided for @medicineName.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Name'**
+  String get medicineName;
+
+  /// No description provided for @pharmacyHoursInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy Hours'**
+  String get pharmacyHoursInfo;
+
+  /// No description provided for @nextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextButton;
+
+  /// No description provided for @pickupCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup Code'**
+  String get pickupCode;
+
+  /// No description provided for @copyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Code'**
+  String get copyCode;
+
+  /// No description provided for @showQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Show QR Code for Scanning'**
+  String get showQRCode;
+
+  /// No description provided for @showCodeAtPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this code at pickup.'**
+  String get showCodeAtPickup;
+
+  /// No description provided for @readyForPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for Pickup'**
+  String get readyForPickup;
+
+  /// No description provided for @readyForPickupMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your medicine will be ready around 1\nhour before the selected pickup time'**
+  String get readyForPickupMessage;
+
+  /// No description provided for @needConsultation.
+  ///
+  /// In en, this message translates to:
+  /// **'Need a Consultation'**
+  String get needConsultation;
+
+  /// No description provided for @reservationInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation Instructions'**
+  String get reservationInstructions;
+
+  /// No description provided for @step1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reservation ID and QR code with a unique 6-digit verification code'**
+  String get step1;
+
+  /// No description provided for @step2.
+  ///
+  /// In en, this message translates to:
+  /// **'When you arrive at the pharmacy, show your code. Our staff will verify your code or QR code in the text'**
+  String get step2;
+
+  /// No description provided for @step3.
+  ///
+  /// In en, this message translates to:
+  /// **'The pharmacy will verify your code and your identity (ID may be required)'**
+  String get step3;
+
+  /// No description provided for @step4.
+  ///
+  /// In en, this message translates to:
+  /// **'Once verified the staff will give your medicine and you can mark the order as completed'**
+  String get step4;
+
+  /// No description provided for @securityNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note: your verification code is valid. Never share your code with anyone. Keep this code secure.'**
+  String get securityNote;
+
+  /// No description provided for @reservedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserved on'**
+  String get reservedOn;
+
+  /// No description provided for @pickedUpSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Picked up successfully.'**
+  String get pickedUpSuccessfully;
+
+  /// No description provided for @open24Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'Open 24 hours'**
+  String get open24Hours;
+
+  /// No description provided for @enterMedicineName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter medicine name'**
+  String get enterMedicineName;
+
+  /// No description provided for @enterQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter quantity'**
+  String get enterQuantity;
+
+  /// No description provided for @pickupTimeDuringHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a pickup time during pharmacy hours'**
+  String get pickupTimeDuringHours;
+
+  /// No description provided for @reservationConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation confirmed!'**
+  String get reservationConfirmed;
+
+  /// No description provided for @selectDateAndTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select date and time'**
+  String get selectDateAndTime;
+
+  /// No description provided for @securePickupProcess.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Pickup Process'**
+  String get securePickupProcess;
 }
 
 class _AppLocalizationsDelegate

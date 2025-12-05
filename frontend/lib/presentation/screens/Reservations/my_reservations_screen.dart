@@ -3,6 +3,7 @@ import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'reservation_details.dart';
 
 class MyReservationsScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class MyReservationsScreen extends StatefulWidget {
 }
 
 class _MyReservationsScreenState extends State<MyReservationsScreen> {
-  String _selectedTab = 'Active';
+  String _selectedTab = 'active'; // Use lowercase keys for consistency
   List<Map<String, dynamic>> _reservations = [];
   // Using modal bottom sheet now; no local bool required
 
@@ -26,15 +27,15 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   void _loadReservations() {
     final allReservations = MockDataService.getUserReservations();
     setState(() {
-      if (_selectedTab == 'Active') {
+      if (_selectedTab == 'active') {
         _reservations = allReservations
             .where((r) => r['status'] == 'pending')
             .toList();
-      } else if (_selectedTab == 'Completed') {
+      } else if (_selectedTab == 'completed') {
         _reservations = allReservations
             .where((r) => r['status'] == 'completed')
             .toList();
-      } else if (_selectedTab == 'Cancelled') {
+      } else if (_selectedTab == 'cancelled') {
         _reservations = allReservations
             .where((r) => r['status'] == 'cancelled')
             .toList();
@@ -72,8 +73,24 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
     }
   }
 
+  String _getLocalizedStatus(String status, AppLocalizations loc) {
+    switch (status) {
+      case 'pending':
+        return loc.pending;
+      case 'confirmed':
+        return loc.confirmed;
+      case 'completed':
+        return loc.completed;
+      case 'cancelled':
+        return loc.cancelled;
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final totalReservations = MockDataService.getUserReservations().length;
 
     return Scaffold(
@@ -101,7 +118,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'My Reservations',
+                          loc.myReservations,
                           style: AppText.bold.copyWith(
                             fontSize: 22,
                             color: AppColors.darkBlue,
@@ -173,9 +190,9 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                         ),
                         child: Row(
                           children: [
-                            Expanded(child: _buildTab('Active')),
-                            Expanded(child: _buildTab('Completed')),
-                            Expanded(child: _buildTab('Cancelled')),
+                            Expanded(child: _buildTab('active', loc.active)),
+                            Expanded(child: _buildTab('completed', loc.completed)),
+                            Expanded(child: _buildTab('cancelled', loc.cancelled)),
                           ],
                         ),
                       ),
@@ -248,7 +265,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Status Guide',
+                                loc.statusGuide,
                                 style: AppText.medium.copyWith(
                                   fontSize: 14,
                                   color: AppColors.primary,
@@ -269,12 +286,12 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
     );
   }
 
-  Widget _buildTab(String label) {
-    final isSelected = _selectedTab == label;
+  Widget _buildTab(String key, String displayText) {
+    final isSelected = _selectedTab == key;
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedTab = label;
+          _selectedTab = key;
         });
         _loadReservations();
       },
@@ -295,7 +312,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
         ),
         child: Center(
           child: Text(
-            label,
+            displayText,
             style: AppText.medium.copyWith(
               fontSize: 14,
               color: isSelected
@@ -309,6 +326,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   }
 
   Widget _buildReservationCard(Map<String, dynamic> reservation) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -343,7 +361,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Quantity: ${reservation['quantity']}',
+                      '${loc.quantity}: ${reservation['quantity']}',
                       style: AppText.regular.copyWith(
                         fontSize: 12,
                         color: AppColors.darkBlue.withOpacity(0.6),
@@ -362,7 +380,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  reservation['status'],
+                  _getLocalizedStatus(reservation['status'], loc),
                   style: AppText.medium.copyWith(
                     fontSize: 12,
                     color: _getStatusTextColor(reservation['status']),
@@ -399,7 +417,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
               ),
               const SizedBox(width: 4),
               Text(
-                'Pickup: ${reservation['pickup_date']} at ${reservation['pickup_time']}',
+                '${loc.pickup}: ${reservation['pickup_date']} ${loc.at} ${reservation['pickup_time']}',
                 style: AppText.regular.copyWith(
                   fontSize: 12,
                   color: AppColors.darkBlue.withOpacity(0.6),
@@ -413,6 +431,16 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   }
 
   Widget _buildEmptyState() {
+    final loc = AppLocalizations.of(context)!;
+    String emptyMessage;
+    if (_selectedTab == 'active') {
+      emptyMessage = loc.noActiveReservations;
+    } else if (_selectedTab == 'completed') {
+      emptyMessage = loc.noCompletedReservations;
+    } else {
+      emptyMessage = loc.noCancelledReservations;
+    }
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -424,7 +452,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No ${_selectedTab.toLowerCase()} reservations',
+            emptyMessage,
             style: AppText.medium.copyWith(
               fontSize: 16,
               color: AppColors.darkBlue.withOpacity(0.5),
@@ -432,7 +460,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Your reservations will appear here',
+            loc.yourReservationsWillAppearHere,
             style: AppText.regular.copyWith(
               fontSize: 14,
               color: AppColors.darkBlue.withOpacity(0.4),
@@ -444,6 +472,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   }
 
   Widget _buildStatusGuideSheet() {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -481,7 +510,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                 const Icon(Icons.bar_chart, color: AppColors.primary, size: 24),
                 const SizedBox(width: 8),
                 Text(
-                  'Status Guide',
+                  loc.statusGuide,
                   style: AppText.bold.copyWith(
                     fontSize: 18,
                     color: AppColors.darkBlue,
@@ -494,27 +523,23 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
           // Status items
           _buildStatusGuideItem(
             color: const Color(0xFFF59E0B),
-            title: 'Pending',
-            description:
-                'Reservation request submitted and waiting for pharmacy confirmation. You\'ll be notified once confirmed.',
+            title: loc.pending,
+            description: loc.pendingDescription,
           ),
           _buildStatusGuideItem(
             color: AppColors.success,
-            title: 'Confirmed',
-            description:
-                'Pharmacy has confirmed your reservation. Medicine is ready for pickup at the scheduled date and time.',
+            title: loc.confirmed,
+            description: loc.confirmedDescription,
           ),
           _buildStatusGuideItem(
             color: Colors.blue,
-            title: 'Completed',
-            description:
-                'You\'ve successfully picked up the medicine from the pharmacy. Reservation is now complete.',
+            title: loc.completed,
+            description: loc.completedDescription,
           ),
           _buildStatusGuideItem(
             color: AppColors.error,
-            title: 'Cancelled',
-            description:
-                'Reservation was cancelled either by you, the pharmacy, or due to expiration. Medicine is no longer reserved.',
+            title: loc.cancelled,
+            description: loc.cancelledDescription,
           ),
           const SizedBox(height: 24),
         ],

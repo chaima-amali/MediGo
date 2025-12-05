@@ -181,12 +181,12 @@ class UserCubit extends Cubit<UserState> {
   }
 
   // Update user location
-  Future<void> updateUserLocation(int userId, double latitude, double longitude) async {
+  Future<void> updateUserLocation(int userId, double latitude, double longitude, {String? locationName}) async {
     try {
       emit(UserLoading());
 
-      print('🔄 Updating location for user $userId: ($latitude, $longitude)');
-      final result = await userRepository.updateUserLocation(userId, latitude, longitude);
+      print('🔄 Updating location for user $userId: ($latitude, $longitude) - $locationName');
+      final result = await userRepository.updateUserLocation(userId, latitude, longitude, locationName: locationName);
       print('💾 Update result: $result rows affected');
       if (result > 0) {
         print('✅ Location updated successfully');
