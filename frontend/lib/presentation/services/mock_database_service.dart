@@ -106,6 +106,7 @@ class MockDataService {
 
   // ==================== MEDICINE METHODS ====================
 
+
   static List<Map<String, dynamic>> getUserMedicines() {
     final userMedicines = _getAllUserMedicines()
         .where(
@@ -1157,6 +1158,7 @@ class MockDataService {
   }
 }
 
+
 // Top-level deterministic LCG RNG used for seeded shuffles in the mock data.
 class _LCGRng {
   int _state;
@@ -1165,4 +1167,9 @@ class _LCGRng {
     _state = (1103515245 * _state + 12345) & 0x7fffffff;
     return _state % max;
   }
+
+
+  
 }
+
+
