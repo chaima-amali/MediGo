@@ -10,9 +10,14 @@ class UserRepository {
   // CREATE - Insert a new user
   Future<int> insertUser(User user) async {
     final db = await _db;
+    final userData = user.toMap();
+    // Remove location_name if null to avoid column errors on older databases
+    if (userData['location_name'] == null) {
+      userData.remove('location_name');
+    }
     return await db.insert(
       DBUserTable.table,
-      user.toMap(),
+      userData,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -69,20 +74,43 @@ class UserRepository {
   // UPDATE - Update user information
   Future<int> updateUser(User user) async {
     final db = await _db;
-    return await db.update(
-      DBUserTable.table,
-      user.toMap(),
-      where: 'user_id = ?',
-      whereArgs: [user.userId],
-    );
+    final userData = user.toMap();
+    
+    // Try to update with all fields
+    try {
+      return await db.update(
+        DBUserTable.table,
+        userData,
+        where: 'user_id = ?',
+        whereArgs: [user.userId],
+      );
+    } catch (e) {
+      // If location_name column doesn't exist (old database), try without it
+      if (e.toString().contains('location_name')) {
+        print('⚠️ Updating without location_name column (old database schema)');
+        userData.remove('location_name');
+        return await db.update(
+          DBUserTable.table,
+          userData,
+          where: 'user_id = ?',
+          whereArgs: [user.userId],
+        );
+      }
+      rethrow;
+    }
   }
 
   // UPDATE - Update user location
-  Future<int> updateUserLocation(int userId, double latitude, double longitude) async {
+  Future<int> updateUserLocation(int userId, double latitude, double longitude, {String? locationName}) async {
     final db = await _db;
+    final updateData = {
+      'latitude': latitude,
+      'longitude': longitude,
+      if (locationName != null) 'location_name': locationName,
+    };
     return await db.update(
       DBUserTable.table,
-      {'latitude': latitude, 'longitude': longitude},
+      updateData,
       where: 'user_id = ?',
       whereArgs: [userId],
     );

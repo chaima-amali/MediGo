@@ -8,6 +8,7 @@ class User {
   final String dob;
   final double? latitude;
   final double? longitude;
+  final String? locationName;
   final String premium;
 
   User({
@@ -20,6 +21,7 @@ class User {
     required this.dob,
     this.latitude,
     this.longitude,
+    this.locationName,
     required this.premium,
   });
 
@@ -33,6 +35,7 @@ class User {
     String? dob,
     double? latitude,
     double? longitude,
+    String? locationName,
     String? premium,
   }) {
     return User(
@@ -45,6 +48,7 @@ class User {
       dob: dob ?? this.dob,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      locationName: locationName ?? this.locationName,
       premium: premium ?? this.premium,
     );
   }
@@ -60,6 +64,7 @@ class User {
       dob: map['dob'] as String,
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),
+      locationName: map['location_name'] as String?,
       premium: map['premium'] as String,
     );
   }
@@ -75,6 +80,7 @@ class User {
       'dob': dob,
       'latitude': latitude,
       'longitude': longitude,
+      'location_name': locationName,
       'premium': premium,
     };
   }

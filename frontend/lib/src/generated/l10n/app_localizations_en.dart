@@ -118,7 +118,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gender => 'Gender';
 
   @override
-  String get select => 'select';
+  String get selectGender => 'Select Gender';
+
+  @override
+  String get select => 'Select';
 
   @override
   String get male => 'Male';
@@ -128,6 +131,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get other => 'Other';
+
+  @override
+  String get location => 'Location';
 
   @override
   String get dateOfBirth => 'Date Of Birth';
@@ -404,4 +410,227 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorSavingLocation => 'Error saving location';
+
+  @override
+  String get oldPassword => 'Old password';
+
+  @override
+  String get enterOldPassword => 'Enter your old password';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get incorrectOldPassword => 'Incorrect old password';
+
+  @override
+  String get passwordChangedSuccessfully => 'Password changed successfully';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get cancelled => 'Cancelled';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get confirmed => 'Confirmed';
+
+  @override
+  String get statusGuide => 'Status Guide';
+
+  @override
+  String get quantity => 'Quantity';
+
+  @override
+  String get pickup => 'Pickup';
+
+  @override
+  String get at => 'at';
+
+  @override
+  String get noActiveReservations => 'No active reservations';
+
+  @override
+  String get noCompletedReservations => 'No completed reservations';
+
+  @override
+  String get noCancelledReservations => 'No cancelled reservations';
+
+  @override
+  String get yourReservationsWillAppearHere =>
+      'Your reservations will appear here';
+
+  @override
+  String get pendingDescription =>
+      'Reservation request submitted and waiting for pharmacy confirmation. You\'ll be notified once confirmed.';
+
+  @override
+  String get confirmedDescription =>
+      'Pharmacy has confirmed your reservation. Medicine is ready for pickup at the scheduled date and time.';
+
+  @override
+  String get completedDescription =>
+      'You\'ve successfully picked up the medicine from the pharmacy. Reservation is now complete.';
+
+  @override
+  String get cancelledDescription =>
+      'Reservation was cancelled either by you, the pharmacy, or due to expiration. Medicine is no longer reserved.';
+
+  @override
+  String get reservationDetails => 'Reservation Details';
+
+  @override
+  String get cancelReservation => 'Cancel Reservation';
+
+  @override
+  String get cancelReservationQuestion => 'Cancel Reservation?';
+
+  @override
+  String get cancelReservationConfirmation =>
+      'Are you sure you want to cancel this reservation? This action cannot be undone.';
+
+  @override
+  String get yesCancelReservation => 'Yes, Cancel';
+
+  @override
+  String get keepReservation => 'Keep Reservation';
+
+  @override
+  String get reservationCancelledSuccessfully =>
+      'Reservation cancelled successfully';
+
+  @override
+  String get reservationNotFound => 'Reservation not found';
+
+  @override
+  String get unknownPharmacy => 'Unknown Pharmacy';
+
+  @override
+  String get pickupDate => 'Pickup Date';
+
+  @override
+  String get pickupTime => 'Pickup Time';
+
+  @override
+  String get pharmacyInformation => 'Pharmacy Information';
+
+  @override
+  String get awaitingConfirmation => 'Awaiting Confirmation';
+
+  @override
+  String get awaitingConfirmationMessage =>
+      'The pharmacy will confirm your reservation shortly. You will be notified once it\'s ready.';
+
+  @override
+  String get getDirections => 'Get Directions';
+
+  @override
+  String get openingDirections => 'Opening directions...';
+
+  @override
+  String get contactPharmacy => 'Contact Pharmacy';
+
+  @override
+  String get calling => 'Calling';
+
+  @override
+  String get reservationId => 'Reservation ID';
+
+  @override
+  String get created => 'Created';
+
+  @override
+  String get reserveMedicine => 'Reserve Medicine';
+
+  @override
+  String get completeFormMessage =>
+      'Complete the form to reserve your medicine';
+
+  @override
+  String get medicineName => 'Medicine Name';
+
+  @override
+  String get pharmacyHoursInfo => 'Pharmacy Hours';
+
+  @override
+  String get nextButton => 'Next';
+
+  @override
+  String get pickupCode => 'Pickup Code';
+
+  @override
+  String get copyCode => 'Copy Code';
+
+  @override
+  String get showQRCode => 'Show QR Code for Scanning';
+
+  @override
+  String get showCodeAtPickup => 'Show this code at pickup.';
+
+  @override
+  String get readyForPickup => 'Ready for Pickup';
+
+  @override
+  String get readyForPickupMessage =>
+      'Your medicine will be ready around 1\nhour before the selected pickup time';
+
+  @override
+  String get needConsultation => 'Need a Consultation';
+
+  @override
+  String get reservationInstructions => 'Reservation Instructions';
+
+  @override
+  String get step1 =>
+      'Your reservation ID and QR code with a unique 6-digit verification code';
+
+  @override
+  String get step2 =>
+      'When you arrive at the pharmacy, show your code. Our staff will verify your code or QR code in the text';
+
+  @override
+  String get step3 =>
+      'The pharmacy will verify your code and your identity (ID may be required)';
+
+  @override
+  String get step4 =>
+      'Once verified the staff will give your medicine and you can mark the order as completed';
+
+  @override
+  String get securityNote =>
+      'Note: your verification code is valid. Never share your code with anyone. Keep this code secure.';
+
+  @override
+  String get reservedOn => 'Reserved on';
+
+  @override
+  String get pickedUpSuccessfully => 'Picked up successfully.';
+
+  @override
+  String get open24Hours => 'Open 24 hours';
+
+  @override
+  String get enterMedicineName => 'Enter medicine name';
+
+  @override
+  String get enterQuantity => 'Enter quantity';
+
+  @override
+  String get pickupTimeDuringHours =>
+      'Please select a pickup time during pharmacy hours';
+
+  @override
+  String get reservationConfirmed => 'Reservation confirmed!';
+
+  @override
+  String get selectDateAndTime => 'Please select date and time';
+
+  @override
+  String get securePickupProcess => 'Secure Pickup Process';
 }
