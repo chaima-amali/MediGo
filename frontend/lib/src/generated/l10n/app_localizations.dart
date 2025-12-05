@@ -783,6 +783,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enjoy a clean, distraction-free interface without any ads'**
   String get adFreeDescription;
+
+  /// No description provided for @yourLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Location?'**
+  String get yourLocation;
+
+  /// No description provided for @locationRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This app requires your location to function properly. Please allow location access.'**
+  String get locationRequiredMessage;
+
+  /// No description provided for @allowLocationAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Location Access'**
+  String get allowLocationAccess;
+
+  /// No description provided for @enterLocationManually.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Location Manually'**
+  String get enterLocationManually;
+
+  /// No description provided for @locationServicesDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are disabled. Please enable them in settings.'**
+  String get locationServicesDisabled;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission denied'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @locationPermissionPermanentlyDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission permanently denied. Please enable it in app settings.'**
+  String get locationPermissionPermanentlyDenied;
+
+  /// No description provided for @errorGettingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting location'**
+  String get errorGettingLocation;
+
+  /// No description provided for @searchYourLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your location'**
+  String get searchYourLocation;
+
+  /// No description provided for @searchLocationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'eg: Algiers,Algeria'**
+  String get searchLocationHint;
+
+  /// No description provided for @useCurrentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my current location'**
+  String get useCurrentLocation;
+
+  /// No description provided for @searchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Search results'**
+  String get searchResults;
+
+  /// No description provided for @errorSavingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving location'**
+  String get errorSavingLocation;
 }
 
 class _AppLocalizationsDelegate

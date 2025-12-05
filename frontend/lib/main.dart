@@ -24,7 +24,7 @@ class MediGoApp extends StatelessWidget {
       title: 'MediGo',
       theme: appTheme,
       debugShowCheckedModeBanner: false,
-      locale: Locale('fr'),
+      locale: Locale('ar'),
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
