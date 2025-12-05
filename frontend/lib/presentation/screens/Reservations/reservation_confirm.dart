@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
 // App Colors
 class AppColors {
@@ -138,8 +139,8 @@ class ReservationDetailsPage extends StatelessWidget {
                   children: [
                     CustomBackArrow(),
                     const SizedBox(width: 16),
-                    const Text(
-                      'Reservation Details',
+                    Text(
+                      AppLocalizations.of(context)!.reservationDetails,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -157,7 +158,7 @@ class ReservationDetailsPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Confirmed',
+                        AppLocalizations.of(context)!.confirmed,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -198,7 +199,7 @@ class ReservationDetailsPage extends StatelessWidget {
                         child: Column(
                           children: [
                             Row(
-                              children: const [
+                              children: [
                                 Icon(
                                   Icons.verified_user,
                                   color: Colors.white,
@@ -206,7 +207,7 @@ class ReservationDetailsPage extends StatelessWidget {
                                 ),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Pickup Code',
+                                  AppLocalizations.of(context)!.pickupCode,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
@@ -233,8 +234,8 @@ class ReservationDetailsPage extends StatelessWidget {
                                 color: Colors.white,
                                 size: 16,
                               ),
-                              label: const Text(
-                                'Copy Code',
+                              label: Text(
+                                AppLocalizations.of(context)!.copyCode,
                                 style: TextStyle(color: Colors.white),
                               ),
                               style: OutlinedButton.styleFrom(
@@ -252,8 +253,8 @@ class ReservationDetailsPage extends StatelessWidget {
                                 color: Colors.white,
                                 size: 16,
                               ),
-                              label: const Text(
-                                'Show QR Code for Scanning',
+                              label: Text(
+                                AppLocalizations.of(context)!.showQrCode,
                                 style: TextStyle(color: Colors.white),
                               ),
                               style: OutlinedButton.styleFrom(
@@ -265,7 +266,7 @@ class ReservationDetailsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Show this code at pickup.',
+                              AppLocalizations.of(context)!.showCodeAtPickup,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
@@ -288,7 +289,7 @@ class ReservationDetailsPage extends StatelessWidget {
                       // Pickup Date Card
                       _buildInfoCard(
                         icon: Icons.calendar_today,
-                        title: 'Pickup Date',
+                        title: AppLocalizations.of(context)!.pickupDate,
                         subtitle: 'samedi 1 novembre 2025',
                         color: AppColors.textLight,
                       ),
@@ -297,15 +298,15 @@ class ReservationDetailsPage extends StatelessWidget {
                       // Pickup Time Card
                       _buildInfoCard(
                         icon: Icons.access_time,
-                        title: 'Pickup Time',
+                        title: AppLocalizations.of(context)!.pickupTime,
                         subtitle: '10:10',
                         color: AppColors.textLight,
                       ),
                       const SizedBox(height: 24),
 
                       // Pharmacy Information Section
-                      const Text(
-                        'Pharmacy Information',
+                      Text(
+                        AppLocalizations.of(context)!.pharmacyInformation,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -338,9 +339,9 @@ class ReservationDetailsPage extends StatelessWidget {
 
                       _buildInfoCard(
                         icon: Icons.watch_later,
-                        title: 'Ready for Pickup',
+                        title: AppLocalizations.of(context)!.readyForPickup,
                         subtitle:
-                            'Your medicine will be ready around 1\nhour before the selected pickup time',
+                            AppLocalizations.of(context)!.readyForPickupMessage,
                         color: AppColors.green,
                       ),
                       const SizedBox(height: 24),
@@ -351,8 +352,8 @@ class ReservationDetailsPage extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () {},
                           icon: const Icon(Icons.directions, size: 20),
-                          label: const Text(
-                            'Get Directions',
+                          label: Text(
+                            AppLocalizations.of(context)!.getDirections,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -376,8 +377,8 @@ class ReservationDetailsPage extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: () {},
                           icon: const Icon(Icons.phone, size: 20),
-                          label: const Text(
-                            'Contact Pharmacy',
+                          label: Text(
+                            AppLocalizations.of(context)!.contactPharmacy,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -403,8 +404,8 @@ class ReservationDetailsPage extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () {},
                           icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                          label: const Text(
-                            'Need an Consulted',
+                          label: Text(
+                            AppLocalizations.of(context)!.needConsultation,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -426,8 +427,8 @@ class ReservationDetailsPage extends StatelessWidget {
                       Center(
                         child: TextButton(
                           onPressed: () {},
-                          child: const Text(
-                            'Cancel Reservation',
+                          child: Text(
+                            AppLocalizations.of(context)!.cancelReservation,
                             style: TextStyle(
                               color: AppColors.red,
                               fontWeight: FontWeight.bold,
@@ -439,8 +440,8 @@ class ReservationDetailsPage extends StatelessWidget {
                       const SizedBox(height: 24),
 
                       // Secure Pickup Process Section
-                      const Text(
-                        '🔒 Secure Pickup Process',
+                      Text(
+                        '🔒 ${AppLocalizations.of(context)!.securePickupProcess}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -451,19 +452,19 @@ class ReservationDetailsPage extends StatelessWidget {
 
                       _buildPickupStep(
                         '1',
-                        'Your reservation ID and QR code with a unique 6-digit verification code',
+                        AppLocalizations.of(context)!.reservationInstructions1,
                       ),
                       _buildPickupStep(
                         '2',
-                        'When you arrive at the pharmacy, show your code. Our staff will verify your code or QR code in the text',
+                        AppLocalizations.of(context)!.reservationInstructions2,
                       ),
                       _buildPickupStep(
                         '3',
-                        'The pharmacy will verify your code and your identity (ID may be required)',
+                        AppLocalizations.of(context)!.reservationInstructions3,
                       ),
                       _buildPickupStep(
                         '4',
-                        'Once verified the staff will give your medicine and you can mark the order as completed',
+                        AppLocalizations.of(context)!.reservationInstructions4,
                       ),
                       const SizedBox(height: 16),
 
@@ -476,8 +477,8 @@ class ReservationDetailsPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Note: your verification code valid. May share your code with anyone. Keep this code secure.',
+                            Text(
+                              AppLocalizations.of(context)!.verificationNote,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textLight,
@@ -485,7 +486,7 @@ class ReservationDetailsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'Reservation ID:\n#RX2024110214523',
+                              '${AppLocalizations.of(context)!.reservationId}:\n#RX2024110214523',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textLight,
@@ -494,7 +495,7 @@ class ReservationDetailsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Reserved on:\nNov 02, 2024 at\n17:30',
+                              '${AppLocalizations.of(context)!.reservedOn}:\nNov 02, 2024 at\n17:30',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textLight,

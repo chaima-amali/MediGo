@@ -17,7 +17,7 @@ import 'db_reservation.dart';
 
 class DBHelper {
   static const _databaseName = "medic_app.db";
-  static const _databaseVersion = 2;
+  static const _databaseVersion = 4;
   static Database? _database;
 
   // List all table create statements in order
@@ -51,14 +51,27 @@ class DBHelper {
         }
       },
       onUpgrade: (db, oldVersion, newVersion) async {
+        print('🔄 Migrating database from version $oldVersion to $newVersion');
+        
+        // Upgrade from version 1 to 2 or higher
         if (oldVersion < 2) {
-          print('🔄 Migrating database from version $oldVersion to $newVersion');
           try {
             await db.execute('ALTER TABLE user ADD COLUMN latitude REAL');
-            await db.execute('ALTER TABLE user ADD COLUMN longitude REAL');
-            print('✅ Added latitude and longitude to user table');
+            print('✅ Added latitude to user table');
           } catch (e) {
-            print('⚠️ User table migration: $e');
+            print('⚠️ Column latitude may already exist: $e');
+          }
+          try {
+            await db.execute('ALTER TABLE user ADD COLUMN longitude REAL');
+            print('✅ Added longitude to user table');
+          } catch (e) {
+            print('⚠️ Column longitude may already exist: $e');
+          }
+          try {
+            await db.execute('ALTER TABLE user ADD COLUMN location_name TEXT');
+            print('✅ Added location_name to user table');
+          } catch (e) {
+            print('⚠️ Column location_name may already exist: $e');
           }
           try {
             await db.execute('ALTER TABLE pharmacy ADD COLUMN latitude REAL');
@@ -66,6 +79,21 @@ class DBHelper {
             print('✅ Added latitude and longitude to pharmacy table');
           } catch (e) {
             print('⚠️ Pharmacy table migration: $e');
+          }
+        }
+        
+        // Future upgrades can be added here
+        if (oldVersion < 3) {
+          print('✅ Database upgraded to version 3');
+        }
+        
+        // Version 4: Ensure location_name column exists
+        if (oldVersion < 4) {
+          try {
+            await db.execute('ALTER TABLE user ADD COLUMN location_name TEXT');
+            print('✅ Added location_name to user table (v4)');
+          } catch (e) {
+            print('⚠️ Column location_name already exists: $e');
           }
         }
       },

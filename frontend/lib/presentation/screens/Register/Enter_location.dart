@@ -14,8 +14,16 @@ import '../../widgets/back_arrow.dart';
 class EnterLocationPage extends StatefulWidget {
   final String email;
   final User? userData;
+  final bool isEditMode;
+  final int? currentUserId;
 
-  const EnterLocationPage({Key? key, required this.email, this.userData}) : super(key: key);
+  const EnterLocationPage({
+    Key? key, 
+    required this.email, 
+    this.userData,
+    this.isEditMode = false,
+    this.currentUserId,
+  }) : super(key: key);
 
   @override
   State<EnterLocationPage> createState() => _EnterLocationPageState();
@@ -156,17 +164,35 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
       
       if (widget.userData != null) {
         // New signup: Save user with location to database
+        // Reverse geocode GPS coordinates to get location name
+        String? locationName;
+        try {
+          final response = await http.get(Uri.parse(
+            'https://photon.komoot.io/reverse?lat=${position.latitude}&lon=${position.longitude}&limit=1&countrycodes=dz'
+          ));
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            if (data['features'] != null && (data['features'] as List).isNotEmpty) {
+              locationName = data['features'][0]['properties']['display_name'];
+              print('🌍 Reverse geocoded location: $locationName');
+            }
+          }
+        } catch (e) {
+          print('⚠️ Reverse geocoding failed: $e');
+        }
+        
         final userWithLocation = widget.userData!.copyWith(
           latitude: position.latitude,
           longitude: position.longitude,
+          locationName: locationName,
         );
-        print('💾 Saving new user to database with location');
+        print('💾 Saving new user to database with location: ${locationName ?? "GPS coordinates only"}');
         await userCubit.registerUser(userWithLocation);
         
         if (context.mounted) {
           final state = userCubit.state;
           if (state is UserOperationSuccess) {
-            print('✅ User registered successfully');
+            print('✅ User registered successfully with location: $locationName');
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MainScreen()),
@@ -178,16 +204,46 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
           }
         }
       } else {
-        // Existing user login: Update location
-        final user = await userCubit.userRepository.getUserByEmail(widget.email);
-        print('👤 Updating location for user: ID=${user?.userId}');
-        if (user != null && context.mounted) {
-          await userCubit.updateUserLocation(user.userId!, position.latitude, position.longitude);
-          print('✅ Location saved to database for user ${user.userId}');
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => MainScreen()),
-          );
+        // Existing user (login or edit): Update location
+        // Reverse geocode GPS coordinates to get location name
+        String? locationName;
+        try {
+          final response = await http.get(Uri.parse(
+            'https://photon.komoot.io/reverse?lat=${position.latitude}&lon=${position.longitude}&limit=1&countrycodes=dz'
+          ));
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            if (data['features'] != null && (data['features'] as List).isNotEmpty) {
+              locationName = data['features'][0]['properties']['display_name'];
+              print('🌍 Reverse geocoded location: $locationName');
+            }
+          }
+        } catch (e) {
+          print('⚠️ Reverse geocoding failed: $e');
+        }
+        
+        // Use currentUserId if in edit mode, otherwise get from email
+        int? userId = widget.currentUserId;
+        if (userId == null) {
+          final user = await userCubit.userRepository.getUserByEmail(widget.email);
+          userId = user?.userId;
+        }
+        
+        print('👤 Updating location for user: ID=$userId');
+        if (userId != null && context.mounted) {
+          await userCubit.updateUserLocation(userId, position.latitude, position.longitude, locationName: locationName);
+          print('✅ Location saved to database for user $userId: $locationName');
+          
+          if (widget.isEditMode) {
+            // Return to edit profile
+            Navigator.pop(context, true);
+          } else {
+            // Go to home for new login
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
+          }
         }
       }
     } catch (e) {
@@ -218,14 +274,15 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         final userWithLocation = widget.userData!.copyWith(
           latitude: latitude,
           longitude: longitude,
+          locationName: locationName,
         );
-        print('💾 Saving new user to database with location');
+        print('💾 Saving new user to database with location: $locationName');
         await userCubit.registerUser(userWithLocation);
         
         if (context.mounted) {
           final state = userCubit.state;
           if (state is UserOperationSuccess) {
-            print('✅ User registered successfully');
+            print('✅ User registered successfully with location: $locationName');
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MainScreen()),
@@ -237,16 +294,29 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
           }
         }
       } else {
-        // Existing user login: Update location
-        final user = await userCubit.userRepository.getUserByEmail(widget.email);
-        print('👤 Updating location for user: ID=${user?.userId}');
-        if (user != null && context.mounted) {
-          await userCubit.updateUserLocation(user.userId!, latitude, longitude);
-          print('✅ Location saved to database for user ${user.userId}');
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => MainScreen()),
-          );
+        // Existing user (login or edit): Update location
+        // Use currentUserId if in edit mode, otherwise get from email
+        int? userId = widget.currentUserId;
+        if (userId == null) {
+          final user = await userCubit.userRepository.getUserByEmail(widget.email);
+          userId = user?.userId;
+        }
+        
+        print('👤 Updating location for user: ID=$userId');
+        if (userId != null && context.mounted) {
+          await userCubit.updateUserLocation(userId, latitude, longitude, locationName: locationName);
+          print('✅ Location saved to database for user $userId');
+          
+          if (widget.isEditMode) {
+            // Return to edit profile
+            Navigator.pop(context, true);
+          } else {
+            // Go to home for new login
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
+          }
         }
       }
     } catch (e) {

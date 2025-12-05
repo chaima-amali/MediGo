@@ -118,6 +118,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gender => 'الجنس';
 
   @override
+  String get selectGender => 'اختر الجنس';
+
+  @override
   String get select => 'اختر';
 
   @override
@@ -128,6 +131,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get other => 'آخر';
+
+  @override
+  String get location => 'الموقع';
 
   @override
   String get dateOfBirth => 'تاريخ الميلاد';
@@ -402,4 +408,264 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errorSavingLocation => 'خطأ في حفظ الموقع';
+
+  @override
+  String get oldPassword => 'كلمة المرور القديمة';
+
+  @override
+  String get enterOldPassword => 'أدخل كلمة المرور القديمة';
+
+  @override
+  String get changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get incorrectOldPassword => 'كلمة المرور القديمة غير صحيحة';
+
+  @override
+  String get passwordChangedSuccessfully => 'تم تغيير كلمة المرور بنجاح';
+
+  @override
+  String get active => 'نشط';
+
+  @override
+  String get completed => 'مكتمل';
+
+  @override
+  String get cancelled => 'ملغي';
+
+  @override
+  String get pending => 'قيد الانتظار';
+
+  @override
+  String get confirmed => 'مؤكد';
+
+  @override
+  String get statusGuide => 'دليل الحالة';
+
+  @override
+  String get quantity => 'الكمية';
+
+  @override
+  String get pickup => 'الاستلام';
+
+  @override
+  String get at => 'في';
+
+  @override
+  String get noActiveReservations => 'لا توجد حجوزات نشطة';
+
+  @override
+  String get noCompletedReservations => 'لا توجد حجوزات مكتملة';
+
+  @override
+  String get noCancelledReservations => 'لا توجد حجوزات ملغاة';
+
+  @override
+  String get yourReservationsWillAppearHere => 'ستظهر حجوزاتك هنا';
+
+  @override
+  String get pendingDescription =>
+      'تم تقديم طلب الحجز وفي انتظار تأكيد الصيدلية. سيتم إخطارك بمجرد التأكيد.';
+
+  @override
+  String get confirmedDescription =>
+      'أكدت الصيدلية حجزك. الدواء جاهز للاستلام في التاريخ والوقت المحددين.';
+
+  @override
+  String get completedDescription =>
+      'لقد استلمت الدواء بنجاح من الصيدلية. الحجز مكتمل الآن.';
+
+  @override
+  String get cancelledDescription =>
+      'تم إلغاء الحجز إما من قبلك أو الصيدلية أو بسبب انتهاء الصلاحية. لم يعد الدواء محجوزًا.';
+
+  @override
+  String get reservationDetails => 'تفاصيل الحجز';
+
+  @override
+  String get cancelReservation => 'إلغاء الحجز';
+
+  @override
+  String get cancelReservationQuestion => 'إلغاء الحجز؟';
+
+  @override
+  String get cancelReservationConfirmation =>
+      'هل أنت متأكد من إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get yesCancelReservation => 'نعم، إلغاء';
+
+  @override
+  String get keepReservation => 'الاحتفاظ بالحجز';
+
+  @override
+  String get reservationCancelledSuccessfully => 'تم إلغاء الحجز بنجاح';
+
+  @override
+  String get reservationNotFound => 'لم يتم العثور على الحجز';
+
+  @override
+  String get unknownPharmacy => 'صيدلية غير معروفة';
+
+  @override
+  String get pickupDate => 'تاريخ الاستلام';
+
+  @override
+  String get pickupTime => 'وقت الاستلام';
+
+  @override
+  String get pharmacyInformation => 'معلومات الصيدلية';
+
+  @override
+  String get awaitingConfirmation => 'في انتظار التأكيد';
+
+  @override
+  String get awaitingConfirmationMessage =>
+      'ستؤكد الصيدلية حجزك قريبًا. سيتم إخطارك بمجرد أن يكون جاهزًا.';
+
+  @override
+  String get getDirections => 'احصل على الاتجاهات';
+
+  @override
+  String get openingDirections => 'جاري فتح الاتجاهات...';
+
+  @override
+  String get contactPharmacy => 'الاتصال بالصيدلية';
+
+  @override
+  String get calling => 'جاري الاتصال';
+
+  @override
+  String get reservationId => 'معرف الحجز';
+
+  @override
+  String get created => 'تم الإنشاء';
+
+  @override
+  String get reserveMedicine => 'حجز الدواء';
+
+  @override
+  String get completeFormMessage => 'أكمل النموذج لحجز دوائك';
+
+  @override
+  String get completeForm => 'أكمل النموذج لحجز دوائك';
+
+  @override
+  String get medicineName => 'اسم الدواء';
+
+  @override
+  String get pharmacyHoursInfo => 'ساعات عمل الصيدلية';
+
+  @override
+  String get openHours => 'ساعات العمل';
+
+  @override
+  String get nextButton => 'التالي';
+
+  @override
+  String get pickupCode => 'كود الاستلام';
+
+  @override
+  String get copyCode => 'نسخ الكود';
+
+  @override
+  String get showQRCode => 'عرض رمز QR للمسح';
+
+  @override
+  String get showQrCode => 'عرض رمز QR للمسح';
+
+  @override
+  String get showCodeAtPickup => 'أظهر هذا الرمز عند الاستلام.';
+
+  @override
+  String get readyForPickup => 'جاهز للاستلام';
+
+  @override
+  String get readyForPickupMessage =>
+      'سيكون دواؤك جاهزًا حوالي \nساعة واحدة قبل وقت الاستلام المحدد';
+
+  @override
+  String get needConsultation => 'بحاجة لاستشارة';
+
+  @override
+  String get reservationInstructions => 'تعليمات الحجز';
+
+  @override
+  String get reservationInstructions1 =>
+      'معرف الحجز ورمز QR الخاص بك مع رمز تحقق فريد مكون من 6 أرقام';
+
+  @override
+  String get reservationInstructions2 =>
+      'عند وصولك إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز QR في النص';
+
+  @override
+  String get reservationInstructions3 =>
+      'ستتحقق الصيدلية من رمزك وهويتك (قد يلزم إبراز الهوية)';
+
+  @override
+  String get reservationInstructions4 =>
+      'بمجرد التحقق، سيعطيك الموظف دواءك ويمكنك وضع علامة على الطلب كمكتمل';
+
+  @override
+  String get step1 => 'معرف حجزك ورمز QR مع رمز تحقق فريد من 6 أرقام';
+
+  @override
+  String get step2 =>
+      'عندما تصل إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز QR في النص';
+
+  @override
+  String get step3 => 'ستتحقق الصيدلية من رمزك وهويتك (قد يلزم إبراز الهوية)';
+
+  @override
+  String get step4 =>
+      'بمجرد التحقق، سيعطيك الموظفون دواءك ويمكنك وضع علامة على الطلب كمكتمل';
+
+  @override
+  String get securityNote =>
+      'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص. احتفظ بهذا الرمز آمنًا.';
+
+  @override
+  String get verificationNote =>
+      'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص. احتفظ بهذا الرمز آمنًا.';
+
+  @override
+  String get reservedOn => 'تم الحجز في';
+
+  @override
+  String get pickedUpSuccessfully => 'تم الاستلام بنجاح.';
+
+  @override
+  String get open24Hours => 'مفتوح 24 ساعة';
+
+  @override
+  String get enterMedicineName => 'أدخل اسم الدواء';
+
+  @override
+  String get enterQuantity => 'أدخل الكمية';
+
+  @override
+  String get pickupTimeDuringHours =>
+      'يرجى اختيار وقت الاستلام خلال ساعات عمل الصيدلية';
+
+  @override
+  String get reservationConfirmed => 'تم تأكيد الحجز!';
+
+  @override
+  String get confirmReservation => 'تأكيد الحجز';
+
+  @override
+  String get selectDateAndTime => 'يرجى اختيار التاريخ والوقت';
+
+  @override
+  String get securePickupProcess => 'عملية الاستلام الآمنة';
+
+  @override
+  String get reserveCancelQuestion => 'إلغاء الحجز؟';
+
+  @override
+  String get reservationCancelledSuccess => 'تم إلغاء الحجز بنجاح';
+
+  @override
+  String get pharmacyWillConfirm =>
+      'ستقوم الصيدلية بتأكيد حجزك قريبًا. سيتم إعلامك بمجرد أن يصبح جاهزًا.';
 }

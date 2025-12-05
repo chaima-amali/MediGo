@@ -107,7 +107,8 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
     );
     if (picked != null) {
       setState(() {
-        _dateController.text = '${picked.day}/${picked.month}/${picked.year}';
+        // Store in YYYY-MM-DD format for database
+        _dateController.text = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       });
     }
   }
@@ -247,19 +248,22 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                                     fontSize: 14,
                                   ),
                                 ),
-                                items: [loc.male, loc.female, loc.other]
-                                    .map(
-                                      (gender) => DropdownMenuItem(
-                                        value: gender,
-                                        child: Text(
-                                          gender,
-                                          style: AppText.regular.copyWith(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'Male',
+                                    child: Text(
+                                      loc.male,
+                                      style: AppText.regular.copyWith(fontSize: 14),
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Female',
+                                    child: Text(
+                                      loc.female,
+                                      style: AppText.regular.copyWith(fontSize: 14),
+                                    ),
+                                  ),
+                                ],
                                 onChanged: (value) {
                                   setState(() {
                                     _selectedGender = value;

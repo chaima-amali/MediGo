@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
@@ -90,13 +91,13 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Cancel Reservation?',
+                  AppLocalizations.of(context)!.cancelReservation,
                   style: AppText.bold.copyWith(fontSize: 18),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Are you sure you want to cancel this reservation? This action cannot be undone.',
+                  AppLocalizations.of(context)!.reserveCancelQuestion,
                   style: AppText.regular.copyWith(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -117,8 +118,8 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text(
-                            'Reservation cancelled successfully',
+                          content: Text(
+                            AppLocalizations.of(context)!.reservationCancelledSuccess,
                           ),
                           backgroundColor: AppColors.error,
                           behavior: SnackBarBehavior.floating,
@@ -137,7 +138,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                       ),
                     ),
                     child: Text(
-                      'Yes, Cancel',
+                      AppLocalizations.of(context)!.yesCancelReservation,
                       style: AppText.medium.copyWith(
                         fontSize: 15,
                         color: Colors.white,
@@ -159,7 +160,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                       ),
                     ),
                     child: Text(
-                      'Keep Reservation',
+                      AppLocalizations.of(context)!.keepReservation,
                       style: AppText.medium.copyWith(fontSize: 15),
                     ),
                   ),
@@ -211,7 +212,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
               Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
               const SizedBox(height: 16),
               Text(
-                'Reservation not found',
+                AppLocalizations.of(context)!.reservationNotFound,
                 style: AppText.medium.copyWith(fontSize: 18),
               ),
             ],
@@ -386,7 +387,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Pickup Date',
+                                    AppLocalizations.of(context)!.pickupDate,
                                     style: AppText.regular.copyWith(
                                       fontSize: 12,
                                       color: Colors.grey[600],
@@ -417,7 +418,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Pickup Time',
+                                    AppLocalizations.of(context)!.pickupTime,
                                     style: AppText.regular.copyWith(
                                       fontSize: 12,
                                       color: Colors.grey[600],
@@ -450,7 +451,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Pharmacy Information',
+                            AppLocalizations.of(context)!.pharmacyInformation,
                             style: AppText.bold.copyWith(fontSize: 16),
                           ),
                           const SizedBox(height: 16),
@@ -558,14 +559,14 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Awaiting Confirmation',
+                                    AppLocalizations.of(context)!.awaitingConfirmation,
                                     style: AppText.medium.copyWith(
                                       fontSize: 14,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'The pharmacy will confirm your reservation shortly. You will be notified once it\'s ready.',
+                                    AppLocalizations.of(context)!.pharmacyWillConfirm,
                                     style: AppText.regular.copyWith(
                                       fontSize: 12,
                                       color: Colors.grey[700],
@@ -585,8 +586,8 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Opening directions...'),
+                              SnackBar(
+                                content: Text(AppLocalizations.of(context)!.openingDirections),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
@@ -595,7 +596,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                             Icons.location_on_outlined,
                             size: 18,
                           ),
-                          label: const Text('Get Directions'),
+                          label: Text(AppLocalizations.of(context)!.getDirections),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
@@ -613,13 +614,13 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Calling $pharmacyPhone...'),
+                                content: Text('${AppLocalizations.of(context)!.calling} $pharmacyPhone...'),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
                           },
                           icon: const Icon(Icons.phone_outlined, size: 18),
-                          label: const Text('Contact Pharmacy'),
+                          label: Text(AppLocalizations.of(context)!.contactPharmacy),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.darkBlue,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -644,7 +645,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                             ),
                           ),
                           child: Text(
-                            'Cancel Reservation',
+                            AppLocalizations.of(context)!.cancelReservation,
                             style: AppText.medium.copyWith(
                               fontSize: 15,
                               color: AppColors.error,
@@ -661,7 +662,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                       child: Column(
                         children: [
                           Text(
-                            'Reservation ID:',
+                            AppLocalizations.of(context)!.reservationId,
                             style: AppText.regular.copyWith(
                               fontSize: 12,
                               color: Colors.grey[600],
@@ -673,7 +674,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Created: 28/10/2025\n16:24:06',
+                            '${AppLocalizations.of(context)!.created}: 28/10/2025\n16:24:06',
                             textAlign: TextAlign.center,
                             style: AppText.regular.copyWith(
                               fontSize: 12,
