@@ -118,7 +118,18 @@
   "instantRestockAlerts": "Alertes de réapprovisionnement instantanées",
   "instantRestockDescription": "Recevez une notification dès que les médicaments en rupture de stock sont disponibles",
   "adFreeExperience": "Expérience sans publicité",
-  "adFreeDescription": "Profitez d’une interface propre et sans distractions, sans aucune publicité"
-
-
+  "adFreeDescription": "Profitez d'une interface propre et sans distractions, sans aucune publicité",
+  "yourLocation": "Votre localisation ?",
+  "locationRequiredMessage": "Cette application nécessite votre localisation pour fonctionner correctement. Veuillez autoriser l'accès à la localisation.",
+  "allowLocationAccess": "Autoriser l'accès à la localisation",
+  "enterLocationManually": "Entrer la localisation manuellement",
+  "locationServicesDisabled": "Les services de localisation sont désactivés. Veuillez les activer dans les paramètres.",
+  "locationPermissionDenied": "Autorisation de localisation refusée",
+  "locationPermissionPermanentlyDenied": "Autorisation de localisation refusée de manière permanente. Veuillez l'activer dans les paramètres de l'application.",
+  "errorGettingLocation": "Erreur lors de l'obtention de la localisation",
+  "searchYourLocation": "Recherchez votre localisation",
+  "searchLocationHint": "ex : Alger, Algérie",
+  "useCurrentLocation": "Utiliser ma localisation actuelle",
+  "searchResults": "Résultats de recherche",
+  "errorSavingLocation": "Erreur lors de l'enregistrement de la localisation"
 }

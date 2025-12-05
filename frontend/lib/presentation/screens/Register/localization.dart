@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../../src/generated/l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';
 import '../../../logic/cubits/user_cubit.dart';
@@ -99,7 +100,7 @@ class LocalizationPage extends StatelessWidget {
 
                     // Title
                     Text(
-                      'Your Location?',
+                      AppLocalizations.of(context)!.yourLocation,
                       style: AppText.bold.copyWith(fontSize: 28),
                       textAlign: TextAlign.center,
                     ),
@@ -108,7 +109,7 @@ class LocalizationPage extends StatelessWidget {
 
                     // Subtitle
                     Text(
-                      'This app requires your location to function properly. Please allow location access.',
+                      AppLocalizations.of(context)!.locationRequiredMessage,
                       style: AppText.regular.copyWith(fontSize: 13, color: AppColors.darkBlue.withOpacity(0.7)),
                       textAlign: TextAlign.center,
                     ),
@@ -229,7 +230,7 @@ class LocalizationPage extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: Text(
-                          'Allow Location Access',
+                          AppLocalizations.of(context)!.allowLocationAccess,
                           style: AppText.medium.copyWith(color: AppColors.white, fontSize: 16),
                         ),
                       ),
@@ -262,7 +263,7 @@ class LocalizationPage extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Enter Location Manually',
+                          AppLocalizations.of(context)!.enterLocationManually,
                           style: AppText.medium.copyWith(color: AppColors.darkBlue.withOpacity(0.7), fontSize: 15),
                         ),
                       ),
