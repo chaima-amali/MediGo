@@ -910,6 +910,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unexpected_error => 'حدث خطأ غير متوقع';
 
   @override
+  String get medicine_calendar => 'تقويم الأدوية';
+
+  @override
+  String get view_report => 'عرض التقرير';
+
+  @override
+  String get no_medicine_records_for_this_date =>
+      'لا توجد سجلات أدوية لهذا التاريخ';
+
+  @override
   String howManyTimesOnDay(String day) {
     return ' كم مرة في اليوم؟';
   }

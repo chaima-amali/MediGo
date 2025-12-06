@@ -3,6 +3,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'reports_page.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 import '../notifications.dart' as notif_page hide CustomBackArrow;
@@ -214,7 +215,9 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                     alignment: Alignment.centerLeft,
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      'Medicine Calendar',
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.medicine_calendar,
                                       style: AppText.bold.copyWith(
                                         fontSize: 24,
                                         color: AppColors.darkBlue,
@@ -252,7 +255,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                       ),
                                     ),
                                     child: Text(
-                                      'View Report',
+                                      AppLocalizations.of(context)!.view_report,
                                       style: AppText.medium.copyWith(
                                         fontSize: 12,
                                         color: AppColors.error,
@@ -470,7 +473,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No medicine records for this date',
+              AppLocalizations.of(context)!.no_medicine_records_for_this_date,
               style: AppText.regular.copyWith(
                 fontSize: 14,
                 color: AppColors.darkBlue.withOpacity(0.5),

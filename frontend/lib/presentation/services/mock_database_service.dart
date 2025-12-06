@@ -1,9 +1,6 @@
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
 class MockDataService {
-
-
-  
   // Current logged-in user (change this to switch users)
   // Made mutable so login/signup pages can change the active user at runtime.
   //static String currentUserId = "user_001"; // serine
@@ -41,7 +38,7 @@ class MockDataService {
       "phone_number": "+213798543073",
       "date_of_birth": "2005-06-15",
       "gender": " Female",
-      "address": "akbou, bejaia",       
+      "address": "akbou, bejaia",
       "subscription_type": "free",
       "profile_image_url": "https://i.pravatar.cc/150?img=1",
     },
@@ -102,6 +99,11 @@ class MockDataService {
   static String getUserFirstName() {
     final user = getCurrentUser();
     return user['full_name'].toString().split(' ')[0];
+  }
+
+  static String getUserFullName() {
+    final user = getCurrentUser();
+    return user['full_name'].toString();
   }
 
   // ==================== MEDICINE METHODS ====================
@@ -1123,7 +1125,6 @@ class MockDataService {
   }
 
   static List<Map<String, dynamic>> _getPremiumFeatures() {
-    
     return [
       {
         "icon": "⚡",
