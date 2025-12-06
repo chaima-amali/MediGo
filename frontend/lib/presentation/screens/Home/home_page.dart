@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/presentation/services/pharmacies.dart';
 import 'package:frontend/presentation/services/navigation_helper.dart' as nav_helper;
@@ -16,27 +18,6 @@ import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/controllers/pharmacy_controller.dart';
 import 'package:frontend/services/location_service.dart';
 
-void main() {
-  runApp(const MediGoApp());
-}
-
-class MediGoApp extends StatelessWidget {
-  const MediGoApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MediGo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.cyan,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      home: MainScreen(),
-    );
-  }
-}
-
 // Main Screen with Bottom Navigation
 class MainScreen extends StatefulWidget {
   MainScreen({Key? key}) : super(key: nav_helper.mainScreenKey);
@@ -47,40 +28,42 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  late String userName;
-  late final List<Widget> _screens;
-
-  @override
-  void initState() {
-    super.initState();
-    userName = MockDataServices.getUserFirstName();
-    _screens = [
-      HomeScreen(userName: userName),
-      const SearchScreen(),
-      TrackingPage(key: nav_helper.trackingPageKey),
-      const ProfilePage(),
-    ];
-  }
-
-  void setTab(int index) {
-    if (index < 0 || index >= _screens.length) return;
-    setState(() {
-      _currentIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
+    return BlocBuilder<UserCubit, UserState>(
+      builder: (context, state) {
+        // Get user name from the current state
+        String userName = 'User';
+        User? currentUser;
+        
+        if (state is UserAuthenticated) {
+          userName = state.user.name.split(' ').first; // Get first name
+          currentUser = state.user;
+        } else if (state is UserLoaded) {
+          userName = state.user.name.split(' ').first;
+          currentUser = state.user;
+        }
+
+        final List<Widget> screens = [
+          HomeScreen(key: ValueKey(userName), userName: userName, user: currentUser),
+          const SearchScreen(),
+          TrackingPage(key: nav_helper.trackingPageKey),
+          const ProfilePage(),
+        ];
+
+        return Scaffold(
+          body: screens[_currentIndex],
+          bottomNavigationBar: CustomBottomNavBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -379,8 +362,9 @@ class _SearchScreenState extends State<SearchScreen> {
 // Home Screen with Pharmacy Search in Search Bar
 class HomeScreen extends StatefulWidget {
   final String userName;
+  final User? user;
 
-  const HomeScreen({super.key, required this.userName});
+  const HomeScreen({super.key, required this.userName, this.user});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -420,7 +404,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadNearbyPharmacies() {
-    final mockUser = User(
+    // Use actual user if available, otherwise use mock user
+    final user = widget.user ?? User(
       userId: 1,
       name: widget.userName,
       email: 'user@example.com',
@@ -434,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     final nearbyPharmacies = _pharmacyController.getNearestPharmacies(
-      user: mockUser,
+      user: user,
       limit: 4,
     );
 
