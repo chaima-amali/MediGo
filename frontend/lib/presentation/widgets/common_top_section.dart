@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/presentation/screens/reminders/edit_medicine_page.dart';
+import 'package:frontend/presentation/screens/reminders/edit_page.dart';
 import 'package:frontend/presentation/screens/reminders/tracking_page.dart';
+import '../screens/notifications.dart';
 import '../theme/app_colors.dart';
-
 import '../screens/reminders/statistics_page.dart';
-
 
 class CommonTopSection extends StatelessWidget {
   final String activeTab;
@@ -21,44 +20,56 @@ class CommonTopSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                Image.asset('assets/images/logo_medicine.png', height: 32),
-                const SizedBox(width: 6),
-                const Text(
+                Text(
                   'MediGo',
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                     color: AppColors.primary,
                   ),
                 ),
+                const SizedBox(width: 4),
+                Icon(Icons.local_hospital, color: AppColors.primary, size: 24),
               ],
             ),
-            Stack(
-              children: [
-                Container(
-                  height: 38,
-                  width: 38,
-                  decoration: BoxDecoration(
-                    color: AppColors.lightBlue,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.notifications_none,
-                      color: AppColors.primary),
+
+            // Notification Button
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NotificationsPage()),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.lightBlue.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Positioned(
-                  right: 10,
-                  top: 10,
-                  child: Container(
-                    height: 8,
-                    width: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
+                child: Stack(
+                  children: [
+                    Icon(
+                      Icons.notifications_outlined,
+                      color: AppColors.primary,
+                      size: 24,
                     ),
-                  ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        height: 10,
+                        width: 10,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            )
+              ),
+            ),
           ],
         ),
 
@@ -72,6 +83,7 @@ class CommonTopSection extends StatelessWidget {
             color: AppColors.darkBlue,
           ),
         ),
+
         const SizedBox(height: 10),
 
         Row(
@@ -85,14 +97,17 @@ class CommonTopSection extends StatelessWidget {
               ),
             ),
             SizedBox(width: 8),
-            Icon(Icons.calendar_today_outlined,
-                size: 18, color: AppColors.primary),
+            Icon(
+              Icons.calendar_today_outlined,
+              size: 18,
+              color: AppColors.primary,
+            ),
           ],
         ),
 
         const SizedBox(height: 20),
 
-        // Buttons Row (Navigation)
+        // Navigation buttons
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -104,7 +119,7 @@ class CommonTopSection extends StatelessWidget {
                 if (activeTab != "Tracking") {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const TrackingPage()),
+                    MaterialPageRoute(builder: (_) => TrackingPage()),
                   );
                 }
               },
@@ -130,7 +145,7 @@ class CommonTopSection extends StatelessWidget {
                 if (activeTab != "Edit") {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const EditMedicinePage()),
+                    MaterialPageRoute(builder: (_) => const EditPage()),
                   );
                 }
               },
@@ -141,10 +156,12 @@ class CommonTopSection extends StatelessWidget {
     );
   }
 
-  static Widget _navButton(BuildContext context,
-      {required String label,
-      required bool isActive,
-      required VoidCallback onTap}) {
+  static Widget _navButton(
+    BuildContext context, {
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

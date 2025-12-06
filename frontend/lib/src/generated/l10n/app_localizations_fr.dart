@@ -64,9 +64,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pleaseEnterEmail => 'Please enter your email';
 
   @override
-  String get validEmail => 'Veuillez entrer un e-mail valide';
-
-  @override
   String get password => 'Mot de passe';
 
   @override
@@ -94,7 +91,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pleaseEnterName => 'Veuillez entrer votre nom';
 
   @override
-  String get enterEmail => 'Entrez votre e-mail';
+  String get enterEmail => 'Veuillez entrer votre e-mail';
+
+  @override
+  String get validEmail => 'Veuillez entrer un e-mail valide';
 
   @override
   String get phoneNumber => 'Numéro de téléphone';
@@ -118,7 +118,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gender => 'Genre';
 
   @override
-  String get select => 'sélectionner';
+  String get select => 'Sélectionner';
 
   @override
   String get male => 'Homme';
@@ -174,10 +174,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nearbyPharmacy => 'Pharmacie à proximité';
 
   @override
-  String get rating => 'Évaluation: \$rating';
+  String rating(Object rating) {
+    return 'Évaluation: \$rating';
+  }
 
   @override
-  String get reviews => '(\$reviews)';
+  String reviews(Object reviews) {
+    return '(\$reviews)';
+  }
 
   @override
   String get findYourMedicine => 'Trouvez votre médicament';
@@ -236,7 +240,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get premiumDescription =>
-      'Débloquez des fonctionnalités exclusives et améliorez\ngestion de vos médicaments';
+      'Profitez d’une expérience sans publicité, de réservations prioritaires et d’alertes de réapprovisionnement instantanées';
 
   @override
   String get upgradeNowPrice => 'Passer maintenant - 3000DA/an';
@@ -248,8 +252,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myReservations => 'Mes réservations';
 
   @override
-  String get activeReservations =>
-      '\$activeReservationsCount réservations\nactives';
+  String activeReservations(Object activeReservationsCount) {
+    return '\$activeReservationsCount réservations actives';
+  }
 
   @override
   String get notifications => 'Notifications';
@@ -309,7 +314,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get subscriptionAgreement =>
-      'En vous abonnant, vous acceptez nos Conditions d\'utilisation\net notre Politique de confidentialité.\nL’abonnement se renouvelle automatiquement sauf annulation.';
+      'En vous abonnant, vous acceptez nos Conditions d\'utilisation et notre Politique de confidentialité. L’abonnement se renouvelle automatiquement sauf annulation.';
 
   @override
   String get subscribeMonthly => 'S’abonner mensuellement';
@@ -342,8 +347,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get subscriptionSuccessMessage =>
-      'Vous vous êtes abonné avec succès à la formule \$planName !';
+  String subscriptionSuccessMessage(Object planName) {
+    return 'Vous vous êtes abonné avec succès à la formule \$planName !';
+  }
 
   @override
   String get medicinePreOrderReservation =>
@@ -367,4 +373,197 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get adFreeDescription =>
       'Profitez d’une interface propre et sans distractions, sans aucune publicité';
+
+  @override
+  String get yourCurrentMedicines => 'Vos médicaments actuels';
+
+  @override
+  String get tracking => 'Suivi';
+
+  @override
+  String get edit => 'Modifier';
+
+  @override
+  String get statistics => 'Statistiques';
+
+  @override
+  String get haveYouTakentYourMedicineToday =>
+      'Avez-vous pris votre médicament aujourd\'hui ?';
+
+  @override
+  String get morning => 'Matin';
+
+  @override
+  String get evening => 'Soir';
+
+  @override
+  String get addMedicine => 'Ajouter un médicament';
+
+  @override
+  String get medicineName => 'Nom du médicament';
+
+  @override
+  String get enterMedicineName => 'Entrez le nom du médicament';
+
+  @override
+  String get medicineType => 'Type de médicament';
+
+  @override
+  String get dose => 'Dose';
+
+  @override
+  String get enterDoseExample => 'ex : 500';
+
+  @override
+  String get unit => 'Unité';
+
+  @override
+  String get frequency => 'Fréquence';
+
+  @override
+  String get timesPerDay => 'Combien de fois par jour';
+
+  @override
+  String get time => 'Heure';
+
+  @override
+  String get selectTime => 'Sélectionner l’heure';
+
+  @override
+  String get startDate => 'Date de début';
+
+  @override
+  String get endDate => 'Date de fin';
+
+  @override
+  String get selectDate => 'Sélectionner la date';
+
+  @override
+  String get importance => 'Importance';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get enterNotes => 'Écrire une note (optionnel)';
+
+  @override
+  String get save => 'Enregistrer';
+
+  @override
+  String get perDay => 'Par jour';
+
+  @override
+  String get perWeek => 'Par semaine';
+
+  @override
+  String get eachNDays => 'Chaque N jours';
+
+  @override
+  String get customized => 'Personnalisé';
+
+  @override
+  String get yourProgress => 'Votre progression';
+
+  @override
+  String get medProgress => 'Progression du médicament';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get no_medicines_for_day => 'Aucun médicament pour ce jour';
+
+  @override
+  String get cannot_update_item => 'Impossible de mettre à jour cet élément';
+
+  @override
+  String get marked_as_done => 'Marqué comme pris';
+
+  @override
+  String get unmarked => 'Démarqué';
+
+  @override
+  String get failed_to_mark => 'Échec du marquage';
+
+  @override
+  String get failed_to_unmark => 'Échec du démarquage';
+
+  @override
+  String get cannot_edit_item => 'Impossible de modifier cet élément';
+
+  @override
+  String get could_not_find_plan_for_occurrence =>
+      'Impossible de trouver le plan pour cette occurrence';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get delete_occurrence_title => 'Supprimer l’occurrence';
+
+  @override
+  String get delete_occurrence_text =>
+      'Êtes-vous sûr de vouloir supprimer cette occurrence ?';
+
+  @override
+  String how_many_times_on_day(Object day) {
+    return 'Combien de fois le $day';
+  }
+
+  @override
+  String get select_start_date => 'Sélectionnez la date de début';
+
+  @override
+  String get select_end_date => 'Sélectionnez la date de fin';
+
+  @override
+  String get start_end_dates_required =>
+      'Les dates de début et de fin sont obligatoires';
+
+  @override
+  String get start_date_before_or_equal_end_date =>
+      'La date de début doit être avant ou égale à la date de fin';
+
+  @override
+  String get medicine_added => 'Médicament ajouté';
+
+  @override
+  String get failed_to_add_medicine => 'Échec de l’ajout du médicament';
+
+  @override
+  String get nothing_to_save => 'Rien à enregistrer';
+
+  @override
+  String get saved => 'Enregistré';
+
+  @override
+  String get name_is_required => 'Le nom est obligatoire';
+
+  @override
+  String get dose_must_be_greater_than_zero =>
+      'La dose doit être supérieure à 0';
+
+  @override
+  String get times_per_day_required =>
+      'Le nombre de prises par jour est requis';
+
+  @override
+  String get start_date_must_before_end_date =>
+      'La date de début doit être avant la date de fin';
+
+  @override
+  String get today_taken => 'Pris aujourd’hui';
+
+  @override
+  String get medicines_progress => 'Progression des médicaments';
+
+  @override
+  String get unnamed => 'Sans nom';
+
+  @override
+  String get removed => 'Supprimé';
+
+  @override
+  String get failed_to_remove => 'Échec de la suppression';
 }

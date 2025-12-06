@@ -1,63 +1,104 @@
 class MedicinePlan {
-  final int? planId;
-  final int medicineTrackId;
-  final int userId;
+  final int? id;
+  final int trackingId;
+  final int? userId;
+
   final String importance;
-  final String startDate;
-  final String endDate;
+  final DateTime startDate;
+  final DateTime endDate;
+
   final String frequencyType;
+  final int? intervalDays;
+  final List<String>? weekdays;
+  final List<int>? monthDays;
+  final List<String>? customDates;
 
   MedicinePlan({
-    this.planId,
-    required this.medicineTrackId,
-    required this.userId,
+    this.id,
+    required this.trackingId,
+    this.userId,
     required this.importance,
     required this.startDate,
     required this.endDate,
     required this.frequencyType,
+    this.intervalDays,
+    this.weekdays,
+    this.monthDays,
+    this.customDates,
   });
-
+  
   MedicinePlan copyWith({
-    int? planId,
-    int? medicineTrackId,
-    int? userId,
-    String? importance,
-    String? startDate,
-    String? endDate,
-    String? frequencyType,
-  }) {
-    return MedicinePlan(
-      planId: planId ?? this.planId,
-      medicineTrackId: medicineTrackId ?? this.medicineTrackId,
-      userId: userId ?? this.userId,
-      importance: importance ?? this.importance,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      frequencyType: frequencyType ?? this.frequencyType,
-    );
-  }
+  int? id,
+  int? trackingId,
+  int? userId,
+  String? importance,
+  DateTime? startDate,
+  DateTime? endDate,
+  String? frequencyType,
+  int? intervalDays,
+  List<String>? weekdays,
+  List<int>? monthDays,
+  List<String>? customDates,
+}) {
+  return MedicinePlan(
+    id: id ?? this.id,
+    trackingId: trackingId ?? this.trackingId,
+    userId: userId ?? this.userId,
+    importance: importance ?? this.importance,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate ?? this.endDate,
+    frequencyType: frequencyType ?? this.frequencyType,
+    intervalDays: intervalDays ?? this.intervalDays,
+    weekdays: weekdays ?? this.weekdays,
+    monthDays: monthDays ?? this.monthDays,
+    customDates: customDates ?? this.customDates,
+  );
+}
+
 
   factory MedicinePlan.fromMap(Map<String, dynamic> map) {
     return MedicinePlan(
-      planId: map['plan_id'] as int?,
-      medicineTrackId: map['medicine_track_id'] as int,
-      userId: map['user_id'] as int,
-      importance: map['importance'] as String,
-      startDate: map['start_date'] as String,
-      endDate: map['end_date'] as String,
-      frequencyType: map['frequency_type'] as String,
+      id: map['plan_id'],
+      trackingId: map['medicine_track_id'],   // ✅ FIXED
+      userId: map['user_id'],
+
+      importance: map['importance'],
+      startDate: DateTime.parse(map['start_date']),
+      endDate: DateTime.parse(map['end_date']),
+
+      frequencyType: map['frequency_type'],
+      intervalDays: map['interval_days'],
+
+      weekdays: map['weekdays'] != null
+          ? (map['weekdays'] as String).split(',')
+          : null,
+
+      monthDays: map['month_days'] != null
+          ? (map['month_days'] as String)
+              .split(',')
+              .map((e) => int.parse(e))
+              .toList()
+          : null,
+
+      customDates: map['custom_dates'] != null
+          ? (map['custom_dates'] as String).split(',')
+          : null,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'plan_id': planId,
-      'medicine_track_id': medicineTrackId,
+      'plan_id': id,
+      'medicine_track_id': trackingId,   // ✅ FIXED
       'user_id': userId,
       'importance': importance,
-      'start_date': startDate,
-      'end_date': endDate,
+      'start_date': startDate.toIso8601String(),
+      'end_date': endDate.toIso8601String(),
       'frequency_type': frequencyType,
+      'interval_days': intervalDays,
+      'weekdays': weekdays?.join(','),
+      'month_days': monthDays?.join(','),
+      'custom_dates': customDates?.join(','),
     };
   }
 }

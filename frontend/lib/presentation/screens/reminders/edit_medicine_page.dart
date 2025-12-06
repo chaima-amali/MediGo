@@ -1,21 +1,42 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_text.dart';
 import '../../widgets/back_arrow.dart';
-import 'edit_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/logic/cubits/tracking_cubit.dart';
+import 'package:frontend/logic/cubits/edit_medicine_cubit.dart';
+import 'package:frontend/data/repositories/medicine_repository.dart';
+import 'package:frontend/data/repositories/occurrence_repository.dart';
+import 'package:frontend/data/models/medicine_plan.dart';
+import 'package:frontend/data/models/medicine_tracking.dart';
+import 'package:frontend/data/models/occurrence_plan.dart';
 
 class EditMedicinePage extends StatefulWidget {
-  const EditMedicinePage({super.key});
+  final int? planId;
+  final int? occurrenceId;
+  final Occurrence? occurrence;
+  const EditMedicinePage({
+    super.key,
+    this.planId,
+    this.occurrenceId,
+    this.occurrence,
+  });
 
   @override
   State<EditMedicinePage> createState() => _EditMedicinePageState();
 }
 
 class _EditMedicinePageState extends State<EditMedicinePage> {
-  final TextEditingController medicineNameController =
-      TextEditingController(text: "Telfast");
-  TimeOfDay selectedTime = const TimeOfDay(hour: 9, minute: 0);
-  DateTime? startDate = DateTime(2025, 9, 12);
-  DateTime? endDate = DateTime(2025, 10, 12);
+  final TextEditingController medicineNameController = TextEditingController();
+  final TextEditingController dosageController = TextEditingController();
+  final TextEditingController timesController = TextEditingController();
+
+  final MedicineRepository _repo = MedicineRepository();
+  MedicinePlan? _plan;
+  MedicineTracking? _tracking;
+
+  late EditMedicineCubit _cubit;
+  bool _createdLocalCubit = false;
 
   final List<String> medicineTypes = [
     'Tablet',
@@ -58,78 +79,187 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
     'Per year',
   ];
 
-  final List<Color> importanceColors = [
-    AppColors.primary,
-    AppColors.pinkCard,
-    AppColors.yellowCard,
-    AppColors.blueCard,
-    AppColors.coralCard,
-    AppColors.lavenderCard,
-    AppColors.mint,
-    AppColors.success,
-    AppColors.warning,
-    AppColors.error,
-  ];
-
   String? selectedMedicineType = 'Tablet';
   String? selectedUnit = 'mg';
   String? selectedFrequency = 'Per day';
   Color? selectedImportanceColor = AppColors.primary;
+
   int dosage = 100;
   int timesPerDay = 1;
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.lightBlue,
-              onSurface: AppColors.darkBlue,
-            ),
-            dialogBackgroundColor: AppColors.lightBlue,
-            timePickerTheme: TimePickerThemeData(
-              dialBackgroundColor: AppColors.white,
-              hourMinuteTextColor:
-                  MaterialStateColor.resolveWith((_) => AppColors.darkBlue),
-              dayPeriodTextColor:
-                  MaterialStateColor.resolveWith((_) => AppColors.darkBlue),
-              dialHandColor: AppColors.primary,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) setState(() => selectedTime = picked);
+  DateTime? startDate = DateTime.now();
+  DateTime? endDate = DateTime.now().add(const Duration(days: 30));
+
+  @override
+  void initState() {
+    super.initState();
+    // Try to obtain a provided EditMedicineCubit from the ancestor. If none,
+    // create a local one and remember to close it on dispose.
+    try {
+      _cubit = BlocProvider.of<EditMedicineCubit>(context);
+      _createdLocalCubit = false;
+    } catch (_) {
+      TrackingCubit? trackingCubit;
+      try {
+        trackingCubit = BlocProvider.of<TrackingCubit>(context);
+      } catch (_) {}
+      _cubit = EditMedicineCubit(_repo, trackingCubit);
+      _createdLocalCubit = true;
+    }
+
+    // Always clear controllers to avoid showing stale data from previous opens.
+    medicineNameController.clear();
+    dosageController.clear();
+    timesController.clear();
+
+    // If the navigator passed an Occurrence, prefill the medicine name immediately
+    // so the user sees something while the repository/cubit load completes.
+    if (widget.occurrence != null) {
+      medicineNameController.text = widget.occurrence!.medicineName ?? '';
+    }
+
+    // Load plan if provided. Use a post-frame callback to ensure context is ready.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Determine a usable planId. If widget.planId is not provided or 0,
+      // try to resolve it from the supplied occurrenceId using OccurrenceRepository.
+      () async {
+        int? planId = widget.planId;
+        if (planId == null || planId == 0) {
+          if (widget.occurrenceId != null) {
+            try {
+              final occRepo = OccurrenceRepository();
+              final fetched = await occRepo.getPlanIdForOccurrence(
+                widget.occurrenceId!,
+              );
+              if (fetched != null && fetched > 0) planId = fetched;
+            } catch (_) {}
+          }
+        }
+        if (planId != null && planId > 0) {
+          _cubit.load(planId);
+
+          // Short fallback: populate fields quickly from repo if available.
+          try {
+            final plan = await _repo.getPlanById(planId);
+            if (plan != null) {
+              final tracking = await _repo.getTrackingById(plan.trackingId);
+              // infer times-per-day from occurrences for this plan
+              final occRepo = OccurrenceRepository();
+              final times = await occRepo.getDistinctTimesForPlan(plan.id!);
+
+              if (!mounted) return;
+              setState(() {
+                _plan = plan;
+                _tracking = tracking;
+
+                // populate tracking fields if available
+                if (tracking != null) {
+                  medicineNameController.text = tracking.name;
+                  selectedMedicineType = tracking.type;
+                  selectedUnit = tracking.unit;
+                  try {
+                    dosage = tracking.dosage.toInt();
+                  } catch (_) {
+                    dosage = tracking.dosage.round();
+                  }
+                  dosageController.text = dosage.toString();
+                } else {
+                  // keep occurrence-provided name if tracking row not found
+                  if (widget.occurrence != null &&
+                      (medicineNameController.text.isEmpty)) {
+                    medicineNameController.text =
+                        widget.occurrence!.medicineName ?? '';
+                  }
+                }
+
+                // set times-per-day based on distinct times found
+                timesPerDay = times.length > 0 ? times.length : timesPerDay;
+                timesController.text = timesPerDay.toString();
+
+                startDate = plan.startDate;
+                endDate = plan.endDate;
+                selectedImportanceColor = _colorFromImportance(plan.importance);
+                switch (plan.frequencyType) {
+                  case 'daily':
+                    selectedFrequency = 'Per day';
+                    break;
+                  case 'weekly':
+                    selectedFrequency = 'Per week';
+                    break;
+                  case 'monthly':
+                    selectedFrequency = 'Per month';
+                    break;
+                  case 'yearly':
+                    selectedFrequency = 'Per year';
+                    break;
+                }
+              });
+            }
+          } catch (_) {}
+        } else {
+          // couldn't resolve planId - show visible feedback and log
+          // ignore: avoid_print
+          print(
+            'EditMedicinePage: could not resolve planId for widget.planId=${widget.planId} occurrenceId=${widget.occurrenceId}',
+          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Could not find plan for this occurrence'),
+              ),
+            );
+          }
+        }
+      }();
+    });
   }
 
-  Future<void> _selectDate(BuildContext context, bool isStart) async {
-    final DateTime? picked = await showDatePicker(
+  @override
+  void didUpdateWidget(covariant EditMedicinePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If planId changes for some reason, reload the cubit and reset fields.
+    if (widget.planId != oldWidget.planId) {
+      medicineNameController.clear();
+      dosageController.clear();
+      timesController.clear();
+      _plan = null;
+      _tracking = null;
+      if (widget.planId != null) _cubit.load(widget.planId!);
+    }
+  }
+
+  @override
+  void dispose() {
+    medicineNameController.dispose();
+    dosageController.dispose();
+    timesController.dispose();
+    if (_createdLocalCubit) _cubit.close();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(bool isStart) async {
+    final initial = isStart
+        ? (startDate ?? DateTime.now())
+        : (endDate ?? DateTime.now());
+    final picked = await showDatePicker(
       context: context,
-      initialDate: isStart ? startDate ?? DateTime.now() : endDate ?? DateTime.now(),
-      firstDate: DateTime(2020),
+      initialDate: initial,
+      firstDate: DateTime(2000),
       lastDate: DateTime(2100),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.lightBlue,
-              onSurface: AppColors.darkBlue,
+              onSurface: Colors.black,
             ),
-            dialogBackgroundColor: AppColors.lightBlue,
           ),
           child: child!,
         );
       },
     );
-    if (picked != null) {
+
+    if (picked != null && mounted) {
       setState(() {
         if (isStart) {
           startDate = picked;
@@ -140,373 +270,584 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
     }
   }
 
-  void _confirmAction(String action, VoidCallback onConfirm) {
+  Color _colorFromImportance(String? importance) {
+    switch (importance) {
+      case 'pink':
+        return AppColors.pinkCard;
+      case 'yellow':
+        return AppColors.yellowCard;
+      case 'blue':
+        return AppColors.blueCard;
+      case 'coral':
+        return AppColors.coralCard;
+      case 'lavender':
+        return AppColors.lavenderCard;
+      case 'mint':
+        return AppColors.mint;
+      default:
+        return AppColors.primary;
+    }
+  }
+
+  String _importanceFromColor(Color? color) {
+    if (color == AppColors.pinkCard) return 'pink';
+    if (color == AppColors.yellowCard) return 'yellow';
+    if (color == AppColors.blueCard) return 'blue';
+    if (color == AppColors.coralCard) return 'coral';
+    if (color == AppColors.lavenderCard) return 'lavender';
+    if (color == AppColors.mint) return 'mint';
+    return 'primary';
+  }
+
+  void _confirm(String action, VoidCallback onConfirm) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
+      builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Confirm $action',
-          style: const TextStyle(
-            color: AppColors.darkBlue,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to $action this medicine?',
-          style: const TextStyle(color: Colors.black87),
-        ),
-        actionsAlignment: MainAxisAlignment.spaceBetween,
+        title: Text("Confirm $action"),
+        content: Text("Are you sure you want to $action this medicine?"),
         actions: [
-          OutlinedButton(
+          TextButton(
             onPressed: () => Navigator.pop(context),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.black26),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text(
-              'No',
-              style: TextStyle(color: Colors.black87),
-            ),
+            child: const Text("No"),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               onConfirm();
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('Yes'),
+            child: const Text("Yes"),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInputField({
+  Widget _field({
     required String label,
     required IconData icon,
-    String? hint,
     Widget? child,
+    TextEditingController? controller,
+    String? hint,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.w600, color: AppColors.darkBlue)),
-        const SizedBox(height: 4),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0x47D9D9D9),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              children: [
-                Icon(icon, color: Colors.black.withOpacity(0.4), size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: child ??
-                      TextField(
-                        controller: medicineNameController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: hint,
-                          hintStyle: const TextStyle(color: Colors.black38),
-                        ),
-                      ),
-                ),
-              ],
-            ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.darkBlue,
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.darkBlue.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            children: [
+              Icon(icon, size: 22, color: Colors.black45),
+              const SizedBox(width: 10),
+              Expanded(
+                child:
+                    child ??
+                    TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        hintText: hint,
+                        border: InputBorder.none,
+                      ),
+                    ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(110),
-        child: AppBar(
-          backgroundColor: AppColors.lightBlue,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const EditPage()),
-              );
+    return BlocProvider.value(
+      /// ✅ Provide the correct cubit to the UI
+      value: _cubit,
+      child: Scaffold(
+        backgroundColor: AppColors.lightBlue,
+        body: SafeArea(
+          child: BlocListener<EditMedicineCubit, EditMedicineState>(
+            listener: (context, state) {
+              if (state.success) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text("Saved")));
+                Navigator.pop(context);
+              }
+
+              if (state.error != null) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.error!)));
+              }
+
+              if (state.plan != null) {
+                final plan = state.plan!;
+                final tracking = state.tracking;
+                // debug print
+                // ignore: avoid_print
+                print(
+                  'EditMedicinePage listener -> planId=${plan.id}, trackingId=${tracking?.id}, name=${tracking?.name}',
+                );
+
+                if (!mounted) return;
+
+                setState(() {
+                  _plan = plan;
+                  if (tracking != null) {
+                    _tracking = tracking;
+                    medicineNameController.text = tracking.name;
+                    selectedMedicineType = tracking.type;
+                    selectedUnit = tracking.unit;
+                    dosage = tracking.dosage.toInt();
+                    dosageController.text = dosage.toString();
+                    timesController.text = timesPerDay.toString();
+                  } else {
+                    // keep occurrence-provided name if tracking row not found
+                    if (widget.occurrence != null &&
+                        (medicineNameController.text.isEmpty)) {
+                      medicineNameController.text =
+                          widget.occurrence!.medicineName ?? '';
+                    }
+                  }
+
+                  startDate = plan.startDate;
+                  endDate = plan.endDate;
+                  selectedImportanceColor = _colorFromImportance(
+                    plan.importance,
+                  );
+
+                  switch (plan.frequencyType) {
+                    case 'daily':
+                      selectedFrequency = 'Per day';
+                      break;
+                    case 'weekly':
+                      selectedFrequency = 'Per week';
+                      break;
+                    case 'monthly':
+                      selectedFrequency = 'Per month';
+                      break;
+                    case 'yearly':
+                      selectedFrequency = 'Per year';
+                      break;
+                  }
+                });
+              }
             },
-            child: const CustomBackArrow(),
-          ),
-          flexibleSpace: SafeArea(
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Edit Medicine ",
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Image.asset(
-                    'assets/images/logo_medicine.png',
-                    height: 32,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      backgroundColor: AppColors.lightBlue,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, -2),
-                )
-              ],
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildInputField(
-                    label: "Medicine Name:",
-                    icon: Icons.medical_services_outlined,
-                    hint: "Enter medicine name",
-                  ),
-                  _buildInputField(
-                    label: "Medicine Type:",
-                    icon: Icons.category_outlined,
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedMedicineType,
-                      underline: const SizedBox(),
-                      items: medicineTypes
-                          .map((type) =>
-                              DropdownMenuItem(value: type, child: Text(type)))
-                          .toList(),
-                      onChanged: (val) =>
-                          setState(() => selectedMedicineType = val),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildInputField(
-                          label: "Dosage:",
-                          icon: Icons.numbers_outlined,
-                          child: TextField(
-                            keyboardType: TextInputType.number,
-                            controller:
-                                TextEditingController(text: dosage.toString()),
-                            decoration: const InputDecoration(
-                                border: InputBorder.none),
-                            onChanged: (val) =>
-                                dosage = int.tryParse(val) ?? dosage,
-                          ),
+
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: const [
+                      CustomBackArrow(),
+                      Spacer(),
+                      Text(
+                        "Edit Medicine",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.darkBlue,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _buildInputField(
-                          label: "Unit:",
-                          icon: Icons.straighten_outlined,
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedUnit,
-                            underline: const SizedBox(),
-                            items: units
-                                .map((unit) => DropdownMenuItem(
-                                    value: unit, child: Text(unit)))
-                                .toList(),
-                            onChanged: (val) =>
-                                setState(() => selectedUnit = val),
-                          ),
-                        ),
-                      ),
+                      Spacer(),
                     ],
                   ),
-                  _buildInputField(
-                    label: "Frequency:",
-                    icon: Icons.access_time_outlined,
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedFrequency,
-                      underline: const SizedBox(),
-                      items: frequencies
-                          .map((f) =>
-                              DropdownMenuItem(value: f, child: Text(f)))
-                          .toList(),
-                      onChanged: (val) =>
-                          setState(() => selectedFrequency = val),
-                    ),
-                  ),
-                  _buildInputField(
-                    label: "How Many Times?:",
-                    icon: Icons.repeat_on_outlined,
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(
-                          text: timesPerDay.toString()),
-                      decoration: const InputDecoration(
-                          border: InputBorder.none, hintText: ""),
-                      onChanged: (val) =>
-                          timesPerDay = int.tryParse(val) ?? timesPerDay,
-                    ),
-                  ),
-                  _buildInputField(
-                    label: "Reminder Time:",
-                    icon: Icons.alarm_outlined,
-                    child: GestureDetector(
-                      onTap: () => _selectTime(context),
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        height: 40,
-                        child: Text(
-                          selectedTime.format(context),
-                          style: const TextStyle(color: Colors.black87),
-                        ),
+                ),
+
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(30),
                       ),
                     ),
-                  ),
-                  _buildInputField(
-                    label: "Importance:",
-                    icon: Icons.priority_high_outlined,
-                    child: SizedBox(
-                      height: 48,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: importanceColors.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(width: 10),
-                        itemBuilder: (context, i) {
-                          final color = importanceColors[i];
-                          final isSelected =
-                              selectedImportanceColor == color;
-                          return GestureDetector(
-                            onTap: () =>
-                                setState(() => selectedImportanceColor = color),
-                            child: Container(
-                              height: 38,
-                              width: 38,
-                              decoration: BoxDecoration(
-                                color: color,
-                                shape: BoxShape.circle,
-                                border: isSelected
-                                    ? Border.all(
-                                        color: AppColors.darkBlue, width: 2)
-                                    : null,
-                              ),
-                              child: isSelected
-                                  ? const Icon(Icons.check,
-                                      color: Colors.white, size: 18)
-                                  : null,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          _field(
+                            label: "Medicine Name:",
+                            icon: Icons.medical_services_outlined,
+                            controller: medicineNameController,
+                            hint: "Enter medicine name",
+                          ),
+
+                          _field(
+                            label: "Medicine Type:",
+                            icon: Icons.category_outlined,
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: selectedMedicineType,
+                              underline: const SizedBox(),
+                              items: medicineTypes.map((e) {
+                                return DropdownMenuItem(
+                                  value: e,
+                                  child: Text(e),
+                                );
+                              }).toList(),
+                              onChanged: (v) =>
+                                  setState(() => selectedMedicineType = v),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  _buildInputField(
-                    label: "Start Date:",
-                    icon: Icons.calendar_today_outlined,
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, true),
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        height: 40,
-                        child: Text(
-                          startDate == null
-                              ? "Select start date"
-                              : "${startDate!.toLocal()}".split(' ')[0],
-                          style: const TextStyle(color: Colors.black87),
-                        ),
-                      ),
-                    ),
-                  ),
-                  _buildInputField(
-                    label: "End Date:",
-                    icon: Icons.event_outlined,
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, false),
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        height: 40,
-                        child: Text(
-                          endDate == null
-                              ? "Select end date"
-                              : "${endDate!.toLocal()}".split(' ')[0],
-                          style: const TextStyle(color: Colors.black87),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _confirmAction("cancel", () {
-                            Navigator.pop(context);
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                        child: const Text("Cancel"),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          _confirmAction("save changes", () {});
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _field(
+                                  label: "Dosage:",
+                                  icon: Icons.numbers_outlined,
+                                  child: TextField(
+                                    controller: dosageController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                    ),
+                                    onChanged: (v) =>
+                                        dosage = int.tryParse(v) ?? dosage,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _field(
+                                  label: "Unit:",
+                                  icon: Icons.straighten_outlined,
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: selectedUnit,
+                                    underline: const SizedBox(),
+                                    items: units
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e,
+                                            child: Text(e),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (v) =>
+                                        setState(() => selectedUnit = v),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        child: const Text("Save Changes"),
+
+                          _field(
+                            label: "Frequency:",
+                            icon: Icons.access_time_outlined,
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: selectedFrequency,
+                              underline: const SizedBox(),
+                              items: frequencies
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (v) =>
+                                  setState(() => selectedFrequency = v),
+                            ),
+                          ),
+
+                          _field(
+                            label: "Times per day:",
+                            icon: Icons.repeat_on_outlined,
+                            child: TextField(
+                              controller: timesController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                              onChanged: (v) =>
+                                  timesPerDay = int.tryParse(v) ?? timesPerDay,
+                            ),
+                          ),
+
+                          _field(
+                            label: "Start Date:",
+                            icon: Icons.calendar_today_outlined,
+                            child: GestureDetector(
+                              onTap: () => _selectDate(true),
+                              child: SizedBox(
+                                height: 40,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    startDate.toString().split(" ")[0],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          _field(
+                            label: "End Date:",
+                            icon: Icons.event_outlined,
+                            child: GestureDetector(
+                              onTap: () => _selectDate(false),
+                              child: SizedBox(
+                                height: 40,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(endDate.toString().split(" ")[0]),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 30),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () => _confirm("cancel", () {
+                                    Navigator.pop(context);
+                                  }),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFFFC7C7),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  child: Text(
+                                    "Cancel",
+                                    style: AppText.medium.copyWith(
+                                      fontSize: 16,
+                                      color: AppColors.darkBlue,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () => _confirm("save changes", () async {
+                                    if (_plan == null || _tracking == null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Nothing to save'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    final name = medicineNameController.text
+                                        .trim();
+                                    if (name.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Name is required'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (dosage <= 0) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Dosage must be greater than 0',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (selectedUnit == null ||
+                                        selectedUnit!.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Unit is required'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (timesPerDay <= 0) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Times per day must be at least 1',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (startDate == null || endDate == null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Start and end dates are required',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (startDate!.isAfter(endDate!)) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Start date must be before end date',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    // read latest text values from controllers
+                                    dosage =
+                                        int.tryParse(dosageController.text) ??
+                                        dosage;
+                                    timesPerDay =
+                                        int.tryParse(timesController.text) ??
+                                        timesPerDay;
+
+                                    final updatedTracking = MedicineTracking(
+                                      id: _tracking!.id,
+                                      name: name,
+                                      type:
+                                          selectedMedicineType ??
+                                          _tracking!.type,
+                                      dosage: dosage.toDouble(),
+                                      unit: selectedUnit ?? _tracking!.unit,
+                                    );
+
+                                    String freq = _plan!.frequencyType;
+                                    switch (selectedFrequency) {
+                                      case 'Per day':
+                                        freq = 'daily';
+                                        break;
+                                      case 'Per week':
+                                        freq = 'weekly';
+                                        break;
+                                      case 'Per month':
+                                        freq = 'monthly';
+                                        break;
+                                      case 'Per year':
+                                        freq = 'yearly';
+                                        break;
+                                    }
+
+                                    final updatedPlan = MedicinePlan(
+                                      id: _plan!.id,
+                                      trackingId: _plan!.trackingId,
+                                      frequencyType: freq,
+                                      startDate: startDate ?? _plan!.startDate,
+                                      endDate: endDate ?? _plan!.endDate,
+                                      importance: _importanceFromColor(
+                                        selectedImportanceColor,
+                                      ),
+                                      intervalDays: _plan!.intervalDays,
+                                      weekdays: _plan!.weekdays,
+                                      monthDays: _plan!.monthDays,
+                                      customDates: _plan!.customDates,
+                                    );
+
+                                    // Use cubit when available so it notifies TrackingCubit
+                                    if (_cubit != null) {
+                                      await _cubit!.save(
+                                        updatedTracking: updatedTracking,
+                                        updatedPlan: updatedPlan,
+                                      );
+                                    } else {
+                                      // fallback to repository updates
+                                      final ok1 = await _repo
+                                          .updateMedicineTracking(
+                                            updatedTracking,
+                                          );
+                                      final ok2 = await _repo
+                                          .updateMedicinePlan(updatedPlan);
+                                      if (ok1 && ok2) {
+                                        try {
+                                          final cubit =
+                                              BlocProvider.of<TrackingCubit>(
+                                                context,
+                                              );
+                                          await cubit.loadDay(DateTime.now());
+                                        } catch (_) {}
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Saved'),
+                                          ),
+                                        );
+                                        Navigator.pop(context);
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Failed to save'),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.lightBlue,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Save Changes",
+                                    style: AppText.medium.copyWith(
+                                      fontSize: 16,
+                                      color: AppColors.darkBlue,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

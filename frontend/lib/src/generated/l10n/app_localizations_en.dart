@@ -64,9 +64,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseEnterEmail => 'Please enter your email';
 
   @override
-  String get validEmail => 'Please enter a valid email';
-
-  @override
   String get password => 'Password';
 
   @override
@@ -95,6 +92,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterEmail => 'Enter your Email';
+
+  @override
+  String get validEmail => 'Please enter a valid email';
 
   @override
   String get phoneNumber => 'Phone Number';
@@ -173,10 +173,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nearbyPharmacy => 'Nearby Pharmacy';
 
   @override
-  String get rating => 'Rating: \$rating';
+  String rating(Object rating) {
+    return 'Rating: \$rating';
+  }
 
   @override
-  String get reviews => '(\$reviews)';
+  String reviews(Object reviews) {
+    return '(\$reviews)';
+  }
 
   @override
   String get findYourMedicine => 'Find your medicine';
@@ -234,7 +238,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumDescription =>
-      'Unlock exclusive features and enhance\nyour medicine management';
+      'Get add-free experience, priority\nreservations and instant restock alerts';
 
   @override
   String get upgradeNowPrice => 'Upgrade Now - 3000DA/year';
@@ -246,8 +250,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myReservations => 'My Reservations';
 
   @override
-  String get activeReservations =>
-      '\$activeReservationsCount active\nreservations';
+  String activeReservations(Object activeReservationsCount) {
+    return '\$activeReservationsCount active\nreservations';
+  }
 
   @override
   String get notifications => 'Notifications';
@@ -339,8 +344,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get subscriptionSuccessMessage =>
-      'You’ve successfully subscribed to the \$planName plan!';
+  String subscriptionSuccessMessage(Object planName) {
+    return 'You’ve successfully subscribed to the \$planName plan!';
+  }
 
   @override
   String get medicinePreOrderReservation => 'Medicine pre-order & reservation';
@@ -362,4 +368,194 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adFreeDescription =>
       'Enjoy a clean, distraction-free interface without any ads';
+
+  @override
+  String get yourCurrentMedicines => 'Your current medicines';
+
+  @override
+  String get tracking => 'tracking';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get statistics => 'statistics';
+
+  @override
+  String get haveYouTakentYourMedicineToday =>
+      ' Have you taken your medicine today ?';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get evening => 'Evening';
+
+  @override
+  String get addMedicine => ' Add Medicine';
+
+  @override
+  String get medicineName => 'Medicine Name';
+
+  @override
+  String get enterMedicineName => 'Enter medicine name';
+
+  @override
+  String get medicineType => 'Medicine Type';
+
+  @override
+  String get dose => 'Dose';
+
+  @override
+  String get enterDoseExample => 'e.g., 500';
+
+  @override
+  String get unit => 'Unit';
+
+  @override
+  String get frequency => 'Frequency';
+
+  @override
+  String get timesPerDay => 'How many times per day';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get selectTime => 'Select time';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get importance => 'Importance';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get enterNotes => 'Write a note (optional)';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get perDay => 'Per day';
+
+  @override
+  String get perWeek => 'Per week';
+
+  @override
+  String get eachNDays => 'Each N days';
+
+  @override
+  String get customized => 'Customized';
+
+  @override
+  String get yourProgress => 'Your progress';
+
+  @override
+  String get medProgress => 'Med Progress';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get no_medicines_for_day => 'No medicines for this day';
+
+  @override
+  String get cannot_update_item => 'Cannot update this item';
+
+  @override
+  String get marked_as_done => 'Marked as done';
+
+  @override
+  String get unmarked => 'Unmarked';
+
+  @override
+  String get failed_to_mark => 'Failed to mark as done';
+
+  @override
+  String get failed_to_unmark => 'Failed to unmark';
+
+  @override
+  String get cannot_edit_item => 'Cannot edit this item';
+
+  @override
+  String get could_not_find_plan_for_occurrence =>
+      'Could not find plan for this occurrence';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get delete_occurrence_title => 'Delete occurrence';
+
+  @override
+  String get delete_occurrence_text =>
+      'Are you sure you want to delete this occurrence?';
+
+  @override
+  String how_many_times_on_day(Object day) {
+    return 'How many times on $day';
+  }
+
+  @override
+  String get select_start_date => 'Select start date';
+
+  @override
+  String get select_end_date => 'Select end date';
+
+  @override
+  String get start_end_dates_required => 'Start and end dates are required';
+
+  @override
+  String get start_date_before_or_equal_end_date =>
+      'Start date must be before or equal to end date';
+
+  @override
+  String get medicine_added => 'Medicine added';
+
+  @override
+  String get failed_to_add_medicine => 'Failed to add medicine';
+
+  @override
+  String get nothing_to_save => 'Nothing to save';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get name_is_required => 'Name is required';
+
+  @override
+  String get dose_must_be_greater_than_zero => 'Dose must be greater than 0';
+
+  @override
+  String get times_per_day_required => 'Times per day required';
+
+  @override
+  String get start_date_must_before_end_date =>
+      'Start date must be before end date';
+
+  @override
+  String get today_taken => 'Today taken';
+
+  @override
+  String get medicines_progress => 'Medicines Progress';
+
+  @override
+  String get unnamed => 'Unnamed';
+
+  @override
+  String get removed => 'Removed';
+
+  @override
+  String get failed_to_remove => 'Failed to remove';
 }

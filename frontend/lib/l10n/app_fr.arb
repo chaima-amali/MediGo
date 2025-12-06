@@ -1,17 +1,22 @@
 {
   "@@locale": "fr",
+
   "appTitle": "MediGo",
   "getStarted": "Commencer",
   "findNearbyPharmacies": "Trouver les pharmacies à proximité",
   "discoverPharmaciesDescription": "Découvrez les pharmacies près de chez vous avec un suivi de distance en temps réel et une navigation facile.",
   "next": "Suivant",
   "skip": "Passer",
+
   "searchMedicines": "Rechercher des médicaments",
   "searchMedicinesDescription": "Trouvez rapidement les médicaments dont vous avez besoin grâce à notre fonction de recherche intelligente.",
+
   "medicineReminders": "Rappels de médicaments",
   "medicineRemindersDescription": "Ne manquez jamais votre traitement grâce aux rappels personnalisés et au suivi de vos soins.",
+
   "contactDirections": "Contact et itinéraire",
   "contactDirectionsDescription": "Obtenez des informations détaillées sur les pharmacies, l’itinéraire et contactez-les directement depuis l’application.",
+
   "noAccountFound": "Aucun compte trouvé pour cet e-mail",
   "welcomeTo": "Bienvenue à ",
   "logIn": "Se connecter",
@@ -24,39 +29,45 @@
   "orLoginWith": "Ou se connecter avec",
   "noAccount": "Vous n’avez pas de compte ? ",
   "signUp": "S’inscrire",
+
   "fullName": "Nom complet",
   "enterFullName": "Entrez votre nom complet",
   "pleaseEnterName": "Veuillez entrer votre nom",
-  "enterEmail": "Entrez votre e-mail",
-  "validEmail": "Veuillez entrer un e-mail valide",
+
   "phoneNumber": "Numéro de téléphone",
   "enterPhoneNumber": "Veuillez entrer votre numéro de téléphone",
   "orSignUpWith": "Ou s’inscrire avec",
   "alreadyHaveAccount": "Vous avez déjà un compte ? ",
+
   "selectGenderPrompt": "Veuillez sélectionner votre genre",
   "selectDOBPrompt": "Veuillez sélectionner votre date de naissance",
   "gender": "Genre",
-  "select": "sélectionner",
+  "select": "Sélectionner",
   "male": "Homme",
   "female": "Femme",
   "other": "Autre",
+
   "dateOfBirth": "Date de naissance",
   "dobFormat": "jj/mm/aaaa",
+
   "createPassword": "Créez votre mot de passe",
-  "enterPassword": "Veuillez entrer votre mot de passe",
   "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
   "confirmPassword": "Confirmer le mot de passe",
   "confirmYourPassword": "Confirmez votre mot de passe",
   "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+
   "hi": "Salut ",
   "howAreYouFeeling": " ,Comment vous\nsentez-vous aujourd’hui ?",
+
   "searchMedicinePrompt": "Recherchez votre médicament ...",
   "medicineReminder": "Rappel de médicament",
   "reminderDescription": "Vous voulez un rappel pour suivre votre traitement",
   "startNow": "Commencer maintenant",
+
   "nearbyPharmacy": "Pharmacie à proximité",
   "rating": "Évaluation: $rating",
   "reviews": "($reviews)",
+
   "findYourMedicine": "Trouvez votre médicament",
   "searchYourMedicine": "Recherchez votre médicament",
   "noResultsFound": "Aucun résultat trouvé",
@@ -64,44 +75,55 @@
   "outOfStock": "En rupture de stock",
   "preOrder": "Pré-commande",
   "pharmacyIdMissing": "Identifiant de pharmacie manquant",
+
   "profileScreen": "Écran du profil",
   "calendarScreen": "Écran du calendrier",
+
   "logoutConfirmation": "Êtes-vous sûr de vouloir vous déconnecter ?",
   "cancel": "Annuler",
   "logOut": "Se déconnecter",
   "notSpecified": "Non spécifié",
+
   "profile": "Profil",
   "premiumPlan": "Forfait Premium",
   "freePlan": "Forfait Gratuit",
   "editProfile": "Modifier le profil",
-  "upgradeToPremium": "Passer au Premium",
-  "premiumDescription": "Profitez d’une expérience sans publicité, de réservations prioritaires\nd’alertes de réapprovisionnement instantanées",
+
+  "upgradeToPremium": "Passer à Premium",
+  "premiumDescription": "Profitez d’une expérience sans publicité, de réservations prioritaires et d’alertes de réapprovisionnement instantanées",
   "upgradeNowPrice": "Passer maintenant - 3000DA/an",
+
   "settings": "Paramètres",
   "myReservations": "Mes réservations",
-  "activeReservations": "$activeReservationsCount réservations\nactives",
+  "activeReservations": "$activeReservationsCount réservations actives",
+
   "notifications": "Notifications",
   "receiveMedicineReminders": "Recevoir des rappels de médicaments",
+
   "darkMode": "Mode sombre",
   "darkModeDescription": "Passer au thème sombre",
+
   "language": "Langue",
+
   "privacySecurityPage": "Page Confidentialité & Sécurité",
   "privacySecurity": "Confidentialité et Sécurité",
   "privacySecurityDescription": "Gérez vos données - Page Confidentialité et Sécurité",
+
   "aboutMedigo": "À propos de MediGo",
   "aboutMedigoPage": "Page À propos de MediGo",
+
   "profileUpdated": "Profil mis à jour avec succès",
-  "editProfile": "Modifier le profil",
+
   "newPassword": "Nouveau mot de passe",
   "enterNewPassword": "Entrez votre nouveau mot de passe",
   "confirmNewPassword": "Confirmez le nouveau mot de passe",
   "enterConfirmNewPassword": "Entrez la confirmation de votre nouveau mot de passe",
   "pleaseConfirmPassword": "Veuillez confirmer votre mot de passe",
+
   "subscription": "Abonnement",
-  "upgradeToPremium": "Passer à Premium",
-  "premiumDescription": "Débloquez des fonctionnalités exclusives et améliorez\ngestion de vos médicaments",
   "chooseYourPlan": "Choisissez votre formule",
-  "subscriptionAgreement": "En vous abonnant, vous acceptez nos Conditions d'utilisation\net notre Politique de confidentialité.\nL’abonnement se renouvelle automatiquement sauf annulation.",
+  "subscriptionAgreement": "En vous abonnant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité. L’abonnement se renouvelle automatiquement sauf annulation.",
+
   "subscribeMonthly": "S’abonner mensuellement",
   "billedAnnually": "Facturé annuellement",
   "yearly": "Annuel",
@@ -110,15 +132,99 @@
   "perMonth": "/mois",
   "perYear": "par an",
   "subscribeYearly": "S’abonner annuellement (Meilleure offre)",
+
   "success": "Succès !",
   "ok": "OK",
   "subscriptionSuccessMessage": "Vous vous êtes abonné avec succès à la formule $planName !",
+
   "medicinePreOrderReservation": "Précommande et réservation de médicaments",
   "medicinePreOrderDescription": "Précommandez vos médicaments, réservez-les puis passez les récupérer quand vous êtes libre",
+
   "instantRestockAlerts": "Alertes de réapprovisionnement instantanées",
   "instantRestockDescription": "Recevez une notification dès que les médicaments en rupture de stock sont disponibles",
+
   "adFreeExperience": "Expérience sans publicité",
-  "adFreeDescription": "Profitez d’une interface propre et sans distractions, sans aucune publicité"
+  "adFreeDescription": "Profitez d’une interface propre et sans distractions, sans aucune publicité",
 
+  "yourCurrentMedicines": "Vos médicaments actuels",
+  "tracking": "Suivi",
+  "edit": "Modifier",
+  "statistics": "Statistiques",
+  "haveYouTakentYourMedicineToday": "Avez-vous pris votre médicament aujourd'hui ?",
 
+  "morning": "Matin",
+  "evening": "Soir",
+
+  "addMedicine": "Ajouter un médicament",
+  "editMedicine": "Modifier le médicament",
+
+  "medicineName": "Nom du médicament",
+  "enterMedicineName": "Entrez le nom du médicament",
+
+  "medicineType": "Type de médicament",
+  "dose": "Dose",
+  "enterDoseExample": "ex : 500",
+  "unit": "Unité",
+
+  "frequency": "Fréquence",
+  "timesPerDay": "Combien de fois par jour",
+
+  "time": "Heure",
+  "selectTime": "Sélectionner l’heure",
+
+  "startDate": "Date de début",
+  "endDate": "Date de fin",
+  "selectDate": "Sélectionner la date",
+
+  "importance": "Importance",
+  "notes": "Notes",
+  "enterNotes": "Écrire une note (optionnel)",
+
+  "save": "Enregistrer",
+
+  "perDay": "Par jour",
+  "perWeek": "Par semaine",
+  "eachNDays": "Chaque N jours",
+  "customized": "Personnalisé",
+
+  "yourProgress": "Votre progression",
+  "medProgress": "Progression du médicament",
+
+  "no_medicines_for_day": "Aucun médicament pour ce jour",
+  "cannot_update_item": "Impossible de mettre à jour cet élément",
+  "marked_as_done": "Marqué comme pris",
+  "unmarked": "Démarqué",
+  "failed_to_mark": "Échec du marquage",
+  "failed_to_unmark": "Échec du démarquage",
+
+  "cannot_edit_item": "Impossible de modifier cet élément",
+  "could_not_find_plan_for_occurrence": "Impossible de trouver le plan pour cette occurrence",
+
+  "delete": "Supprimer",
+  "delete_occurrence_title": "Supprimer l’occurrence",
+  "delete_occurrence_text": "Êtes-vous sûr de vouloir supprimer cette occurrence ?",
+
+  "how_many_times_on_day": "Combien de fois le {day}",
+  "select_start_date": "Sélectionnez la date de début",
+  "select_end_date": "Sélectionnez la date de fin",
+  "start_end_dates_required": "Les dates de début et de fin sont obligatoires",
+  "start_date_before_or_equal_end_date": "La date de début doit être avant ou égale à la date de fin",
+
+  "medicine_added": "Médicament ajouté",
+  "failed_to_add_medicine": "Échec de l’ajout du médicament",
+
+  "nothing_to_save": "Rien à enregistrer",
+  "saved": "Enregistré",
+
+  "name_is_required": "Le nom est obligatoire",
+  "dose_must_be_greater_than_zero": "La dose doit être supérieure à 0",
+  "times_per_day_required": "Le nombre de prises par jour est requis",
+  "start_date_must_before_end_date": "La date de début doit être avant la date de fin",
+
+  "today_taken": "Pris aujourd’hui",
+  "medicines_progress": "Progression des médicaments",
+  "unnamed": "Sans nom",
+
+  "removed": "Supprimé",
+  "failed_to_remove": "Échec de la suppression"
 }
