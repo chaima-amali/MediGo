@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
-import 'package:frontend/presentation/services/navigation_helper.dart' as nav_helper;
+import 'package:frontend/presentation/services/navigation_helper.dart'
+    as nav_helper;
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/Bottom_Navbar.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
@@ -20,7 +23,6 @@ class MediGoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'MediGo',
       debugShowCheckedModeBanner: false,
@@ -44,17 +46,14 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  late String userName;
 
   late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
-    // Pull the name from the shared mock data service so Home uses centralized data
-    userName = MockDataService.getUserFirstName();
     _screens = [
-      HomeScreen(userName: userName),
+      const HomeScreen(),
       const SearchScreen(),
       // Provide the tracking page a global key so we can control its subview
       TrackingPage(key: nav_helper.trackingPageKey),
@@ -97,7 +96,6 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-     
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _searchResults = [];
 
@@ -125,6 +123,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _searchController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -207,7 +206,7 @@ class _SearchScreenState extends State<SearchScreen> {
               const SizedBox(height: 30),
 
               // Title
-               Text(
+              Text(
                 loc.findYourMedicine,
                 style: TextStyle(
                   fontSize: 26,
@@ -282,6 +281,7 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
+
   Widget _buildPharmacyCard(Map<String, dynamic> data) {
     final loc = AppLocalizations.of(context)!;
     return Container(
@@ -407,7 +407,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   final pname = data['pharmacy_name'] ?? '';
                   if (pid.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(content: Text(loc.pharmacyIdMissing)),
+                      SnackBar(content: Text(loc.pharmacyIdMissing)),
                     );
                     return;
                   }
@@ -430,9 +430,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child:  Text(
+                child: Text(
                   loc.preOrder,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
             ),
@@ -445,248 +445,260 @@ class _SearchScreenState extends State<SearchScreen> {
 
 // Home Screen
 class HomeScreen extends StatelessWidget {
-  final String userName;
-
-  const HomeScreen({super.key, required this.userName});
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<UserCubit, UserState>(
+      builder: (context, state) {
+        String userName = 'User';
+        
+        if (state is UserLoaded || state is UserAuthenticated) {
+          final user = state is UserLoaded 
+              ? state.user 
+              : (state as UserAuthenticated).user;
+          userName = user.name;
+        }
+        
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'MediGo',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.local_hospital,
-                        color: AppColors.primary,
-                        size: 24,
-                      ),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const notif_page.NotificationsPage(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightBlue.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Stack(
+                      Row(
                         children: [
+                          Text(
+                            'MediGo',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
                           Icon(
-                            Icons.notifications_outlined,
+                            Icons.local_hospital,
                             color: AppColors.primary,
                             size: 24,
                           ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Greeting
-              RichText(
-                text: TextSpan(
-                  style: const TextStyle(
-                    fontSize: 24,
-                    color: AppColors.darkBlue,
-                  ),
-                  children: [
-                     TextSpan(text: loc.hi),
-                    TextSpan(
-                      text: userName,
-                      style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                     TextSpan(text: loc.howAreYouFeeling),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Search Bar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: AppColors.lightBlue),
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SearchMedicineScreen(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const notif_page.NotificationsPage(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightBlue.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      },
-                      child: Icon(Icons.search, color: AppColors.primary),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: loc.searchMedicinePrompt,
-                          hintStyle: TextStyle(color: Colors.grey[400]),
-                          border: InputBorder.none,
+                          child: Stack(
+                            children: [
+                              Icon(
+                                Icons.notifications_outlined,
+                                color: AppColors.primary,
+                                size: 24,
+                              ),
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              // Medicine Reminder Card (uses requested color #DAA3B5)
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.reminderBox,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                           Text(
-                            loc.medicineReminder,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                           Text(
-                            loc.reminderDescription,
-                            style: TextStyle(fontSize: 12, color: Colors.white),
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: AppColors.pink,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 8,
-                              ),
-                            ),
-                            child:  Text(
-                              loc.startNow,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Icon(
-                        Icons.medical_services,
-                        size: 50,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
 
-              // Nearby Pharmacy Section
-               Text(
-                loc.nearbyPharmacy,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.darkBlue,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Pharmacy Cards
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildNearbyPharmacyCard(
-                      context,
-                      'PharmSync',
-                      '0.8km',
-                      '4.7',
-                      '1222 reviews',
+                  // Greeting
+                  RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 24,
+                        color: AppColors.darkBlue,
+                      ),
+                      children: [
+                        TextSpan(text: loc.hi),
+                        TextSpan(
+                          text: userName,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextSpan(text: loc.howAreYouFeeling),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildNearbyPharmacyCard(
-                      context,
-                      'PharmSync',
-                      '0.8km',
-                      '4.7',
-                      '1222 reviews',
+                  const SizedBox(height: 24),
+
+                  // Search Bar
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: AppColors.lightBlue),
                     ),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SearchMedicineScreen(),
+                              ),
+                            );
+                          },
+                          child: Icon(Icons.search, color: AppColors.primary),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: loc.searchMedicinePrompt,
+                              hintStyle: TextStyle(color: Colors.grey[400]),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Medicine Reminder Card (uses requested color #DAA3B5)
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.reminderBox,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                loc.medicineReminder,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                loc.reminderDescription,
+                                style: const TextStyle(fontSize: 12, color: Colors.white),
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: AppColors.pink,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 8,
+                                  ),
+                                ),
+                                child: Text(
+                                  loc.startNow,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: const Icon(
+                            Icons.medical_services,
+                            size: 50,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Nearby Pharmacy Section
+                  Text(
+                    loc.nearbyPharmacy,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkBlue,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Pharmacy Cards
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildNearbyPharmacyCard(
+                          context,
+                          'PharmSync',
+                          '0.8km',
+                          '4.7',
+                          '1222 reviews',
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildNearbyPharmacyCard(
+                          context,
+                          'PharmSync',
+                          '0.8km',
+                          '4.7',
+                          '1222 reviews',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
   Widget _buildNearbyPharmacyCard(
     BuildContext context,
     String name,
@@ -696,13 +708,10 @@ class HomeScreen extends StatelessWidget {
   ) {
     final loc = AppLocalizations.of(context)!;
     return GestureDetector(
-      
       onTap: () {
         final pList = MockDataService.getNearbyPharmacies(limit: 1);
         final p = pList.isNotEmpty ? pList.first : <String, dynamic>{};
         Navigator.push(
-          // use the nearest pharmacy details
-          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
             builder: (context) => PharmacyDetailScreen(pharmacy: p),
@@ -789,7 +798,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-             SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               loc.reviews,
               style: const TextStyle(fontSize: 10, color: AppColors.darkBlue),
@@ -803,13 +812,12 @@ class HomeScreen extends StatelessWidget {
 
 // Placeholder Screens
 class CalendarScreen extends StatelessWidget {
-
   const CalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return  Center(
+    return Center(
       child: Text(
         loc.calendarScreen,
         style: TextStyle(fontSize: 24, color: AppColors.primary),
@@ -824,7 +832,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return  Center(
+    return Center(
       child: Text(
         loc.profileScreen,
         style: TextStyle(fontSize: 24, color: AppColors.primary),

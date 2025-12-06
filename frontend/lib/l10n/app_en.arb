@@ -295,6 +295,9 @@
   "no": "No",
   "plan_not_found": "Plan not found",
   "unexpected_error": "Something went wrong",
+  "medicine_calendar": "Medicine Calendar",
+  "view_report": "View Report",
+  "no_medicine_records_for_this_date": "No medicine records for this date",
   "howManyTimesOnDay": "How many times on {day}?",
   "@howManyTimesOnDay": {
     "placeholders": {
