@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
 // Import all table schema files:
 import 'db_user.dart';
 import 'db_medicine_tracking.dart';
@@ -17,7 +16,7 @@ import 'db_reservation.dart';
 
 class DBHelper {
   static const _databaseName = "medic_app.db";
-  static const _databaseVersion = 4;
+  static const _databaseVersion = 1;
   static Database? _database;
 
   // List all table create statements in order
@@ -50,54 +49,83 @@ class DBHelper {
           await db.execute(sql);
         }
       },
+      onOpen: (db) async {
+        // Ensure any missing columns from older schemas are added so
+        // the app can run without requiring a reinstall. Safe to run
+        // on every open because ALTER TABLE ADD COLUMN is idempotent
+        // when guarded by an existence check below.
+        await _ensureSchema(db);
+      },
       onUpgrade: (db, oldVersion, newVersion) async {
-        print('🔄 Migrating database from version $oldVersion to $newVersion');
-        
-        // Upgrade from version 1 to 2 or higher
-        if (oldVersion < 2) {
-          try {
-            await db.execute('ALTER TABLE user ADD COLUMN latitude REAL');
-            print('✅ Added latitude to user table');
-          } catch (e) {
-            print('⚠️ Column latitude may already exist: $e');
-          }
-          try {
-            await db.execute('ALTER TABLE user ADD COLUMN longitude REAL');
-            print('✅ Added longitude to user table');
-          } catch (e) {
-            print('⚠️ Column longitude may already exist: $e');
-          }
-          try {
-            await db.execute('ALTER TABLE user ADD COLUMN location_name TEXT');
-            print('✅ Added location_name to user table');
-          } catch (e) {
-            print('⚠️ Column location_name may already exist: $e');
-          }
-          try {
-            await db.execute('ALTER TABLE pharmacy ADD COLUMN latitude REAL');
-            await db.execute('ALTER TABLE pharmacy ADD COLUMN longitude REAL');
-            print('✅ Added latitude and longitude to pharmacy table');
-          } catch (e) {
-            print('⚠️ Pharmacy table migration: $e');
-          }
-        }
-        
-        // Future upgrades can be added here
-        if (oldVersion < 3) {
-          print('✅ Database upgraded to version 3');
-        }
-        
-        // Version 4: Ensure location_name column exists
-        if (oldVersion < 4) {
-          try {
-            await db.execute('ALTER TABLE user ADD COLUMN location_name TEXT');
-            print('✅ Added location_name to user table (v4)');
-          } catch (e) {
-            print('⚠️ Column location_name already exists: $e');
-          }
-        }
+        // Handle schema migrations here if needed in future
       },
     );
     return _database!;
+  }
+
+  static Future<void> _ensureSchema(Database db) async {
+    Future<List<Map<String, Object?>>> columns(String table) async {
+      return await db.rawQuery('PRAGMA table_info($table)');
+    }
+
+    // occurrence_plan: ensure 'date' and 'is_taken' exist
+    try {
+      final occCols = await columns('occurrence_plan');
+      final occNames = occCols.map((r) => r['name'] as String).toSet();
+      if (!occNames.contains('date')) {
+        await db.execute('ALTER TABLE occurrence_plan ADD COLUMN date TEXT');
+      }
+      if (!occNames.contains('is_taken')) {
+        await db.execute(
+          'ALTER TABLE occurrence_plan ADD COLUMN is_taken INTEGER DEFAULT 0',
+        );
+      }
+    } catch (_) {}
+
+    // medicine_plan: ensure 'medicine_track_id' exists
+    try {
+      final planCols = await columns('medicine_plan');
+      final planNames = planCols.map((r) => r['name'] as String).toSet();
+      if (!planNames.contains('medicine_track_id')) {
+        await db.execute(
+          'ALTER TABLE medicine_plan ADD COLUMN medicine_track_id INTEGER',
+        );
+      }
+      // add other optional columns if missing
+      if (!planNames.contains('interval_days')) {
+        await db.execute(
+          'ALTER TABLE medicine_plan ADD COLUMN interval_days INTEGER',
+        );
+      }
+      if (!planNames.contains('weekdays')) {
+        await db.execute('ALTER TABLE medicine_plan ADD COLUMN weekdays TEXT');
+      }
+      if (!planNames.contains('month_days')) {
+        await db.execute(
+          'ALTER TABLE medicine_plan ADD COLUMN month_days TEXT',
+        );
+      }
+      if (!planNames.contains('custom_dates')) {
+        await db.execute(
+          'ALTER TABLE medicine_plan ADD COLUMN custom_dates TEXT',
+        );
+      }
+      if (!planNames.contains('importance')) {
+        await db.execute(
+          'ALTER TABLE medicine_plan ADD COLUMN importance TEXT',
+        );
+      }
+    } catch (_) {}
+
+    // medicine_tracking: ensure 'medicine_track_id' exists
+    try {
+      final mtCols = await columns('medicine_tracking');
+      final mtNames = mtCols.map((r) => r['name'] as String).toSet();
+      if (!mtNames.contains('medicine_track_id')) {
+        await db.execute(
+          'ALTER TABLE medicine_tracking ADD COLUMN medicine_track_id INTEGER',
+        );
+      }
+    } catch (_) {}
   }
 }
