@@ -1,214 +1,450 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
+
 import '../../theme/app_colors.dart';
+import '../../theme/app_text.dart';
+import '../../widgets/back_arrow.dart';
 
+import 'package:frontend/logic/cubits/medicine_statistics_cubit.dart';
+import 'package:frontend/data/repositories/medicine_statistics_repository.dart';
+import 'package:frontend/presentation/widgets/medicine_ring.dart';
+import 'package:frontend/data/repositories/medicine_repository.dart';
+import 'package:frontend/logic/cubits/edit_medicine_cubit.dart';
+import 'package:frontend/presentation/screens/reminders/edit_medicine_page.dart';
+import 'package:frontend/data/repositories/occurrence_repository.dart';
+import 'package:frontend/logic/cubits/tracking_cubit.dart';
 
+/// =============================================================
+/// MAIN STATISTICS PAGE — ALWAYS WRAPPED WITH BLOC PROVIDER
+/// =============================================================
+class StatisticsPage extends StatelessWidget {
+  final VoidCallback? onBack;
 
-class StatisticsPage extends StatefulWidget {
-  const StatisticsPage({super.key});
-
-  @override
-  State<StatisticsPage> createState() => _StatisticsPageState();
-}
-
-class _StatisticsPageState extends State<StatisticsPage> {
-  
+  const StatisticsPage({Key? key, this.onBack}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: const SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: StatisticsContent(),
-        ),
-      ),
+    return BlocProvider(
+      create: (_) => MedicineStatisticsCubit(MedicineStatisticsRepository()),
+      child: _StatisticsContent(onBack: onBack),
     );
   }
 }
 
-/// Embeddable statistics content (no Scaffold or AppBar)
-class StatisticsContent extends StatelessWidget {
-  const StatisticsContent({super.key});
+/// Embeddable panel version of statistics (no Scaffold) suitable for inline
+/// embedding inside other screens such as `TrackingPage`.
+class StatisticsPanel extends StatelessWidget {
+  const StatisticsPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
+    Widget panelBuilder(BuildContext ctx, MedicineStatisticsState state) {
+      if (state is MSLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (state is MSError) {
+        return Center(
+          child: Text("Error: ${state.message}", style: AppText.medium),
+        );
+      }
+      if (state is MSLoaded) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: SizedBox(
+                height: 160,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 140,
+                      height: 140,
+                      child: CircularProgressIndicator(
+                        value: state.todayProgress.clamp(0.0, 1.0),
+                        strokeWidth: 12,
+                        color: state.todayProgress >= 1.0
+                            ? AppColors.success
+                            : AppColors.warning,
+                        backgroundColor: AppColors.lightBlue.withOpacity(0.4),
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "${(state.todayProgress * 100).round()}%",
+                          style: AppText.bold.copyWith(fontSize: 26),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          AppLocalizations.of(context)!.today_taken,
+                          style: AppText.medium.copyWith(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              AppLocalizations.of(context)!.medicines_progress,
+              style: AppText.bold.copyWith(fontSize: 16),
+            ),
+            const SizedBox(height: 12),
+
+            // When embedded inside a scrollable parent (TrackingPage uses
+            // SingleChildScrollView) we must avoid `Expanded`. Use a
+            // shrink-wrapped ListView instead so the panel lays out correctly.
+            state.items.isEmpty
+                ? Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.no_medicines_for_this_day,
+                      style: AppText.regular,
+                    ),
+                  )
+                : ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: state.items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, idx) {
+                      final it = state.items[idx];
+                      final medicineColors = [
+                        AppColors.primary,
+                        AppColors.pinkCard,
+                        AppColors.yellowCard,
+                        AppColors.blueCard,
+                        AppColors.coralCard,
+                        AppColors.lavenderCard,
+                        AppColors.mint,
+                      ];
+                      final colorHex =
+                          medicineColors[idx % medicineColors.length].value
+                              .toRadixString(16)
+                              .padLeft(8, '0');
+                      return InkWell(
+                        onTap: () async {
+                          TrackingCubit? trackingCubit;
+                          try {
+                            trackingCubit = BlocProvider.of<TrackingCubit>(
+                              context,
+                            );
+                          } catch (_) {
+                            trackingCubit = null;
+                          }
+
+                          final tc =
+                              trackingCubit ??
+                              (TrackingCubit(OccurrenceRepository())
+                                ..loadDay(DateTime.now()));
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (ctx) => BlocProvider<EditMedicineCubit>(
+                                create: (_) =>
+                                    EditMedicineCubit(MedicineRepository(), tc),
+                                child: EditMedicinePage(
+                                  planId: it.planId,
+                                  occurrenceId: null,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            MedicineRing(
+                              size: 72,
+                              percent: it.progress,
+                              colorHex: colorHex,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    it.name.isNotEmpty ? it.name : "Unnamed",
+                                    style: AppText.medium,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  LinearProgressIndicator(
+                                    value: it.progress.clamp(0.0, 1.0),
+                                    color: AppColors.primary,
+                                    backgroundColor: AppColors.lightBlue
+                                        .withOpacity(0.2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              "${(it.progress * 100).round()}%",
+                              style: AppText.regular,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ],
+        );
+      }
+      return const SizedBox.shrink();
+    }
+
+    try {
+      BlocProvider.of<MedicineStatisticsCubit>(context);
+      return BlocBuilder<MedicineStatisticsCubit, MedicineStatisticsState>(
+        builder: panelBuilder,
+      );
+    } catch (_) {
+      return BlocProvider<MedicineStatisticsCubit>(
+        create: (_) => MedicineStatisticsCubit(MedicineStatisticsRepository()),
+        child: BlocBuilder<MedicineStatisticsCubit, MedicineStatisticsState>(
+          builder: panelBuilder,
+        ),
+      );
+    }
+  }
+}
+
+/// =============================================================
+/// INTERNAL CONTENT — must only be used inside StatisticsPage
+/// =============================================================
+class _StatisticsContent extends StatelessWidget {
+  final VoidCallback? onBack;
+
+  const _StatisticsContent({Key? key, this.onBack}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.lightBlue,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // HEADER
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  CustomBackArrow(onPressed: onBack),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Statistics',
+                    style: AppText.bold.copyWith(fontSize: 22),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+            ),
+
+            // PAGE BODY
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+
+                // Detect if a provider already exists above
+                child: _buildStatisticsBloc(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// =============================================================
+  /// Handles BlocProvider auto-detection
+  /// =============================================================
+  Widget _buildStatisticsBloc(BuildContext context) {
+    try {
+      // If this works, provider already exists above
+      BlocProvider.of<MedicineStatisticsCubit>(context);
+
+      return BlocBuilder<MedicineStatisticsCubit, MedicineStatisticsState>(
+        builder: _statisticsBuilder,
+      );
+    } catch (_) {
+      // If no provider found, create one locally
+      return BlocProvider(
+        create: (_) => MedicineStatisticsCubit(MedicineStatisticsRepository()),
+        child: BlocBuilder<MedicineStatisticsCubit, MedicineStatisticsState>(
+          builder: _statisticsBuilder,
+        ),
+      );
+    }
+  }
+
+  /// =============================================================
+  /// ACTUAL UI FOR THE STATISTICS
+  /// =============================================================
+  Widget _statisticsBuilder(
+    BuildContext context,
+    MedicineStatisticsState state,
+  ) {
+    if (state is MSLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is MSError) {
+      return Center(
+        child: Text("Error: ${state.message}", style: AppText.medium),
+      );
+    }
+
+    if (state is MSLoaded) {
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Your Progress",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.darkBlue,
-            ),
-          ),
-          const SizedBox(height: 20),
+          /// TODAY CIRCLE PROGRESS
           Center(
-            child: CircularPercentIndicator(
-              radius: 110,
-              lineWidth: 14,
-              percent: 0.92,
-              progressColor: AppColors.primary,
-              backgroundColor: AppColors.lightBlue.withOpacity(0.4),
-              circularStrokeCap: CircularStrokeCap.round,
-              center: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    "92%",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.darkBlue,
+            child: SizedBox(
+              height: 160,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 140,
+                    height: 140,
+                    child: CircularProgressIndicator(
+                      value: state.todayProgress.clamp(0.0, 1.0),
+                      strokeWidth: 12,
+                      color: state.todayProgress >= 1.0
+                          ? AppColors.success
+                          : AppColors.warning,
+                      backgroundColor: AppColors.lightBlue.withOpacity(0.4),
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text(
-                    "Completed",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "${(state.todayProgress * 100).round()}%",
+                        style: AppText.bold.copyWith(fontSize: 26),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        AppLocalizations.of(context)!.today_taken,
+                        style: AppText.medium.copyWith(fontSize: 14),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          const Center(
-            child: Text(
-              "DON'T STOP, you're so close to finish your treatment",
-              style: TextStyle(fontSize: 13, color: Colors.black54),
-              textAlign: TextAlign.center,
+
+          const SizedBox(height: 24),
+          Text(
+            AppLocalizations.of(context)!.medicines_progress,
+            style: AppText.bold.copyWith(fontSize: 16),
+          ),
+          const SizedBox(height: 12),
+
+          /// MEDICINES LIST
+          Expanded(
+            child: state.items.isEmpty
+                ? Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.no_medicines_for_this_day,
+                      style: AppText.regular,
+                    ),
+                  )
+                : ListView.separated(
+                    itemCount: state.items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, idx) {
+                      final it = state.items[idx];
+                      return _medicineTile(context, it, idx);
+                    },
+                  ),
+          ),
+        ],
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  /// =============================================================
+  /// ONE MEDICINE PROGRESS ROW
+  /// =============================================================
+  Widget _medicineTile(BuildContext context, dynamic it, int idx) {
+    final medicineColors = [
+      AppColors.primary,
+      AppColors.pinkCard,
+      AppColors.yellowCard,
+      AppColors.blueCard,
+      AppColors.coralCard,
+      AppColors.lavenderCard,
+      AppColors.mint,
+    ];
+    final colorHex = medicineColors[idx % medicineColors.length].value
+        .toRadixString(16)
+        .padLeft(8, '0');
+
+    return InkWell(
+      onTap: () async {
+        TrackingCubit? trackingCubit;
+
+        try {
+          trackingCubit = BlocProvider.of<TrackingCubit>(context);
+        } catch (_) {
+          trackingCubit = null;
+        }
+
+        final tc =
+            trackingCubit ??
+            (TrackingCubit(OccurrenceRepository())..loadDay(DateTime.now()));
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (ctx) => BlocProvider<EditMedicineCubit>(
+              create: (_) => EditMedicineCubit(MedicineRepository(), tc),
+              child: EditMedicinePage(planId: it.planId, occurrenceId: null),
             ),
           ),
-          const SizedBox(height: 35),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                "Med progress",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.darkBlue,
+        );
+      },
+      child: Row(
+        children: [
+          MedicineRing(size: 72, percent: it.progress, colorHex: colorHex),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  it.name.isNotEmpty ? it.name : "Unnamed",
+                  style: AppText.medium,
                 ),
-              ),
-              Text(
-                "3 months",
-                style: TextStyle(fontSize: 14, color: AppColors.primary),
-              ),
-            ],
+                const SizedBox(height: 6),
+                LinearProgressIndicator(
+                  value: it.progress.clamp(0.0, 1.0),
+                  color: AppColors.primary,
+                  backgroundColor: AppColors.lightBlue.withOpacity(0.2),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 20),
-          const MultiRingProgressChart(),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildLegend(AppColors.pinkCard, "Aspirin"),
-              SizedBox(width: 12),
-              _buildLegend(AppColors.yellowCard, "Telfast"),
-              SizedBox(width: 12),
-              _buildLegend(AppColors.coralCard, "Naproxen"),
-              SizedBox(width: 12),
-              _buildLegend(AppColors.blueCard, "Diclofenac"),
-            ],
-          ),
+          const SizedBox(width: 12),
+
+          Text("${(it.progress * 100).round()}%", style: AppText.regular),
         ],
       ),
     );
   }
-
-  static Widget _buildLegend(Color color, String label) {
-    return Row(
-      children: [
-        Container(
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 13, color: AppColors.darkBlue),
-        ),
-      ],
-    );
-  }
-}
-
-class MultiRingProgressChart extends StatelessWidget {
-  const MultiRingProgressChart({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        height: 340,
-        width: 340,
-        child: CustomPaint(painter: _MultiRingPainter()),
-      ),
-    );
-  }
-}
-
-class _MultiRingPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    const double startAngle = 3.14;
-    const double sweepBase = 3.14;
-
-    final bgPaint = Paint()
-      ..color = Colors.grey.shade300
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 16;
-
-    for (int i = 0; i < 4; i++) {
-      final double radius = 140 - (i * 25);
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepBase,
-        false,
-        bgPaint,
-      );
-    }
-
-    final List<Color> colors = [
-      const Color(0xFFFFC107),
-      const Color(0xFFFFA5D0),
-      const Color(0xFF00C853),
-      const Color(0xFF00B0FF),
-    ];
-
-    final List<double> progresses = [0.9, 0.8, 0.7, 0.6];
-
-    for (int i = 0; i < colors.length; i++) {
-      final paint = Paint()
-        ..color = colors[i]
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = 16;
-
-      final double radius = 140 - (i * 25);
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepBase * progresses[i],
-        false,
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

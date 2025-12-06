@@ -1359,6 +1359,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The pharmacy will confirm your reservation shortly. You will be notified once it\'s ready.'**
   String get pharmacyWillConfirm;
+
+  /// No description provided for @yourCurrentMedicines.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current medicines'**
+  String get yourCurrentMedicines;
+
+  /// No description provided for @tracking.
+  ///
+  /// In en, this message translates to:
+  /// **'tracking'**
+  String get tracking;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'statistics'**
+  String get statistics;
+
+  /// No description provided for @haveYouTakentYourMedicineToday.
+  ///
+  /// In en, this message translates to:
+  /// **' Have you taken your medicine today ?'**
+  String get haveYouTakentYourMedicineToday;
+
+  /// No description provided for @morning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// No description provided for @evening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get evening;
+
+  /// No description provided for @addMedicine.
+  ///
+  /// In en, this message translates to:
+  /// **' Add Medicine'**
+  String get addMedicine;
+
+  /// No description provided for @medicineType.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Type'**
+  String get medicineType;
+
+  /// No description provided for @dose.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose'**
+  String get dose;
+
+  /// No description provided for @enterDoseExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 500'**
+  String get enterDoseExample;
+
+  /// No description provided for @unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get unit;
+
+  /// No description provided for @frequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get frequency;
+
+  /// No description provided for @timesPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'How many times per day'**
+  String get timesPerDay;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @selectTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Select time'**
+  String get selectTime;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
+
+  /// No description provided for @importance.
+  ///
+  /// In en, this message translates to:
+  /// **'Importance'**
+  String get importance;
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// No description provided for @enterNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a note (optional)'**
+  String get enterNotes;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @perDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Per day'**
+  String get perDay;
+
+  /// No description provided for @perWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Per week'**
+  String get perWeek;
+
+  /// No description provided for @eachNDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Each N days'**
+  String get eachNDays;
+
+  /// No description provided for @customized.
+  ///
+  /// In en, this message translates to:
+  /// **'Customized'**
+  String get customized;
+
+  /// No description provided for @yourProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress'**
+  String get yourProgress;
+
+  /// No description provided for @medProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Med Progress'**
+  String get medProgress;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @no_medicines_for_day.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicines for this day'**
+  String get no_medicines_for_day;
+
+  /// No description provided for @cannot_update_item.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot update this item'**
+  String get cannot_update_item;
+
+  /// No description provided for @marked_as_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as done'**
+  String get marked_as_done;
+
+  /// No description provided for @unmarked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmarked'**
+  String get unmarked;
+
+  /// No description provided for @failed_to_mark.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark as done'**
+  String get failed_to_mark;
+
+  /// No description provided for @failed_to_unmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unmark'**
+  String get failed_to_unmark;
+
+  /// No description provided for @cannot_edit_item.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot edit this item'**
+  String get cannot_edit_item;
+
+  /// No description provided for @could_not_find_plan_for_occurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not find plan for this occurrence'**
+  String get could_not_find_plan_for_occurrence;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @delete_occurrence_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete occurrence'**
+  String get delete_occurrence_title;
+
+  /// No description provided for @delete_occurrence_text.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this occurrence?'**
+  String get delete_occurrence_text;
+
+  /// No description provided for @how_many_times_on_day.
+  ///
+  /// In en, this message translates to:
+  /// **'How many times on {day}'**
+  String how_many_times_on_day(Object day);
+
+  /// No description provided for @select_start_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Select start date'**
+  String get select_start_date;
+
+  /// No description provided for @select_end_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Select end date'**
+  String get select_end_date;
+
+  /// No description provided for @start_end_dates_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Start and end dates are required'**
+  String get start_end_dates_required;
+
+  /// No description provided for @start_date_before_or_equal_end_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date must be before or equal to end date'**
+  String get start_date_before_or_equal_end_date;
+
+  /// No description provided for @medicine_added.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine added'**
+  String get medicine_added;
+
+  /// No description provided for @failed_to_add_medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add medicine'**
+  String get failed_to_add_medicine;
+
+  /// No description provided for @nothing_to_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to save'**
+  String get nothing_to_save;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @name_is_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get name_is_required;
+
+  /// No description provided for @dose_must_be_greater_than_zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose must be greater than 0'**
+  String get dose_must_be_greater_than_zero;
+
+  /// No description provided for @times_per_day_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Times per day required'**
+  String get times_per_day_required;
+
+  /// No description provided for @start_date_must_before_end_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date must be before end date'**
+  String get start_date_must_before_end_date;
+
+  /// No description provided for @today_taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Today taken'**
+  String get today_taken;
+
+  /// No description provided for @medicines_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines Progress'**
+  String get medicines_progress;
+
+  /// No description provided for @unnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unnamed'**
+  String get unnamed;
+
+  /// No description provided for @removed.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed'**
+  String get removed;
+
+  /// No description provided for @failed_to_remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove'**
+  String get failed_to_remove;
+
+  /// No description provided for @enter_number_of_days.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter number of days'**
+  String get enter_number_of_days;
+
+  /// No description provided for @select_weekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Select weekdays'**
+  String get select_weekdays;
+
+  /// No description provided for @type_is_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Type is required'**
+  String get type_is_required;
+
+  /// No description provided for @unit_is_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit is required'**
+  String get unit_is_required;
+
+  /// No description provided for @frequency_is_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency is required'**
+  String get frequency_is_required;
+
+  /// No description provided for @save_changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get save_changes;
+
+  /// No description provided for @times_per_day_must_be_at_least_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Times per day must be at least 1'**
+  String get times_per_day_must_be_at_least_1;
+
+  /// No description provided for @dosage_must_be_greater_than_0.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage must be greater than 0'**
+  String get dosage_must_be_greater_than_0;
+
+  /// No description provided for @failed_to_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save'**
+  String get failed_to_save;
+
+  /// No description provided for @no_medicines_for_this_day.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicines for this day'**
+  String get no_medicines_for_this_day;
+
+  /// No description provided for @edit_medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Medicine'**
+  String get edit_medicine;
+
+  /// No description provided for @confirm_action_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm {action}'**
+  String confirm_action_title(Object action);
+
+  /// No description provided for @confirm_action_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to {action} this medicine?'**
+  String confirm_action_message(Object action);
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @plan_not_found.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan not found'**
+  String get plan_not_found;
+
+  /// No description provided for @unexpected_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get unexpected_error;
+
+  /// No description provided for @howManyTimesOnDay.
+  ///
+  /// In en, this message translates to:
+  /// **'How many times on {day}?'**
+  String howManyTimesOnDay(String day);
 }
 
 class _AppLocalizationsDelegate
