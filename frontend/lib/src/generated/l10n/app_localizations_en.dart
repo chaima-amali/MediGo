@@ -918,6 +918,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unexpected_error => 'Something went wrong';
 
   @override
+  String get medicine_calendar => 'Medicine Calendar';
+
+  @override
+  String get view_report => 'View Report';
+
+  @override
+  String get no_medicine_records_for_this_date =>
+      'No medicine records for this date';
+
+  @override
   String howManyTimesOnDay(String day) {
     return 'How many times on $day?';
   }

@@ -1816,6 +1816,24 @@ abstract class AppLocalizations {
   /// **'Something went wrong'**
   String get unexpected_error;
 
+  /// No description provided for @medicine_calendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Calendar'**
+  String get medicine_calendar;
+
+  /// No description provided for @view_report.
+  ///
+  /// In en, this message translates to:
+  /// **'View Report'**
+  String get view_report;
+
+  /// No description provided for @no_medicine_records_for_this_date.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicine records for this date'**
+  String get no_medicine_records_for_this_date;
+
   /// No description provided for @howManyTimesOnDay.
   ///
   /// In en, this message translates to:

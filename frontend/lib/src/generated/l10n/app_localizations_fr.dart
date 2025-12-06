@@ -927,6 +927,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unexpected_error => 'Une erreur est survenue';
 
   @override
+  String get medicine_calendar => 'Calendrier des médicaments';
+
+  @override
+  String get view_report => 'Voir le rapport';
+
+  @override
+  String get no_medicine_records_for_this_date =>
+      'Aucun enregistrement de médicament pour cette date';
+
+  @override
   String howManyTimesOnDay(String day) {
     return ' Combien de fois par jour ?';
   }
