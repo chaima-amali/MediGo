@@ -287,5 +287,8 @@
   "no": "لا",
   "plan_not_found": "الخطة غير موجودة",
   "unexpected_error": "حدث خطأ غير متوقع",
+  "medicine_calendar": "تقويم الأدوية",
+  "view_report": "عرض التقرير",
+  "no_medicine_records_for_this_date": "لا توجد سجلات أدوية لهذا التاريخ",
   "howManyTimesOnDay": " كم مرة في اليوم؟"
 }

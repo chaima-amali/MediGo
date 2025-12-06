@@ -37,7 +37,7 @@ class MediGoApp extends StatefulWidget {
 }
 
 class _MediGoAppState extends State<MediGoApp> {
-  Locale _locale = const Locale('en'); // Default to English
+  Locale _locale = const Locale('ar'); // Default to English
 
   @override
   void initState() {
