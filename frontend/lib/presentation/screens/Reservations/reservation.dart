@@ -2,17 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
-
-C:\Users\dell\Desktop\3rd Year\semester1\Mobile dev\MediGo\frontend>flutter run
-Launching lib\main.dart on SM A127F in debug mode...
-Running Gradle task 'assembleDebug'...                              3,9s
-√ Built build\app\outputs\flutter-apk\app-debug.apk
-Installing build\app\outputs\flutter-apk\app-debug.apk...          61,2s
-D/FlutterJNI(14530): Beginning load of flutter...
-D/FlutterJNI(14530): flutter (null) was loaded normally!
-I/flutter (14530): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).       
-
-C:\Users\dell\Desktop\3rd Year\semester1\Mobile dev\MediGo\frontend>       
+     
 class MediGoApp extends StatelessWidget {
   const MediGoApp({Key? key}) : super(key: key);
 
