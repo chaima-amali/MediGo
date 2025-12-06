@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class NotificationsPage extends StatelessWidget {
+class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
+
+  @override
+  State<NotificationsPage> createState() => _NotificationsPageState();
+}
+
+class _NotificationsPageState extends State<NotificationsPage> {
+  String selectedFilter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +38,46 @@ class NotificationsPage extends StatelessWidget {
                 ],
               ),
             ),
+            
+            // Filter Buttons
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  FilterButton(
+                    label: 'All',
+                    isSelected: selectedFilter == 'All',
+                    onTap: () {
+                      setState(() {
+                        selectedFilter = 'All';
+                      });
+                    },
+                  ),
+                  SizedBox(width: 8),
+                  FilterButton(
+                    label: 'Reminders',
+                    isSelected: selectedFilter == 'Reminders',
+                    onTap: () {
+                      setState(() {
+                        selectedFilter = 'Reminders';
+                      });
+                    },
+                  ),
+                  SizedBox(width: 8),
+                  FilterButton(
+                    label: 'medstock/Reserv',
+                    isSelected: selectedFilter == 'medicine stock/Reservation',
+                    onTap: () {
+                      setState(() {
+                        selectedFilter = 'medicine stock/Reservation';
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            
+            SizedBox(height: 16),
             
             Expanded(
               child: ListView(
@@ -106,6 +153,45 @@ class NotificationsPage extends StatelessWidget {
   }
 }
 
+class FilterButton extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const FilterButton({
+    Key? key,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Color(0xFFB2EBF2),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Color(0xFF4DD0E1) : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class NotificationCard extends StatelessWidget {
   final String time;
   final String message;
@@ -160,7 +246,7 @@ class NotificationCard extends StatelessWidget {
   }
 }
 
-// Custom Back Arrow Widget (same as before)
+// Custom Back Arrow Widget
 class CustomBackArrow extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color? backgroundColor;

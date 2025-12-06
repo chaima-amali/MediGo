@@ -7,7 +7,8 @@ import 'package:frontend/presentation/theme/app_theme.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/data/repositories/user_repo.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
-import 'package:frontend/data/databases/db_helper.dart';
+import 'package:frontend/presentation/screens/Home/home_page.dart';
+
 
 
 void main() async {
@@ -68,7 +69,7 @@ class _MediGoAppState extends State<MediGoApp> {
       title: 'MediGo',
       theme: appTheme,
       debugShowCheckedModeBanner: false,
-      locale: _locale,
+      locale: Locale('en'),
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -77,7 +78,7 @@ class _MediGoAppState extends State<MediGoApp> {
         ],
         supportedLocales: const [Locale('en'), Locale('fr'), Locale('ar')],
 
-      home: const SplashScreen(),
+      home: MainScreen(),
 
 
       //ReservationDetailsScreen(reservationId: 'res_002',),
