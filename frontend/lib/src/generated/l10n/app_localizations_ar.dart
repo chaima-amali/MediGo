@@ -15,11 +15,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get getStarted => 'ابدأ';
 
   @override
-  String get findNearbyPharmacies => 'ابحث عن الصيدليات القريبة';
+  String get findNearbyPharmacies => 'ابحث عن صيدليات قريبة';
 
   @override
   String get discoverPharmaciesDescription =>
-      'اكتشف الصيدليات القريبة منك مع تتبّع المسافة لحظة بلحظة وملاحة سهلة.';
+      'اكتشف الصيدليات القريبة منك مع تتبع المسافة في الوقت الفعلي والملاحة السهلة.';
 
   @override
   String get next => 'التالي';
@@ -35,24 +35,24 @@ class AppLocalizationsAr extends AppLocalizations {
       'ابحث بسرعة عن الأدوية التي تحتاجها باستخدام ميزة البحث الذكية لدينا.';
 
   @override
-  String get medicineReminders => 'تذكيرات الدواء';
+  String get medicineReminders => 'تذكيرات الأدوية';
 
   @override
   String get medicineRemindersDescription =>
-      'لا تفوت تناول أدويتك مع تذكيرات مخصصة وتتبع العلاج.';
+      'لا تفوت أبداً موعد دوائك مع التذكيرات الشخصية وتتبع العلاج.';
 
   @override
   String get contactDirections => 'الاتصال والاتجاهات';
 
   @override
   String get contactDirectionsDescription =>
-      'احصل على معلومات مفصلة عن الصيدليات، الاتجاهات، وتواصل معهم مباشرة من التطبيق.';
+      'احصل على معلومات مفصلة عن الصيدلية والاتجاهات واتصل بهم مباشرة من التطبيق.';
 
   @override
   String get noAccountFound => 'لم يتم العثور على حساب لهذا البريد الإلكتروني';
 
   @override
-  String get welcomeTo => 'مرحبًا الى ';
+  String get welcomeTo => 'مرحباً بك في ';
 
   @override
   String get logIn => 'تسجيل الدخول';
@@ -64,7 +64,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pleaseEnterEmail => 'الرجاء إدخال بريدك الإلكتروني';
 
   @override
-  String get validEmail => 'الرجاء إدخال بريد إلكتروني صحيح';
+  String get validEmail => 'الرجاء إدخال بريد إلكتروني صالح';
 
   @override
   String get password => 'كلمة المرور';
@@ -76,13 +76,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get forgetPassword => 'نسيت كلمة المرور؟';
 
   @override
-  String get orLoginWith => 'أو تسجيل الدخول عبر';
+  String get orLoginWith => 'أو سجل الدخول باستخدام';
 
   @override
   String get noAccount => 'ليس لديك حساب؟ ';
 
   @override
-  String get signUp => 'إنشاء حساب';
+  String get signUp => 'سجل';
 
   @override
   String get fullName => 'الاسم الكامل';
@@ -103,7 +103,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enterPhoneNumber => 'الرجاء إدخال رقم هاتفك';
 
   @override
-  String get orSignUpWith => 'أو إنشاء حساب عبر';
+  String get orSignUpWith => 'أو سجل باستخدام';
 
   @override
   String get alreadyHaveAccount => 'لديك حساب بالفعل؟ ';
@@ -139,7 +139,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dateOfBirth => 'تاريخ الميلاد';
 
   @override
-  String get dobFormat => 'يوم/شهر/سنة';
+  String get dobFormat => 'يي/شش/سسسس';
 
   @override
   String get createPassword => 'أنشئ كلمة المرور الخاصة بك';
@@ -152,25 +152,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmPassword => 'تأكيد كلمة المرور';
 
   @override
-  String get confirmYourPassword => 'الرجاء تأكيد كلمة المرور';
+  String get confirmYourPassword => 'أكد كلمة المرور الخاصة بك';
 
   @override
   String get passwordsDoNotMatch => 'كلمات المرور غير متطابقة';
 
   @override
-  String get hi => 'مرحبًا ';
+  String get hi => 'مرحباً ';
 
   @override
-  String get howAreYouFeeling => ' ,كيف تشعر اليوم؟';
+  String get howAreYouFeeling => ' ،كيف حالك\naليوم؟';
 
   @override
   String get searchMedicinePrompt => 'ابحث عن دوائك ...';
 
   @override
-  String get medicineReminder => 'تذكير الدواء';
+  String get medicineReminder => 'تذكير بالدواء';
 
   @override
-  String get reminderDescription => 'تريد تذكيرًا لتتبع علاجك';
+  String get reminderDescription => 'تريد تذكيراً لتتبع\nعلاجك';
 
   @override
   String get startNow => 'ابدأ الآن';
@@ -179,7 +179,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nearbyPharmacy => 'صيدلية قريبة';
 
   @override
-  String get rating => 'تقييم: \$rating';
+  String get rating => 'التقييم: \$rating';
 
   @override
   String get reviews => '(\$reviews)';
@@ -197,13 +197,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get inStock => 'متوفر';
 
   @override
-  String get outOfStock => 'غير متوفر';
+  String get outOfStock => 'نفذت الكمية';
 
   @override
-  String get preOrder => 'طلب مسبق';
+  String get preOrder => 'الطلب المسبق';
 
   @override
-  String get pharmacyIdMissing => 'معرّف الصيدلية غير موجود';
+  String get pharmacyIdMissing => 'معرف الصيدلية مفقود';
 
   @override
   String get profileScreen => 'شاشة الملف الشخصي';
@@ -236,13 +236,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editProfile => 'تعديل الملف الشخصي';
 
   @override
-  String get upgradeToPremium => 'الترقية إلى بريميوم';
+  String get upgradeToPremium => 'الترقية إلى المميز';
 
   @override
-  String get premiumDescription => 'افتح الميزات الحصرية وحسّن\nإدارة أدويتك';
+  String get premiumDescription =>
+      'احصل على تجربة خالية من الإعلانات، حجوزات\nذات أولوية وتنبيهات فورية لإعادة التخزين';
 
   @override
-  String get upgradeNowPrice => 'الترقية الآن - 3000 دج/سنة';
+  String get upgradeNowPrice => 'قم بالترقية الآن - 3000دج/سنة';
 
   @override
   String get settings => 'الإعدادات';
@@ -251,20 +252,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myReservations => 'حجوزاتي';
 
   @override
-  String get activeReservations =>
-      'الحجوزات\nالفعّالة \$activeReservationsCount';
+  String get activeReservations => '\$activeReservationsCount حجوزات\nنشطة';
 
   @override
   String get notifications => 'الإشعارات';
 
   @override
-  String get receiveMedicineReminders => 'استلام تذكيرات الدواء';
+  String get receiveMedicineReminders => 'تلقي تذكيرات الأدوية';
 
   @override
   String get darkMode => 'الوضع الداكن';
 
   @override
-  String get darkModeDescription => 'التبديل إلى الوضع الداكن';
+  String get darkModeDescription => 'التبديل إلى السمة الداكنة';
 
   @override
   String get language => 'اللغة';
@@ -276,8 +276,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get privacySecurity => 'الخصوصية والأمان';
 
   @override
-  String get privacySecurityDescription =>
-      'إدارة بياناتك - صفحة الخصوصية والأمان';
+  String get privacySecurityDescription => 'إدارة خصوصية بياناتك وصفحة الأمان';
 
   @override
   String get aboutMedigo => 'حول MediGo';
@@ -289,7 +288,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileUpdated => 'تم تحديث الملف الشخصي بنجاح';
 
   @override
-  String get newPassword => 'كلمة المرور الجديدة';
+  String get newPassword => 'كلمة مرور جديدة';
 
   @override
   String get enterNewPassword => 'أدخل كلمة المرور الجديدة';
@@ -298,7 +297,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmNewPassword => 'تأكيد كلمة المرور الجديدة';
 
   @override
-  String get enterConfirmNewPassword => 'أدخل تأكيد كلمة المرور الجديدة';
+  String get enterConfirmNewPassword => 'أكد كلمة المرور الجديدة';
 
   @override
   String get pleaseConfirmPassword => 'الرجاء تأكيد كلمة المرور';
@@ -311,13 +310,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subscriptionAgreement =>
-      'باشتراكك، فإنك توافق على شروط الخدمة\nوسياسة الخصوصية.\nيتجدد الاشتراك تلقائيًا ما لم يتم إلغاؤه.';
+      'من خلال الاشتراك، فإنك توافق على شروط الخدمة\nوسياسة الخصوصية الخاصة بنا.\nيتم تجديد الاشتراك تلقائياً ما لم يتم إلغاؤه.';
 
   @override
-  String get subscribeMonthly => 'اشتراك شهري';
+  String get subscribeMonthly => 'اشترك شهرياً';
 
   @override
-  String get billedAnnually => 'يُفوتر سنويًا';
+  String get billedAnnually => 'يتم إصدار الفاتورة سنوياً';
 
   @override
   String get yearly => 'سنوي';
@@ -326,70 +325,71 @@ class AppLocalizationsAr extends AppLocalizations {
   String get monthly => 'شهري';
 
   @override
-  String get billedMonthly => 'يُفوتر شهريًا';
+  String get billedMonthly => 'يتم إصدار الفاتورة شهرياً';
 
   @override
   String get perMonth => '/شهر';
 
   @override
-  String get perYear => 'سنويًا';
+  String get perYear => 'في السنة';
 
   @override
-  String get subscribeYearly => 'اشتراك سنوي (أفضل قيمة)';
+  String get subscribeYearly => 'اشترك سنوياً (أفضل قيمة)';
 
   @override
   String get success => 'نجاح!';
 
   @override
-  String get ok => 'موافق';
+  String get ok => 'حسناً';
 
   @override
-  String get subscriptionSuccessMessage => 'لقد اشتركت بنجاح في خطe!';
+  String get subscriptionSuccessMessage =>
+      'لقد اشتركت بنجاح في خطة \$planName!';
 
   @override
-  String get medicinePreOrderReservation => 'الحجز والطلب المسبق للأدوية';
+  String get medicinePreOrderReservation => 'الطلب المسبق وحجز الأدوية';
 
   @override
   String get medicinePreOrderDescription =>
-      'قم بطلب دوائك مسبقًا وحجزه ثم توجه للاستلام عندما تكون متفرغًا';
+      'اطلب مسبقاً دواءك واحجزه ثم اذهب لاستلامه عندما تكون متفرغاً';
 
   @override
-  String get instantRestockAlerts => 'تنبيهات إعادة التوفير الفورية';
+  String get instantRestockAlerts => 'تنبيهات فورية لإعادة التخزين';
 
   @override
   String get instantRestockDescription =>
-      'احصل على إشعار فور توفر الأدوية غير المتوفرة';
+      'احصل على إشعار فوري عندما تتوفر الأدوية غير المتوفرة في المخزون';
 
   @override
   String get adFreeExperience => 'تجربة خالية من الإعلانات';
 
   @override
   String get adFreeDescription =>
-      'استمتع بواجهة نظيفة وخالية من الإزعاج دون أي إعلانات';
+      'استمتع بواجهة نظيفة وخالية من الإلهاء بدون أي إعلانات';
 
   @override
   String get yourLocation => 'موقعك؟';
 
   @override
   String get locationRequiredMessage =>
-      'يتطلب هذا التطبيق موقعك للعمل بشكل صحيح. يرجى السماح بالوصول إلى الموقع.';
+      'يتطلب هذا التطبيق موقعك ليعمل بشكل صحيح. يرجى السماح بالوصول إلى الموقع.';
 
   @override
   String get allowLocationAccess => 'السماح بالوصول إلى الموقع';
 
   @override
-  String get enterLocationManually => 'إدخال الموقع يدويًا';
+  String get enterLocationManually => 'أدخل الموقع يدوياً';
 
   @override
   String get locationServicesDisabled =>
-      'خدمات الموقع معطلة. يرجى تفعيلها في الإعدادات.';
+      'خدمات الموقع معطلة. يرجى تمكينها في الإعدادات.';
 
   @override
   String get locationPermissionDenied => 'تم رفض إذن الموقع';
 
   @override
   String get locationPermissionPermanentlyDenied =>
-      'تم رفض إذن الموقع بشكل دائم. يرجى تفعيله في إعدادات التطبيق.';
+      'تم رفض إذن الموقع بشكل دائم. يرجى تمكينه في إعدادات التطبيق.';
 
   @override
   String get errorGettingLocation => 'خطأ في الحصول على الموقع';
@@ -401,7 +401,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchLocationHint => 'مثال: الجزائر، الجزائر';
 
   @override
-  String get useCurrentLocation => 'استخدام موقعي الحالي';
+  String get useCurrentLocation => 'استخدم موقعي الحالي';
 
   @override
   String get searchResults => 'نتائج البحث';
@@ -431,7 +431,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get completed => 'مكتمل';
 
   @override
-  String get cancelled => 'ملغي';
+  String get cancelled => 'ملغى';
 
   @override
   String get pending => 'قيد الانتظار';
@@ -465,7 +465,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pendingDescription =>
-      'تم تقديم طلب الحجز وفي انتظار تأكيد الصيدلية. سيتم إخطارك بمجرد التأكيد.';
+      'تم تقديم طلب الحجز وفي انتظار تأكيد الصيدلية. سيتم إعلامك بمجرد التأكيد.';
 
   @override
   String get confirmedDescription =>
@@ -477,7 +477,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cancelledDescription =>
-      'تم إلغاء الحجز إما من قبلك أو الصيدلية أو بسبب انتهاء الصلاحية. لم يعد الدواء محجوزًا.';
+      'تم إلغاء الحجز إما من قبلك أو الصيدلية أو بسبب انتهاء الصلاحية. لم يعد الدواء محجوزاً.';
 
   @override
   String get reservationDetails => 'تفاصيل الحجز';
@@ -490,7 +490,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cancelReservationConfirmation =>
-      'هل أنت متأكد من إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.';
+      'هل أنت متأكد من أنك تريد إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.';
 
   @override
   String get yesCancelReservation => 'نعم، إلغاء';
@@ -521,13 +521,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get awaitingConfirmationMessage =>
-      'ستؤكد الصيدلية حجزك قريبًا. سيتم إخطارك بمجرد أن يكون جاهزًا.';
+      'ستؤكد الصيدلية حجزك قريباً. سيتم إعلامك بمجرد أن يصبح جاهزاً.';
 
   @override
-  String get getDirections => 'احصل على الاتجاهات';
+  String get getDirections => 'الحصول على الاتجاهات';
 
   @override
-  String get openingDirections => 'جاري فتح الاتجاهات...';
+  String get openingDirections => 'فتح الاتجاهات...';
 
   @override
   String get contactPharmacy => 'الاتصال بالصيدلية';
@@ -542,7 +542,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get created => 'تم الإنشاء';
 
   @override
-  String get reserveMedicine => 'حجز الدواء';
+  String get reserveMedicine => 'حجز دواء';
 
   @override
   String get completeFormMessage => 'أكمل النموذج لحجز دوائك';
@@ -563,16 +563,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nextButton => 'التالي';
 
   @override
-  String get pickupCode => 'كود الاستلام';
+  String get pickupCode => 'رمز الاستلام';
 
   @override
-  String get copyCode => 'نسخ الكود';
+  String get copyCode => 'نسخ الرمز';
 
   @override
-  String get showQRCode => 'عرض رمز QR للمسح';
+  String get showQRCode => 'إظهار رمز الاستجابة السريعة للمسح';
 
   @override
-  String get showQrCode => 'عرض رمز QR للمسح';
+  String get showQrCode => 'إظهار رمز الاستجابة السريعة للمسح';
 
   @override
   String get showCodeAtPickup => 'أظهر هذا الرمز عند الاستلام.';
@@ -582,39 +582,41 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get readyForPickupMessage =>
-      'سيكون دواؤك جاهزًا حوالي \nساعة واحدة قبل وقت الاستلام المحدد';
+      'سيكون دواؤك جاهزاً حوالي 1\nساعة قبل وقت الاستلام المحدد';
 
   @override
-  String get needConsultation => 'بحاجة لاستشارة';
+  String get needConsultation => 'بحاجة إلى استشارة';
 
   @override
   String get reservationInstructions => 'تعليمات الحجز';
 
   @override
   String get reservationInstructions1 =>
-      'معرف الحجز ورمز QR الخاص بك مع رمز تحقق فريد مكون من 6 أرقام';
+      'معرف حجزك ورمز الاستجابة السريعة مع رمز تحقق فريد مكون من 6 أرقام';
 
   @override
   String get reservationInstructions2 =>
-      'عند وصولك إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز QR في النص';
+      'عندما تصل إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز الاستجابة السريعة في النص';
 
   @override
   String get reservationInstructions3 =>
-      'ستتحقق الصيدلية من رمزك وهويتك (قد يلزم إبراز الهوية)';
+      'ستتحقق الصيدلية من رمزك وهويتك (قد تكون هناك حاجة إلى بطاقة الهوية)';
 
   @override
   String get reservationInstructions4 =>
-      'بمجرد التحقق، سيعطيك الموظف دواءك ويمكنك وضع علامة على الطلب كمكتمل';
+      'بمجرد التحقق، سيعطيك الموظفون دواءك ويمكنك وضع علامة على الطلب كمكتمل';
 
   @override
-  String get step1 => 'معرف حجزك ورمز QR مع رمز تحقق فريد من 6 أرقام';
+  String get step1 =>
+      'معرف حجزك ورمز الاستجابة السريعة مع رمز تحقق فريد مكون من 6 أرقام';
 
   @override
   String get step2 =>
-      'عندما تصل إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز QR في النص';
+      'عندما تصل إلى الصيدلية، أظهر رمزك. سيتحقق موظفونا من رمزك أو رمز الاستجابة السريعة في النص';
 
   @override
-  String get step3 => 'ستتحقق الصيدلية من رمزك وهويتك (قد يلزم إبراز الهوية)';
+  String get step3 =>
+      'ستتحقق الصيدلية من رمزك وهويتك (قد تكون هناك حاجة إلى بطاقة الهوية)';
 
   @override
   String get step4 =>
@@ -622,14 +624,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get securityNote =>
-      'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص. احتفظ بهذا الرمز آمنًا.';
+      'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص أبداً. احتفظ بهذا الرمز آمناً.';
 
   @override
   String get verificationNote =>
-      'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص. احتفظ بهذا الرمز آمنًا.';
+      'ملاحظة: رمز التحقق الخاص بك صالح. لا تشارك رمزك مع أي شخص أبداً. احتفظ بهذا الرمز آمناً.';
 
   @override
-  String get reservedOn => 'تم الحجز في';
+  String get reservedOn => 'محجوز في';
 
   @override
   String get pickedUpSuccessfully => 'تم الاستلام بنجاح.';
@@ -657,7 +659,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectDateAndTime => 'يرجى اختيار التاريخ والوقت';
 
   @override
-  String get securePickupProcess => 'عملية الاستلام الآمنة';
+  String get securePickupProcess => 'عملية استلام آمنة';
 
   @override
   String get reserveCancelQuestion => 'إلغاء الحجز؟';
@@ -667,5 +669,248 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pharmacyWillConfirm =>
-      'ستقوم الصيدلية بتأكيد حجزك قريبًا. سيتم إعلامك بمجرد أن يصبح جاهزًا.';
+      'ستؤكد الصيدلية حجزك قريباً. سيتم إعلامك بمجرد أن يصبح جاهزاً.';
+
+  @override
+  String get yourCurrentMedicines => 'أدويتك الحالية';
+
+  @override
+  String get tracking => 'التتبع';
+
+  @override
+  String get edit => 'تعديل';
+
+  @override
+  String get statistics => 'الإحصائيات';
+
+  @override
+  String get haveYouTakentYourMedicineToday => ' هل تناولت دواءك اليوم؟';
+
+  @override
+  String get morning => 'صباح';
+
+  @override
+  String get evening => 'مساء';
+
+  @override
+  String get addMedicine => ' إضافة دواء';
+
+  @override
+  String get medicineType => 'نوع الدواء';
+
+  @override
+  String get dose => 'الجرعة';
+
+  @override
+  String get enterDoseExample => 'مثال: 500';
+
+  @override
+  String get unit => 'الوحدة';
+
+  @override
+  String get frequency => 'التكرار';
+
+  @override
+  String get timesPerDay => 'كم مرة في اليوم';
+
+  @override
+  String get time => 'الوقت';
+
+  @override
+  String get selectTime => 'اختر الوقت';
+
+  @override
+  String get startDate => 'تاريخ البداية';
+
+  @override
+  String get endDate => 'تاريخ الانتهاء';
+
+  @override
+  String get selectDate => 'اختر التاريخ';
+
+  @override
+  String get importance => 'الأهمية';
+
+  @override
+  String get notes => 'الملاحظات';
+
+  @override
+  String get enterNotes => 'اكتب ملاحظة (اختياري)';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get perDay => 'في اليوم';
+
+  @override
+  String get perWeek => 'في الأسبوع';
+
+  @override
+  String get eachNDays => 'كل N أيام';
+
+  @override
+  String get customized => 'مخصص';
+
+  @override
+  String get yourProgress => 'تقدمك';
+
+  @override
+  String get medProgress => 'تقدم الأدوية';
+
+  @override
+  String get add => 'إضافة';
+
+  @override
+  String get no_medicines_for_day => 'لا توجد أدوية لهذا اليوم';
+
+  @override
+  String get cannot_update_item => 'لا يمكن تحديث هذا العنصر';
+
+  @override
+  String get marked_as_done => 'تم وضع علامة كمكتمل';
+
+  @override
+  String get unmarked => 'تم إلغاء العلامة';
+
+  @override
+  String get failed_to_mark => 'فشل وضع علامة كمكتمل';
+
+  @override
+  String get failed_to_unmark => 'فشل إلغاء العلامة';
+
+  @override
+  String get cannot_edit_item => 'لا يمكن تعديل هذا العنصر';
+
+  @override
+  String get could_not_find_plan_for_occurrence =>
+      'تعذر العثور على الخطة لهذا الحدث';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get delete_occurrence_title => 'حذف الحدث';
+
+  @override
+  String get delete_occurrence_text => 'هل أنت متأكد أنك تريد حذف هذا الحدث؟';
+
+  @override
+  String how_many_times_on_day(Object day) {
+    return 'كم مرة في $day';
+  }
+
+  @override
+  String get select_start_date => 'اختر تاريخ البداية';
+
+  @override
+  String get select_end_date => 'اختر تاريخ الانتهاء';
+
+  @override
+  String get start_end_dates_required => 'تواريخ البداية والانتهاء مطلوبة';
+
+  @override
+  String get start_date_before_or_equal_end_date =>
+      'يجب أن يكون تاريخ البداية قبل أو يساوي تاريخ الانتهاء';
+
+  @override
+  String get medicine_added => 'تمت إضافة الدواء';
+
+  @override
+  String get failed_to_add_medicine => 'فشل في إضافة الدواء';
+
+  @override
+  String get nothing_to_save => 'لا يوجد شيء لحفظه';
+
+  @override
+  String get saved => 'تم الحفظ';
+
+  @override
+  String get name_is_required => 'الاسم مطلوب';
+
+  @override
+  String get dose_must_be_greater_than_zero => 'يجب أن تكون الجرعة أكبر من 0';
+
+  @override
+  String get times_per_day_required => 'عدد المرات في اليوم مطلوب';
+
+  @override
+  String get start_date_must_before_end_date =>
+      'يجب أن يكون تاريخ البداية قبل تاريخ الانتهاء';
+
+  @override
+  String get today_taken => 'تم تناوله اليوم';
+
+  @override
+  String get medicines_progress => 'تقدم الأدوية';
+
+  @override
+  String get unnamed => 'بدون اسم';
+
+  @override
+  String get removed => 'تم الحذف';
+
+  @override
+  String get failed_to_remove => 'فشل الحذف';
+
+  @override
+  String get enter_number_of_days => 'أدخل عدد الأيام';
+
+  @override
+  String get select_weekdays => 'اختر أيام الأسبوع';
+
+  @override
+  String get type_is_required => 'النوع مطلوب';
+
+  @override
+  String get unit_is_required => 'الوحدة مطلوبة';
+
+  @override
+  String get frequency_is_required => 'التكرار مطلوب';
+
+  @override
+  String get save_changes => 'حفظ التغييرات';
+
+  @override
+  String get times_per_day_must_be_at_least_1 =>
+      'يجب أن يكون عدد المرات في اليوم على الأقل 1';
+
+  @override
+  String get dosage_must_be_greater_than_0 => 'يجب أن تكون الجرعة أكبر من 0';
+
+  @override
+  String get failed_to_save => 'فشل الحفظ';
+
+  @override
+  String get no_medicines_for_this_day => 'لا توجد أدوية لهذا اليوم';
+
+  @override
+  String get edit_medicine => 'تعديل الدواء';
+
+  @override
+  String confirm_action_title(Object action) {
+    return 'تأكيد $action';
+  }
+
+  @override
+  String confirm_action_message(Object action) {
+    return 'هل أنت متأكد أنك تريد $action هذا الدواء؟';
+  }
+
+  @override
+  String get yes => 'نعم';
+
+  @override
+  String get no => 'لا';
+
+  @override
+  String get plan_not_found => 'الخطة غير موجودة';
+
+  @override
+  String get unexpected_error => 'حدث خطأ غير متوقع';
+
+  @override
+  String howManyTimesOnDay(String day) {
+    return ' كم مرة في اليوم؟';
+  }
 }
