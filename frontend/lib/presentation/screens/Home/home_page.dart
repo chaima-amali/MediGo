@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/presentation/services/pharmacies.dart';
 import 'package:frontend/presentation/services/navigation_helper.dart' as nav_helper;
@@ -55,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     userName = MockDataServices.getUserFirstName();
     _screens = [
-      HomeScreen(userName: userName),
+      const HomeScreen(),
       const SearchScreen(),
       TrackingPage(key: nav_helper.trackingPageKey),
       const ProfilePage(),
@@ -543,6 +545,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightBlue.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ],
