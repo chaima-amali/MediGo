@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import '../../../src/generated/l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';
@@ -13,7 +14,8 @@ class LocalizationPage extends StatelessWidget {
   final String email;
   final User? userData;
 
-  const LocalizationPage({Key? key, required this.email, this.userData}) : super(key: key);
+  const LocalizationPage({Key? key, required this.email, this.userData})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +112,10 @@ class LocalizationPage extends StatelessWidget {
                     // Subtitle
                     Text(
                       AppLocalizations.of(context)!.locationRequiredMessage,
-                      style: AppText.regular.copyWith(fontSize: 13, color: AppColors.darkBlue.withOpacity(0.7)),
+                      style: AppText.regular.copyWith(
+                        fontSize: 13,
+                        color: AppColors.darkBlue.withOpacity(0.7),
+                      ),
                       textAlign: TextAlign.center,
                     ),
 
@@ -125,12 +130,15 @@ class LocalizationPage extends StatelessWidget {
                           // Request location permission and get current location
                           try {
                             // Check if location services are enabled
-                            bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+                            bool serviceEnabled =
+                                await Geolocator.isLocationServiceEnabled();
                             if (!serviceEnabled) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Location services are disabled. Please enable them in settings.'),
+                                    content: Text(
+                                      'Location services are disabled. Please enable them in settings.',
+                                    ),
                                     duration: Duration(seconds: 3),
                                   ),
                                 );
@@ -140,24 +148,32 @@ class LocalizationPage extends StatelessWidget {
                               return;
                             }
 
-                            LocationPermission permission = await Geolocator.checkPermission();
+                            LocationPermission permission =
+                                await Geolocator.checkPermission();
                             if (permission == LocationPermission.denied) {
                               permission = await Geolocator.requestPermission();
                               if (permission == LocationPermission.denied) {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Location permission denied')),
+                                    const SnackBar(
+                                      content: Text(
+                                        'Location permission denied',
+                                      ),
+                                    ),
                                   );
                                 }
                                 return;
                               }
                             }
 
-                            if (permission == LocationPermission.deniedForever) {
+                            if (permission ==
+                                LocationPermission.deniedForever) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Location permission permanently denied. Please enable it in app settings.'),
+                                    content: Text(
+                                      'Location permission permanently denied. Please enable it in app settings.',
+                                    ),
                                     duration: Duration(seconds: 3),
                                   ),
                                 );
@@ -168,32 +184,61 @@ class LocalizationPage extends StatelessWidget {
                             }
 
                             // Get current position
-                            Position position = await Geolocator.getCurrentPosition(
-                              desiredAccuracy: LocationAccuracy.high,
+                            Position position =
+                                await Geolocator.getCurrentPosition(
+                                  desiredAccuracy: LocationAccuracy.high,
+                                );
+
+                            print(
+                              '🌍 GPS Location Retrieved: Latitude=${position.latitude}, Longitude=${position.longitude}',
                             );
 
-                            print('🌍 GPS Location Retrieved: Latitude=${position.latitude}, Longitude=${position.longitude}');
+                            // Get location name from coordinates
+                            String locationName = 'Unknown Location';
+                            try {
+                              List<Placemark> placemarks =
+                                  await placemarkFromCoordinates(
+                                    position.latitude,
+                                    position.longitude,
+                                  );
+                              if (placemarks.isNotEmpty) {
+                                final place = placemarks.first;
+                                locationName =
+                                    '${place.locality ?? place.subAdministrativeArea ?? place.administrativeArea ?? "Unknown"}';
+                                print('📍 Location Name: $locationName');
+                              }
+                            } catch (e) {
+                              print('⚠️ Error getting location name: $e');
+                            }
 
-                            final userCubit = BlocProvider.of<UserCubit>(context);
-                            
+                            final userCubit = BlocProvider.of<UserCubit>(
+                              context,
+                            );
+
                             if (userData != null) {
                               // New signup: Save user with location to database
                               final userWithLocation = userData!.copyWith(
                                 latitude: position.latitude,
                                 longitude: position.longitude,
+                                locationName: locationName,
                               );
-                              print('💾 Saving new user to database with location');
+                              print(
+                                '💾 Saving new user to database with location',
+                              );
                               await userCubit.registerUser(userWithLocation);
-                              
+
                               if (context.mounted) {
                                 final state = userCubit.state;
-                                if (state is UserOperationSuccess) {
+                                if (state is UserAuthenticated) {
                                   print('✅ User registered successfully');
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (context) => MainScreen()),
+                                    MaterialPageRoute(
+                                      builder: (context) => MainScreen(),
+                                    ),
                                   );
                                 } else if (state is UserError) {
+                                  print('❌ Registration error: ${state.error}');
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(state.error)),
                                   );
@@ -201,24 +246,48 @@ class LocalizationPage extends StatelessWidget {
                               }
                             } else {
                               // Existing user login: Update location
-                              final user = await userCubit.userRepository.getUserByEmail(email);
-                              print('👤 Updating location for user: ID=${user?.userId}');
+                              final user = await userCubit.userRepository
+                                  .getUserByEmail(email);
+                              print(
+                                '👤 Updating location for user: ID=${user?.userId}',
+                              );
                               if (user != null && context.mounted) {
                                 await userCubit.updateUserLocation(
-                                  user.userId!, 
-                                  position.latitude, 
+                                  user.userId!,
+                                  position.latitude,
                                   position.longitude,
+                                  locationName: locationName,
                                 );
-                                print('✅ Location updated for user ${user.userId}');
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => MainScreen()),
+                                print(
+                                  '✅ Location updated for user ${user.userId}',
                                 );
+
+                                if (context.mounted) {
+                                  // After updating location, emit authenticated state for navigation
+                                  final updatedUser = await userCubit
+                                      .userRepository
+                                      .getUserById(user.userId!);
+                                  if (updatedUser != null) {
+                                    // Manually emit UserAuthenticated state so login flow works properly
+                                    userCubit.emit(
+                                      UserAuthenticated(updatedUser),
+                                    );
+                                  }
+
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MainScreen(),
+                                    ),
+                                  );
+                                }
                               }
                             }
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error getting location: $e')),
+                              SnackBar(
+                                content: Text('Error getting location: $e'),
+                              ),
                             );
                           }
                         },
@@ -231,7 +300,10 @@ class LocalizationPage extends StatelessWidget {
                         ),
                         child: Text(
                           AppLocalizations.of(context)!.allowLocationAccess,
-                          style: AppText.medium.copyWith(color: AppColors.white, fontSize: 16),
+                          style: AppText.medium.copyWith(
+                            color: AppColors.white,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -257,14 +329,20 @@ class LocalizationPage extends StatelessWidget {
                         },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: AppColors.white,
-                          side: BorderSide(color: AppColors.lightBlue, width: 1.5),
+                          side: BorderSide(
+                            color: AppColors.lightBlue,
+                            width: 1.5,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(28),
                           ),
                         ),
                         child: Text(
                           AppLocalizations.of(context)!.enterLocationManually,
-                          style: AppText.medium.copyWith(color: AppColors.darkBlue.withOpacity(0.7), fontSize: 15),
+                          style: AppText.medium.copyWith(
+                            color: AppColors.darkBlue.withOpacity(0.7),
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ),

@@ -11,6 +11,7 @@ class DBUserTable {
  dob TEXT,
  latitude REAL,
  longitude REAL,
+ location_name TEXT,
  premium TEXT
  )
  ''';
