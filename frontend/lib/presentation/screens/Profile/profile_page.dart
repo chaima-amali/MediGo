@@ -10,6 +10,7 @@ import 'edit_profile_page.dart';
 import 'Language_page.dart';
 import 'Edit_password.dart';
 import '../Home/splash_screen.dart';
+import '../Home/home_page.dart';
 import '../Reservations/my_reservations_screen.dart';
 
 class ProfilePage extends StatefulWidget {

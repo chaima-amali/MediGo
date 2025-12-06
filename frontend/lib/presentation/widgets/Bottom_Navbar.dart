@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/reminders/tracking_page.dart';
 import '../theme/app_colors.dart';
+
 import '../screens/reminders/edit_page.dart';
 import '../screens/reminders/statistics_page.dart';
 
@@ -82,7 +83,14 @@ class CustomBottomNavBar extends StatelessWidget {
     bool isCalendar = false,
     bool isCalendarActive = false,
   }) {
-    final isActive = isCalendar ? isCalendarActive : (currentIndex == index);
+    // Calendar should be active when either the tracking-related pages are
+    // active (isCalendarActive) OR when the main currentIndex matches.
+    final isActive = isCalendar
+        ? (currentIndex == index || isCalendarActive)
+        : (currentIndex == index);
+
+    // matches the other icons when selected.
+    final Color activeColor = AppColors.primary;
 
     return GestureDetector(
       onTap: () {
@@ -94,7 +102,7 @@ class CustomBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Icon(
           isActive ? activeIcon : icon,
-          color: isActive ? AppColors.primary : Colors.black54,
+          color: isActive ? activeColor : Colors.black54,
           size: 28,
         ),
       ),
