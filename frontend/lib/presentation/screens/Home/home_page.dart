@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/presentation/services/pharmacies.dart';
-import 'package:frontend/presentation/services/navigation_helper.dart' as nav_helper;
+import 'package:frontend/presentation/services/navigation_helper.dart'
+    as nav_helper;
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/Bottom_Navbar.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
@@ -18,27 +19,6 @@ import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/controllers/pharmacy_controller.dart';
 import 'package:frontend/services/location_service.dart';
 
-void main() {
-  runApp(const MediGoApp());
-}
-
-class MediGoApp extends StatelessWidget {
-  const MediGoApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MediGo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.cyan,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      home: MainScreen(),
-    );
-  }
-}
-
 // Main Screen with Bottom Navigation
 class MainScreen extends StatefulWidget {
   MainScreen({Key? key}) : super(key: nav_helper.mainScreenKey);
@@ -49,40 +29,39 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  late String userName;
-  late final List<Widget> _screens;
-
-  @override
-  void initState() {
-    super.initState();
-    userName = MockDataServices.getUserFirstName();
-    _screens = [
-      const HomeScreen(),
-      const SearchScreen(),
-      TrackingPage(key: nav_helper.trackingPageKey),
-      const ProfilePage(),
-    ];
-  }
-
-  void setTab(int index) {
-    if (index < 0 || index >= _screens.length) return;
-    setState(() {
-      _currentIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
+    return BlocBuilder<UserCubit, UserState>(
+      builder: (context, state) {
+        // Get user name from the current state
+        String userName = 'User';
+
+        if (state is UserAuthenticated) {
+          userName = state.user.name.split(' ').first; // Get first name
+        } else if (state is UserLoaded) {
+          userName = state.user.name.split(' ').first;
+        }
+
+        final List<Widget> screens = [
+          HomeScreen(key: ValueKey(userName), userName: userName),
+          const SearchScreen(),
+          TrackingPage(key: nav_helper.trackingPageKey),
+          const ProfilePage(),
+        ];
+
+        return Scaffold(
+          body: screens[_currentIndex],
+          bottomNavigationBar: CustomBottomNavBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -360,8 +339,11 @@ class _SearchScreenState extends State<SearchScreen> {
           // Opening Hours
           Row(
             children: [
-              Icon(Icons.access_time,
-                  color: AppColors.darkBlue.withOpacity(0.6), size: 18),
+              Icon(
+                Icons.access_time,
+                color: AppColors.darkBlue.withOpacity(0.6),
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Text(
                 pharmacy.openingHours,
@@ -392,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final PharmacyController _pharmacyController = PharmacyController();
   final TextEditingController _homeSearchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  
+
   List<PharmacyWithDistance> _nearbyPharmacies = [];
   List<Pharmacy> _searchResults = [];
   bool _isLoading = true;
@@ -402,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadNearbyPharmacies();
-    
+
     // Listen to search focus changes
     _searchFocusNode.addListener(() {
       if (!_searchFocusNode.hasFocus && _homeSearchController.text.isEmpty) {
@@ -545,13 +527,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightBlue.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ],
@@ -739,8 +714,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // Opening Hours
             Row(
               children: [
-                Icon(Icons.access_time,
-                    color: AppColors.darkBlue.withOpacity(0.6), size: 18),
+                Icon(
+                  Icons.access_time,
+                  color: AppColors.darkBlue.withOpacity(0.6),
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   pharmacy.openingHours,
@@ -853,37 +831,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   )
                 : _nearbyPharmacies.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(40.0),
-                          child: Text(
-                            'No nearby pharmacies found',
-                            style: TextStyle(
-                              color: AppColors.darkBlue.withOpacity(0.6),
-                              fontSize: 14,
-                            ),
-                          ),
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Text(
+                        'No nearby pharmacies found',
+                        style: TextStyle(
+                          color: AppColors.darkBlue.withOpacity(0.6),
+                          fontSize: 14,
                         ),
-                      )
-                    : GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                      ),
+                    ),
+                  )
+                : GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 0.75,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
-                        itemCount: _nearbyPharmacies.length,
-                        itemBuilder: (context, index) {
-                          final pharmacyData = _nearbyPharmacies[index];
-                          return _buildNearbyPharmacyCard(
-                            context,
-                            pharmacyData,
-                          );
-                        },
-                      ),
+                    itemCount: _nearbyPharmacies.length,
+                    itemBuilder: (context, index) {
+                      final pharmacyData = _nearbyPharmacies[index];
+                      return _buildNearbyPharmacyCard(context, pharmacyData);
+                    },
+                  ),
           ],
         ),
       ),
@@ -901,9 +876,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PharmacyDetailScreen(
-              pharmacy: pharmacy.toMap(),
-            ),
+            builder: (context) =>
+                PharmacyDetailScreen(pharmacy: pharmacy.toMap()),
           ),
         );
       },
@@ -990,10 +964,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 4),
             Text(
               pharmacy.phone,
-              style: const TextStyle(
-                fontSize: 10,
-                color: AppColors.darkBlue,
-              ),
+              style: const TextStyle(fontSize: 10, color: AppColors.darkBlue),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
