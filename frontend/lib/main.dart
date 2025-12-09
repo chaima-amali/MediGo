@@ -6,14 +6,13 @@ import 'package:frontend/presentation/screens/Home/splash_screen.dart';
 import 'package:frontend/presentation/theme/app_theme.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/data/repositories/user_repo.dart';
+import 'package:frontend/data/databases/db_helper.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/presentation/screens/Home/home_page.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize database
   try {
     await DBHelper.getDatabase();
@@ -21,7 +20,7 @@ void main() async {
   } catch (e) {
     debugPrint('❌ Database initialization error: $e');
   }
-  
+
   runApp(const MediGoApp());
 }
 
@@ -65,11 +64,10 @@ class _MediGoAppState extends State<MediGoApp> {
     return BlocProvider(
       create: (context) => UserCubit(UserRepository()),
       child: MaterialApp(
-      
-      title: 'MediGo',
-      theme: appTheme,
-      debugShowCheckedModeBanner: false,
-      locale: Locale('en'),
+        title: 'MediGo',
+        theme: appTheme,
+        debugShowCheckedModeBanner: false,
+        locale: Locale('en'),
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -78,10 +76,9 @@ class _MediGoAppState extends State<MediGoApp> {
         ],
         supportedLocales: const [Locale('en'), Locale('fr'), Locale('ar')],
 
-      home: MainScreen(),
+        home: SplashScreen(),
 
-
-      //ReservationDetailsScreen(reservationId: 'res_002',),
+        //ReservationDetailsScreen(reservationId: 'res_002',),
       ),
     );
   }
