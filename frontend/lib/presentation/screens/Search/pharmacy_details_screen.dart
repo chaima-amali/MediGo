@@ -1,18 +1,19 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
+import 'package:frontend/data/models/user.dart';
 
 class PharmacyDetailScreen extends StatefulWidget {
   final Map<String, dynamic> pharmacy;
 
-  const PharmacyDetailScreen({
-    super.key,
-    required this.pharmacy,
-  });
+  const PharmacyDetailScreen({super.key, required this.pharmacy});
 
   @override
   State<PharmacyDetailScreen> createState() => _PharmacyDetailScreenState();
@@ -20,6 +21,43 @@ class PharmacyDetailScreen extends StatefulWidget {
 
 class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
   final MapController _mapController = MapController();
+
+  // Calculate distance between two coordinates using Haversine formula
+  double _calculateDistance(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
+    const double earthRadius = 6371; // km
+    final dLat = _toRadians(lat2 - lat1);
+    final dLon = _toRadians(lon2 - lon1);
+
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_toRadians(lat1)) *
+            math.cos(_toRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return earthRadius * c;
+  }
+
+  double _toRadians(double degree) {
+    return degree * (math.pi / 180);
+  }
+
+  // Generate approximate address based on pharmacy name and location
+  String _generateAddress(String pharmacyName) {
+    // Extract area name from pharmacy name
+    if (pharmacyName.contains('Mahelma')) return 'Mahelma, Algiers';
+    if (pharmacyName.contains('El Harrach')) return 'El Harrach, Algiers';
+    if (pharmacyName.contains('Sidi Moussa')) return 'Sidi Moussa, Algiers';
+    if (pharmacyName.contains('Bab Ezzouar')) return 'Bab Ezzouar, Algiers';
+    if (pharmacyName.contains('Oued Smar')) return 'Oued Smar, Algiers';
+    return 'Algiers, Algeria';
+  }
 
   @override
   void initState() {
@@ -39,12 +77,12 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
   Future<void> _openDirections() async {
     final lat = widget.pharmacy['latitude'] ?? 36.753769;
     final lng = widget.pharmacy['longitude'] ?? 3.058756;
-    
+
     // Try to open Google Maps
     final googleMapsUrl = Uri.parse(
       'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
     );
-    
+
     if (await canLaunchUrl(googleMapsUrl)) {
       await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
     } else {
@@ -66,7 +104,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
   }
 
   Future<void> _makePhoneCall() async {
-    final phoneNumber = widget.pharmacy['phone_number'] ?? '';
+    final phoneNumber = widget.pharmacy['phone'] ?? '';
     if (phoneNumber.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +118,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
     }
 
     final telUrl = Uri.parse('tel:${phoneNumber.replaceAll(' ', '')}');
-    
+
     if (await canLaunchUrl(telUrl)) {
       await launchUrl(telUrl);
     } else {
@@ -100,7 +138,41 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
     final pharmacy = widget.pharmacy;
     final lat = pharmacy['latitude'] ?? 36.753769;
     final lng = pharmacy['longitude'] ?? 3.058756;
-    final distance = pharmacy['distance_km'] ?? 0.0;
+
+    // Get user location from cubit to calculate distance
+    User? currentUser;
+    final userState = context.watch<UserCubit>().state;
+    if (userState is UserAuthenticated) {
+      currentUser = userState.user;
+    } else if (userState is UserLoaded) {
+      currentUser = userState.user;
+    }
+
+    // Use passed distance if available, otherwise calculate
+    double distance;
+    if (pharmacy.containsKey('distance_km') &&
+        pharmacy['distance_km'] != null) {
+      distance = pharmacy['distance_km'];
+      print('🎯 Using passed distance: ${distance}km');
+    } else if (currentUser != null &&
+        currentUser.latitude != null &&
+        currentUser.longitude != null) {
+      distance = _calculateDistance(
+        currentUser.latitude!,
+        currentUser.longitude!,
+        lat,
+        lng,
+      );
+      print(
+        '📏 Calculated distance: ${distance}km from user (${currentUser.latitude}, ${currentUser.longitude}) to pharmacy ($lat, $lng)',
+      );
+    } else {
+      distance = 0.0;
+      print('⚠️ No location data available');
+    }
+
+    // Generate address
+    final address = _generateAddress(pharmacy['name'] ?? 'Pharmacy');
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -157,7 +229,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-                // Coordinates display (like in your design)
+                // Coordinates display
                 Positioned(
                   top: 16,
                   right: 16,
@@ -274,21 +346,22 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                     _buildDetailItem(
                       icon: Icons.location_on_outlined,
                       title: 'Address',
-                      content: pharmacy['address'] ?? 'N/A',
+                      content: address,
                     ),
                     const SizedBox(height: 20),
                     // Contact
                     _buildDetailItem(
                       icon: Icons.phone_outlined,
                       title: 'Contact',
-                      content: pharmacy['phone_number'] ?? 'N/A',
+                      content: pharmacy['phone'] ?? 'N/A',
                     ),
                     const SizedBox(height: 20),
                     // Opening Hours
                     _buildDetailItem(
                       icon: Icons.access_time_outlined,
                       title: 'Opening Hours',
-                      content: pharmacy['opening_hours'] ??
+                      content:
+                          pharmacy['opening_hours'] ??
                           'Mon-Sat: 8:00 AM - 9:00 PM',
                     ),
                     const SizedBox(height: 20),
@@ -296,8 +369,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                     _buildDetailItem(
                       icon: Icons.star_outline,
                       title: 'Rating',
-                      content:
-                          '${pharmacy['rating'] ?? 4.7} (${pharmacy['total_reviews'] ?? 0} reviews)',
+                      content: '${pharmacy['rating'] ?? 4.7}',
                     ),
                     const SizedBox(height: 32),
                     // Call Now button
@@ -347,11 +419,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
             color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: AppColors.primary,
-          ),
+          child: Icon(icon, size: 20, color: AppColors.primary),
         ),
         const SizedBox(width: 12),
         Expanded(

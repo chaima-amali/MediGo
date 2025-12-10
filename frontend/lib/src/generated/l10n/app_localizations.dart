@@ -718,6 +718,24 @@ abstract class AppLocalizations {
   /// **'Monthly'**
   String get monthly;
 
+  /// No description provided for @premiumFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Feature'**
+  String get premiumFeature;
+
+  /// No description provided for @premiumFeatureMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-order and reservation is a premium feature. Upgrade to Premium to unlock this feature and enjoy an ad-free experience with instant restock alerts.'**
+  String get premiumFeatureMessage;
+
+  /// No description provided for @later.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get later;
+
   /// No description provided for @billedMonthly.
   ///
   /// In en, this message translates to:

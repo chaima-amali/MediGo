@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
 
 class ReservationFormScreen extends StatefulWidget {
   final String pharmacyId;
@@ -26,7 +27,12 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
       appBar: AppBar(
         backgroundColor: Colors.grey[50],
         elevation: 0,
-        title: Text(AppLocalizations.of(context)!.reserveMedicine, style: TextStyle(color: Colors.black)),
+        automaticallyImplyLeading: false,
+        leading: CustomBackArrow(onPressed: () => Navigator.pop(context)),
+        title: Text(
+          AppLocalizations.of(context)!.reserveMedicine,
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -104,7 +110,10 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
               SizedBox(height: 16),
 
               // Quantity
-              Text(AppLocalizations.of(context)!.quantity, style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(
+                AppLocalizations.of(context)!.quantity,
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
               SizedBox(height: 8),
               TextFormField(
                 initialValue: '1',
@@ -149,9 +158,27 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(
-                              Icons.calendar_today,
-                              color: Colors.grey,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  color: Colors.grey,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    pickupDate != null
+                                        ? '${pickupDate!.day}/${pickupDate!.month}/${pickupDate!.year}'
+                                        : 'Select date',
+                                    style: TextStyle(
+                                      color: pickupDate != null
+                                          ? Colors.black
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -182,7 +209,28 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(Icons.access_time, color: Colors.grey),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  color: Colors.grey,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    pickupTime != null
+                                        ? pickupTime!.format(context)
+                                        : 'Select time',
+                                    style: TextStyle(
+                                      color: pickupTime != null
+                                          ? Colors.black
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],

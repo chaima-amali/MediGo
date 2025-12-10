@@ -327,6 +327,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monthly => 'Monthly';
 
   @override
+  String get premiumFeature => 'Premium Feature';
+
+  @override
+  String get premiumFeatureMessage =>
+      'Pre-order and reservation is a premium feature. Upgrade to Premium to unlock this feature and enjoy an ad-free experience with instant restock alerts.';
+
+  @override
+  String get later => 'Later';
+
+  @override
   String get billedMonthly => 'Billed monthly';
 
   @override

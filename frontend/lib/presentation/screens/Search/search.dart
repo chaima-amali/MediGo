@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
+import 'package:frontend/data/models/user.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
 import '../notifications.dart' as notif_page;
 import 'pharmacy_details_screen.dart';
 import '../Reservations/reservations_form.dart';
-
-// App Colors
-class AppColors {
-  static const Color primary = Color(0xFF4ECDC4);
-  static const Color lightBlue = Color(0xFFB8F3F0);
-  static const Color pink = Color(0xFFFFB6C1);
-  static const Color background = Color(0xFFF8F9FA);
-  static const Color textDark = Color(0xFF2D3436);
-  static const Color textLight = Color(0xFF636E72);
-  static const Color green = Color(0xFF90EE90);
-  static const Color red = Color(0xFFFFB6C1);
-}
+import '../Profile/subscription_page.dart';
 
 // Mock Database
 class MockDatabase {
@@ -228,7 +222,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                    color: AppColors.darkBlue,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -279,10 +273,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             _searchController.text.isEmpty
                                 ? ''
                                 : 'No results found',
-                            style: TextStyle(
-                              color: AppColors.textLight,
-                              fontSize: 16,
-                            ),
+                            style: TextStyle(color: Colors.grey, fontSize: 16),
                           ),
                         )
                       : ListView.builder(
@@ -344,9 +335,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: Text(
                     data['pharmacy_name'] ?? '',
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AppColors.darkBlue,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -360,8 +351,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: data['in_stock']
-                        ? AppColors.green.withOpacity(0.3)
-                        : AppColors.red.withOpacity(0.3),
+                        ? AppColors.inStock.withOpacity(0.3)
+                        : AppColors.outOfStock.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -385,13 +376,13 @@ class _SearchScreenState extends State<SearchScreen> {
             children: [
               Icon(
                 Icons.location_on_outlined,
-                color: AppColors.textLight,
+                color: AppColors.lightBlue,
                 size: 18,
               ),
               const SizedBox(width: 8),
               Text(
                 '${data['distance']} ${data['address']}',
-                style: TextStyle(fontSize: 13, color: AppColors.textLight),
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -420,24 +411,41 @@ class _SearchScreenState extends State<SearchScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Open reservation form for this pharmacy
-                  final pid = data['pharmacy_id'] ?? '';
-                  final pname = data['pharmacy_name'] ?? '';
-                  if (pid.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Pharmacy id missing')),
-                    );
-                    return;
+                  // Check if user is premium
+                  final userState = context.read<UserCubit>().state;
+                  User? currentUser;
+
+                  if (userState is UserAuthenticated) {
+                    currentUser = userState.user;
+                  } else if (userState is UserLoaded) {
+                    currentUser = userState.user;
                   }
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ReservationFormScreen(
-                        pharmacyId: pid,
-                        pharmacyName: pname,
+
+                  // Check premium status
+                  if (currentUser != null &&
+                      currentUser.premium.toLowerCase() == 'premium') {
+                    // User is premium, proceed to reservation form
+                    final pid = data['pharmacy_id'] ?? '';
+                    final pname = data['pharmacy_name'] ?? '';
+                    if (pid.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Pharmacy id missing')),
+                      );
+                      return;
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ReservationFormScreen(
+                          pharmacyId: pid,
+                          pharmacyName: pname,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    // User is not premium, show upgrade dialog
+                    _showPremiumRequiredDialog(context);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.lightBlue,
@@ -457,6 +465,74 @@ class _SearchScreenState extends State<SearchScreen> {
           ],
         ],
       ),
+    );
+  }
+
+  void _showPremiumRequiredDialog(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.workspace_premium,
+                color: AppColors.premiumOrange,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  loc.upgradeToPremium,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Text(
+              loc.premiumDescription,
+              style: TextStyle(fontSize: 14, color: AppColors.darkBlue),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(loc.cancel, style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // Navigate to subscription page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SubscriptionPage(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.premiumOrange,
+                foregroundColor: AppColors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+              child: Text(
+                loc.subscribeMonthly,
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
