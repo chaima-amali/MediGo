@@ -9,6 +9,7 @@ import 'db_medicine_plan.dart';
 import 'db_occurrence_plan.dart';
 import 'db_daily_dosage_checking.dart';
 import 'db_notification.dart';
+import 'db_medicine.dart';
 import 'db_medicine_find.dart';
 import 'db_pharmacy.dart';
 import 'db_pharmacy_medicine.dart';
@@ -16,7 +17,7 @@ import 'db_reservation.dart';
 
 class DBHelper {
   static const _databaseName = "medic_app.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2; // Incremented for schema change
   static Database? _database;
 
   // List all table create statements in order
@@ -27,9 +28,10 @@ class DBHelper {
     DBOccurrencePlanTable.sql_code,
     DBDailyDosageCheckingTable.sql_code,
     DBNotificationTable.sql_code,
-    DBMedicineFindTable.sql_code,
+    DBMedicineTable.sql_code, // Medicine catalog first
+    DBMedicineFindTable.sql_code, // Search history references medicine
     DBPharmacyTable.sql_code,
-    DBPharmacyMedicineTable.sql_code,
+    DBPharmacyMedicineTable.sql_code, // Inventory references both
     DBReservationTable.sql_code,
   ];
 
@@ -41,8 +43,9 @@ class DBHelper {
       databaseFactory = databaseFactoryFfi;
     }
 
+    final dbPath = join(await getDatabasesPath(), _databaseName);
     _database = await openDatabase(
-      join(await getDatabasesPath(), _databaseName),
+      dbPath,
       version: _databaseVersion,
       onCreate: (db, version) async {
         for (final sql in _tableSQL) {
@@ -144,6 +147,8 @@ class DBHelper {
         'phone': '+213 23 45 67 89',
         'opening_hours': 'Mon-Sat: 8:00 AM - 9:00 PM',
         'rating': 4.5,
+        'image_url':
+            'https://images.unsplash.com/photo-1576602976047-174e57a47881?w=400',
       },
       {
         'name': 'Pharmacie El Harrach',
@@ -152,6 +157,8 @@ class DBHelper {
         'phone': '+213 23 45 67 90',
         'opening_hours': 'Mon-Sun: 8:00 AM - 10:00 PM',
         'rating': 4.7,
+        'image_url':
+            'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400',
       },
       {
         'name': 'Pharmacie Sidi Moussa',
@@ -160,6 +167,8 @@ class DBHelper {
         'phone': '+213 23 45 67 91',
         'opening_hours': 'Mon-Sat: 9:00 AM - 8:00 PM',
         'rating': 4.3,
+        'image_url':
+            'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400',
       },
       {
         'name': 'Pharmacie Bab Ezzouar',
@@ -168,6 +177,8 @@ class DBHelper {
         'phone': '+213 23 45 67 92',
         'opening_hours': 'Mon-Fri: 8:30 AM - 7:30 PM',
         'rating': 4.6,
+        'image_url':
+            'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400',
       },
       {
         'name': 'Pharmacie Oued Smar',
@@ -176,6 +187,8 @@ class DBHelper {
         'phone': '+213 23 45 67 93',
         'opening_hours': 'Mon-Sat: 8:00 AM - 9:00 PM',
         'rating': 4.4,
+        'image_url':
+            'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400',
       },
     ];
 
@@ -183,6 +196,227 @@ class DBHelper {
       await db.insert(
         DBPharmacyTable.table,
         pharmacy,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    // Insert mock medicines into the medicine catalog
+    final mockMedicines = [
+      {
+        'name': 'Aspirin',
+        'generic_name': 'Acetylsalicylic Acid',
+        'dosage': '500mg',
+        'form': 'Tablet',
+        'manufacturer': 'Bayer',
+        'description': 'Pain reliever and fever reducer',
+        'requires_prescription': 0,
+        'created_at': DateTime.now().toIso8601String(),
+      },
+      {
+        'name': 'Paracetamol',
+        'generic_name': 'Acetaminophen',
+        'dosage': '500mg',
+        'form': 'Tablet',
+        'manufacturer': 'Generic',
+        'description': 'Pain and fever relief',
+        'requires_prescription': 0,
+        'created_at': DateTime.now().toIso8601String(),
+      },
+      {
+        'name': 'Ibuprofen',
+        'generic_name': 'Ibuprofen',
+        'dosage': '400mg',
+        'form': 'Tablet',
+        'manufacturer': 'Generic',
+        'description': 'Anti-inflammatory pain reliever',
+        'requires_prescription': 0,
+        'created_at': DateTime.now().toIso8601String(),
+      },
+      {
+        'name': 'Amoxicillin',
+        'generic_name': 'Amoxicillin',
+        'dosage': '500mg',
+        'form': 'Capsule',
+        'manufacturer': 'Generic',
+        'description': 'Antibiotic',
+        'requires_prescription': 1,
+        'created_at': DateTime.now().toIso8601String(),
+      },
+      {
+        'name': 'Doliprane',
+        'generic_name': 'Paracetamol',
+        'dosage': '1000mg',
+        'form': 'Tablet',
+        'manufacturer': 'Sanofi',
+        'description': 'Pain and fever relief',
+        'requires_prescription': 0,
+        'created_at': DateTime.now().toIso8601String(),
+      },
+      {
+        'name': 'Efferalgan',
+        'generic_name': 'Paracetamol',
+        'dosage': '500mg',
+        'form': 'Effervescent Tablet',
+        'manufacturer': 'UPSA',
+        'description': 'Fast pain and fever relief',
+        'requires_prescription': 0,
+        'created_at': DateTime.now().toIso8601String(),
+      },
+    ];
+
+    for (final medicine in mockMedicines) {
+      await db.insert(
+        DBMedicineTable.table,
+        medicine,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    // Insert mock pharmacy-medicine inventory
+    // Pharmacy IDs: 1-5, Medicine IDs: 1-6
+    // Medicine IDs: 1=Aspirin, 2=Paracetamol, 3=Ibuprofen, 4=Amoxicillin, 5=Doliprane, 6=Efferalgan
+    final mockInventory = [
+      // Pharmacie Mahelma Centre (pharmacy_id: 1)
+      {
+        'pharmacy_id': 1,
+        'medicine_id': 1,
+        'price': 250.0,
+        'stock': 150,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 1,
+        'medicine_id': 2,
+        'price': 180.0,
+        'stock': 200,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 1,
+        'medicine_id': 5,
+        'price': 220.0,
+        'stock': 100,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+
+      // Pharmacie El Harrach (pharmacy_id: 2)
+      {
+        'pharmacy_id': 2,
+        'medicine_id': 1,
+        'price': 240.0,
+        'stock': 80,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 2,
+        'medicine_id': 3,
+        'price': 320.0,
+        'stock': 50,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 2,
+        'medicine_id': 4,
+        'price': 450.0,
+        'stock': 30,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 2,
+        'medicine_id': 6,
+        'price': 210.0,
+        'stock': 120,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+
+      // Pharmacie Sidi Moussa (pharmacy_id: 3)
+      {
+        'pharmacy_id': 3,
+        'medicine_id': 2,
+        'price': 190.0,
+        'stock': 150,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 3,
+        'medicine_id': 3,
+        'price': 310.0,
+        'stock': 60,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 3,
+        'medicine_id': 5,
+        'price': 230.0,
+        'stock': 90,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+
+      // Pharmacie Bab Ezzouar (pharmacy_id: 4)
+      {
+        'pharmacy_id': 4,
+        'medicine_id': 1,
+        'price': 260.0,
+        'stock': 100,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 4,
+        'medicine_id': 2,
+        'price': 185.0,
+        'stock': 180,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 4,
+        'medicine_id': 4,
+        'price': 460.0,
+        'stock': 40,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 4,
+        'medicine_id': 6,
+        'price': 200.0,
+        'stock': 150,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+
+      // Pharmacie Oued Smar (pharmacy_id: 5)
+      {
+        'pharmacy_id': 5,
+        'medicine_id': 3,
+        'price': 330.0,
+        'stock': 70,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 5,
+        'medicine_id': 4,
+        'price': 440.0,
+        'stock': 25,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 5,
+        'medicine_id': 5,
+        'price': 225.0,
+        'stock': 110,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+      {
+        'pharmacy_id': 5,
+        'medicine_id': 6,
+        'price': 215.0,
+        'stock': 130,
+        'last_updated': DateTime.now().toIso8601String(),
+      },
+    ];
+
+    for (final inventory in mockInventory) {
+      await db.insert(
+        DBPharmacyMedicineTable.table,
+        inventory,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
@@ -199,5 +433,21 @@ class DBHelper {
         await _insertMockData(db);
       }
     } catch (_) {}
+  }
+
+  // Force reset mock data (for testing)
+  static Future<void> resetMockData() async {
+    final db = await getDatabase();
+
+    // Delete existing data (in reverse order of foreign keys)
+    await db.delete(DBPharmacyMedicineTable.table);
+    await db.delete(DBMedicineFindTable.table); // Search history
+    await db.delete(DBMedicineTable.table); // Medicine catalog
+    await db.delete(DBPharmacyTable.table);
+
+    // Reinsert mock data
+    await _insertMockData(db);
+
+    print('✅ Mock data reset successfully');
   }
 }

@@ -67,7 +67,9 @@ class UserUnauthenticated extends UserState {}
 class UserCubit extends Cubit<UserState> {
   final UserRepository userRepository;
 
-  UserCubit(this.userRepository) : super(UserInitial());
+  UserCubit(this.userRepository) : super(UserInitial()) {
+    restoreSession();
+  }
 
   // Register new user
   Future<void> registerUser(User user) async {
