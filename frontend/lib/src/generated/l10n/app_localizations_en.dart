@@ -912,6 +912,93 @@ class AppLocalizationsEn extends AppLocalizations {
   String get no => 'No';
 
   @override
+  String get notifTitle => 'Notifications';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterReminders => 'Reminders';
+
+  @override
+  String get filterStock => 'Stock/Reserv';
+
+  @override
+  String get labelToday => 'Today';
+
+  @override
+  String get labelYesterday => 'Yesterday';
+
+  @override
+  String get notifMsg1 =>
+      'Time for your medicine \"Aspirin\" — your health will thank you';
+
+  @override
+  String get notifMsg2 =>
+      'Hey there! Don\'t forget your dose of \"Telfast\" small steps for a healthier you.';
+
+  @override
+  String get notifMsg3 =>
+      'Evening dose time — take your medicine \"Aspirin\" and rest easy tonight';
+
+  @override
+  String get notifMsg4 =>
+      'Good morning! It\'s time to take your medicine and start your day right.';
+
+  @override
+  String get premiumTitle => 'Premium Feature';
+
+  @override
+  String get premiumDesc =>
+      'Medicine stock tracking and reservation notifications are available for Premium members only. Upgrade now to unlock this feature!';
+
+  @override
+  String get premiumBtn => 'Get Premium';
+
+  @override
+  String get premiumBenefitsTitle => 'Premium Benefits:';
+
+  @override
+  String get premiumBenefit1 => 'Track medicine stock in real-time';
+
+  @override
+  String get premiumBenefit2 => 'Reserve medicines in advance';
+
+  @override
+  String get premiumBenefit3 => 'Get priority notifications';
+
+  @override
+  String get premiumBenefit4 => '24/7 Priority support';
+
+  @override
+  String get dialogTitle => 'Upgrade to Premium';
+
+  @override
+  String get dialogMsg =>
+      'Unlock all premium features including medicine stock tracking, reservation notifications, and priority support.';
+
+  @override
+  String get btnCancel => 'Cancel';
+
+  @override
+  String get btnSubscribe => 'Subscribe';
+
+  @override
+  String get msgComingSoon => 'Premium subscription coming soon!';
+
+  @override
+  String get searchMedicine => 'Search Medicine';
+
+  @override
+  String get searchHint => 'Search for medicine...';
+
+  @override
+  String get searchPrompt => 'Search for a medicine to see results';
+
+  @override
+  String get noResults => 'No results found for';
+
+  @override
   String get plan_not_found => 'Plan not found';
 
   @override

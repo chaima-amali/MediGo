@@ -107,7 +107,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
               Text(AppLocalizations.of(context)!.quantity, style: TextStyle(fontWeight: FontWeight.w600)),
               SizedBox(height: 8),
               TextFormField(
-                initialValue: '1',
+                initialValue: 'eg:1',
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   filled: true,

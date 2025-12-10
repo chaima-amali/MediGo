@@ -921,6 +921,93 @@ class AppLocalizationsFr extends AppLocalizations {
   String get no => 'Non';
 
   @override
+  String get notifTitle => 'Notifications';
+
+  @override
+  String get filterAll => 'Tout';
+
+  @override
+  String get filterReminders => 'Rappels';
+
+  @override
+  String get filterStock => 'Stock/Réserv';
+
+  @override
+  String get labelToday => 'Aujourd\'hui';
+
+  @override
+  String get labelYesterday => 'Hier';
+
+  @override
+  String get notifMsg1 =>
+      'C\'est l\'heure de votre médicament \"Aspirine\" — votre santé vous remerciera';
+
+  @override
+  String get notifMsg2 =>
+      'Bonjour! N\'oubliez pas votre dose de \"Telfast\" — de petits pas pour une meilleure santé.';
+
+  @override
+  String get notifMsg3 =>
+      'Heure de la dose du soir — prenez votre médicament \"Aspirine\" et reposez-vous tranquillement ce soir';
+
+  @override
+  String get notifMsg4 =>
+      'Bonjour! Il est temps de prendre votre médicament et de bien commencer votre journée.';
+
+  @override
+  String get premiumTitle => 'Fonctionnalité Premium';
+
+  @override
+  String get premiumDesc =>
+      'Le suivi du stock de médicaments et les notifications de réservation sont disponibles uniquement pour les membres Premium. Mettez à niveau maintenant pour débloquer cette fonctionnalité!';
+
+  @override
+  String get premiumBtn => 'Obtenir Premium';
+
+  @override
+  String get premiumBenefitsTitle => 'Avantages Premium:';
+
+  @override
+  String get premiumBenefit1 => 'Suivre le stock de médicaments en temps réel';
+
+  @override
+  String get premiumBenefit2 => 'Réserver des médicaments à l\'avance';
+
+  @override
+  String get premiumBenefit3 => 'Recevoir des notifications prioritaires';
+
+  @override
+  String get premiumBenefit4 => 'Support prioritaire 24/7';
+
+  @override
+  String get dialogTitle => 'Passer à Premium';
+
+  @override
+  String get dialogMsg =>
+      'Débloquez toutes les fonctionnalités premium, y compris le suivi du stock de médicaments, les notifications de réservation et le support prioritaire.';
+
+  @override
+  String get btnCancel => 'Annuler';
+
+  @override
+  String get btnSubscribe => 'S\'abonner';
+
+  @override
+  String get msgComingSoon => 'Abonnement premium bientôt disponible!';
+
+  @override
+  String get searchMedicine => 'Rechercher un médicament';
+
+  @override
+  String get searchHint => 'Rechercher un médicament...';
+
+  @override
+  String get searchPrompt => 'Recherchez un médicament pour voir les résultats';
+
+  @override
+  String get noResults => 'Aucun résultat trouvé pour';
+
+  @override
   String get plan_not_found => 'Plan introuvable';
 
   @override

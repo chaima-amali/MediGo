@@ -49,7 +49,7 @@
   "confirmYourPassword": "أكد كلمة المرور الخاصة بك",
   "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
   "hi": "مرحباً ",
-  "howAreYouFeeling": " ،كيف حالك\naليوم؟",
+  "howAreYouFeeling": " ،كيف حالك ليوم؟",
   "searchMedicinePrompt": "ابحث عن دوائك ...",
   "medicineReminder": "تذكير بالدواء",
   "reminderDescription": "تريد تذكيراً لتتبع\nعلاجك",
@@ -290,5 +290,36 @@
   "medicine_calendar": "تقويم الأدوية",
   "view_report": "عرض التقرير",
   "no_medicine_records_for_this_date": "لا توجد سجلات أدوية لهذا التاريخ",
-  "howManyTimesOnDay": " كم مرة في اليوم؟"
+  "howManyTimesOnDay": " كم مرة في اليوم؟",
+    "notifTitle": "الإشعارات",
+  "filterAll": "الكل",
+  "filterReminders": "التذكيرات",
+  "filterStock": "المخزون/الحجز",
+  "labelToday": "اليوم",
+  "labelYesterday": "أمس",
+  
+  "notifMsg1": "حان وقت دوائك \"أسبرين\" — صحتك ستشكرك",
+  "notifMsg2": "مرحباً! لا تنسى جرعتك من \"تيلفاست\" خطوات صغيرة لصحة أفضل.",
+  "notifMsg3": "وقت الجرعة المسائية — تناول دواءك \"أسبرين\" واسترح الليلة بسهولة",
+  "notifMsg4": "صباح الخير! حان وقت تناول دوائك وابدأ يومك بشكل صحيح.",
+  
+  "premiumTitle": "ميزة مميزة",
+  "premiumDesc": "تتبع مخزون الأدوية وإشعارات الحجز متاحة للأعضاء المميزين فقط. قم بالترقية الآن لفتح هذه الميزة!",
+  "premiumBtn": "احصل على الباقة المميزة",
+  "premiumBenefitsTitle": "فوائد الباقة المميزة:",
+  "premiumBenefit1": "تتبع مخزون الأدوية في الوقت الفعلي",
+  "premiumBenefit2": "حجز الأدوية مسبقاً",
+  "premiumBenefit3": "احصل على إشعارات ذات أولوية",
+  "premiumBenefit4": "دعم ذو أولوية على مدار الساعة",
+  
+"searchMedicine": "البحث عن الدواء",
+"searchHint": "ابحث عن دواء...",
+"searchPrompt": "ابحث عن دواء لرؤية النتائج",
+"noResults": "لم يتم العثور على نتائج لـ",
+  
+  "dialogTitle": "الترقية للباقة المميزة",
+  "dialogMsg": "افتح جميع الميزات المميزة بما في ذلك تتبع مخزون الأدوية وإشعارات الحجز والدعم ذو الأولوية.",
+  "btnCancel": "إلغاء",
+  "btnSubscribe": "اشترك",
+  "msgComingSoon": "الاشتراك المميز قريباً!"
 }

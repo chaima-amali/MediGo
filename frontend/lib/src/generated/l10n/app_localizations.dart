@@ -1804,6 +1804,168 @@ abstract class AppLocalizations {
   /// **'No'**
   String get no;
 
+  /// No description provided for @notifTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifTitle;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get filterReminders;
+
+  /// No description provided for @filterStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock/Reserv'**
+  String get filterStock;
+
+  /// No description provided for @labelToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get labelToday;
+
+  /// No description provided for @labelYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get labelYesterday;
+
+  /// No description provided for @notifMsg1.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for your medicine \"Aspirin\" — your health will thank you'**
+  String get notifMsg1;
+
+  /// No description provided for @notifMsg2.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey there! Don\'t forget your dose of \"Telfast\" small steps for a healthier you.'**
+  String get notifMsg2;
+
+  /// No description provided for @notifMsg3.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening dose time — take your medicine \"Aspirin\" and rest easy tonight'**
+  String get notifMsg3;
+
+  /// No description provided for @notifMsg4.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning! It\'s time to take your medicine and start your day right.'**
+  String get notifMsg4;
+
+  /// No description provided for @premiumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Feature'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine stock tracking and reservation notifications are available for Premium members only. Upgrade now to unlock this feature!'**
+  String get premiumDesc;
+
+  /// No description provided for @premiumBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Premium'**
+  String get premiumBtn;
+
+  /// No description provided for @premiumBenefitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Benefits:'**
+  String get premiumBenefitsTitle;
+
+  /// No description provided for @premiumBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'Track medicine stock in real-time'**
+  String get premiumBenefit1;
+
+  /// No description provided for @premiumBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve medicines in advance'**
+  String get premiumBenefit2;
+
+  /// No description provided for @premiumBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'Get priority notifications'**
+  String get premiumBenefit3;
+
+  /// No description provided for @premiumBenefit4.
+  ///
+  /// In en, this message translates to:
+  /// **'24/7 Priority support'**
+  String get premiumBenefit4;
+
+  /// No description provided for @dialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get dialogTitle;
+
+  /// No description provided for @dialogMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock all premium features including medicine stock tracking, reservation notifications, and priority support.'**
+  String get dialogMsg;
+
+  /// No description provided for @btnCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get btnCancel;
+
+  /// No description provided for @btnSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get btnSubscribe;
+
+  /// No description provided for @msgComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium subscription coming soon!'**
+  String get msgComingSoon;
+
+  /// No description provided for @searchMedicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Medicine'**
+  String get searchMedicine;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for medicine...'**
+  String get searchHint;
+
+  /// No description provided for @searchPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a medicine to see results'**
+  String get searchPrompt;
+
+  /// No description provided for @noResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found for'**
+  String get noResults;
+
   /// No description provided for @plan_not_found.
   ///
   /// In en, this message translates to:

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -12,6 +13,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    
     return Scaffold(
       backgroundColor: Color(0xFFE0F7FA),
       body: SafeArea(
@@ -29,7 +32,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   SizedBox(width: 12),
                   Text(
-                    'Notifications',
+                    loc.notifTitle,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -45,7 +48,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               child: Row(
                 children: [
                   FilterButton(
-                    label: 'All',
+                    label: loc.filterAll,
                     isSelected: selectedFilter == 'All',
                     onTap: () {
                       setState(() {
@@ -55,7 +58,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   SizedBox(width: 8),
                   FilterButton(
-                    label: 'Reminders',
+                    label: loc.filterReminders,
                     isSelected: selectedFilter == 'Reminders',
                     onTap: () {
                       setState(() {
@@ -65,11 +68,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   SizedBox(width: 8),
                   FilterButton(
-                    label: 'medstock/Reserv',
-                    isSelected: selectedFilter == 'medicine stock/Reservation',
+                    label: loc.filterStock,
+                    isSelected: selectedFilter == 'Stock/Reserv',
                     onTap: () {
                       setState(() {
-                        selectedFilter = 'medicine stock/Reservation';
+                        selectedFilter = 'Stock/Reserv';
                       });
                     },
                   ),
@@ -79,76 +82,280 @@ class _NotificationsPageState extends State<NotificationsPage> {
             
             SizedBox(height: 16),
             
+            // Content based on filter
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+              child: selectedFilter == 'Stock/Reserv'
+                  ? _buildPremiumContent(loc)
+                  : _buildNotificationsList(loc),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Premium Content for Medicine Stock/Reservation
+  Widget _buildPremiumContent(AppLocalizations loc) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Premium Icon
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.amber.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.workspace_premium,
+                size: 60,
+                color: Colors.amber.shade700,
+              ),
+            ),
+            SizedBox(height: 24),
+            
+            // Title
+            Text(
+              loc.premiumTitle,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12),
+            
+            // Description
+            Text(
+              loc.premiumDesc,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.grey[700],
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 32),
+            
+            // Get Premium Button
+            ElevatedButton(
+              onPressed: () {
+                _showPremiumDialog(context, loc);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber.shade600,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 3,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Today Section
+                  Icon(Icons.star, size: 20),
+                  SizedBox(width: 8),
                   Text(
-                    'Today',
+                    loc.premiumBtn,
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+            
+            // Premium Features List
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.premiumBenefitsTitle,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
                   SizedBox(height: 12),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Time for your medicine "Aspirin" — your health will thank you',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Hey there! Don\'t forget your dose of "Telfast" small steps for a healthier you.',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Evening dose time  take your medicine "Aspirin" and rest easy tonight',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 am',
-                    message: 'Good morning! It\'s time to take your medicine and start your day right.',
-                  ),
-                  
-                  SizedBox(height: 24),
-                  
-                  // Yesterday Section
-                  Text(
-                    'Yesterday',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Time for your medicine "Aspirin" — your health will thank you',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Hey there! Don\'t forget your dose of "Telfast" small steps for a healthier you.',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Hey there! Don\'t forget your dose of "Telfast" small steps for a healthier you.',
-                  ),
-                  
-                  SizedBox(height: 20),
+                  _buildBenefitItem(Icons.inventory, loc.premiumBenefit1),
+                  _buildBenefitItem(Icons.bookmark, loc.premiumBenefit2),
+                  _buildBenefitItem(Icons.notifications_active, loc.premiumBenefit3),
+                  _buildBenefitItem(Icons.support_agent, loc.premiumBenefit4),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBenefitItem(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.amber.shade700, size: 20),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[800],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Notifications List
+  Widget _buildNotificationsList(AppLocalizations loc) {
+    return ListView(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      children: [
+        // Today Section
+        Text(
+          loc.labelToday,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        SizedBox(height: 12),
+        
+        NotificationCard(
+          time: '8:30 pm',
+          message: loc.notifMsg1,
+        ),
+        
+        NotificationCard(
+          time: '8:30 pm',
+          message: loc.notifMsg2,
+        ),
+        
+        NotificationCard(
+          time: '8:30 pm',
+          message: loc.notifMsg3,
+        ),
+        
+        NotificationCard(
+          time: '8:30 am',
+          message: loc.notifMsg4,
+        ),
+        
+        SizedBox(height: 24),
+        
+        // Yesterday Section
+        Text(
+          loc.labelYesterday,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        SizedBox(height: 12),
+        
+        NotificationCard(
+          time: '8:30 pm',
+          message: loc.notifMsg1,
+        ),
+        
+        NotificationCard(
+          time: '8:30 pm',
+          message: loc.notifMsg2,
+        ),
+        
+        NotificationCard(
+          time: '8:30 pm',
+          message: loc.notifMsg2,
+        ),
+        
+        SizedBox(height: 20),
+      ],
+    );
+  }
+
+  // Show Premium Dialog
+  void _showPremiumDialog(BuildContext context, AppLocalizations loc) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.workspace_premium, color: Colors.amber.shade700),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  loc.dialogTitle,
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: Text(loc.dialogMsg),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                loc.btnCancel,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // TODO: Navigate to premium subscription page
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(loc.msgComingSoon),
+                    backgroundColor: Colors.amber.shade700,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber.shade600,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(loc.btnSubscribe),
+            ),
+          ],
+        );
+      },
     );
   }
 }

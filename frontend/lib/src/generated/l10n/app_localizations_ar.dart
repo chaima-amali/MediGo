@@ -161,7 +161,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hi => 'مرحباً ';
 
   @override
-  String get howAreYouFeeling => ' ،كيف حالك\naليوم؟';
+  String get howAreYouFeeling => ' ،كيف حالك ليوم؟';
 
   @override
   String get searchMedicinePrompt => 'ابحث عن دوائك ...';
@@ -902,6 +902,92 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get no => 'لا';
+
+  @override
+  String get notifTitle => 'الإشعارات';
+
+  @override
+  String get filterAll => 'الكل';
+
+  @override
+  String get filterReminders => 'التذكيرات';
+
+  @override
+  String get filterStock => 'المخزون/الحجز';
+
+  @override
+  String get labelToday => 'اليوم';
+
+  @override
+  String get labelYesterday => 'أمس';
+
+  @override
+  String get notifMsg1 => 'حان وقت دوائك \"أسبرين\" — صحتك ستشكرك';
+
+  @override
+  String get notifMsg2 =>
+      'مرحباً! لا تنسى جرعتك من \"تيلفاست\" خطوات صغيرة لصحة أفضل.';
+
+  @override
+  String get notifMsg3 =>
+      'وقت الجرعة المسائية — تناول دواءك \"أسبرين\" واسترح الليلة بسهولة';
+
+  @override
+  String get notifMsg4 =>
+      'صباح الخير! حان وقت تناول دوائك وابدأ يومك بشكل صحيح.';
+
+  @override
+  String get premiumTitle => 'ميزة مميزة';
+
+  @override
+  String get premiumDesc =>
+      'تتبع مخزون الأدوية وإشعارات الحجز متاحة للأعضاء المميزين فقط. قم بالترقية الآن لفتح هذه الميزة!';
+
+  @override
+  String get premiumBtn => 'احصل على الباقة المميزة';
+
+  @override
+  String get premiumBenefitsTitle => 'فوائد الباقة المميزة:';
+
+  @override
+  String get premiumBenefit1 => 'تتبع مخزون الأدوية في الوقت الفعلي';
+
+  @override
+  String get premiumBenefit2 => 'حجز الأدوية مسبقاً';
+
+  @override
+  String get premiumBenefit3 => 'احصل على إشعارات ذات أولوية';
+
+  @override
+  String get premiumBenefit4 => 'دعم ذو أولوية على مدار الساعة';
+
+  @override
+  String get dialogTitle => 'الترقية للباقة المميزة';
+
+  @override
+  String get dialogMsg =>
+      'افتح جميع الميزات المميزة بما في ذلك تتبع مخزون الأدوية وإشعارات الحجز والدعم ذو الأولوية.';
+
+  @override
+  String get btnCancel => 'إلغاء';
+
+  @override
+  String get btnSubscribe => 'اشترك';
+
+  @override
+  String get msgComingSoon => 'الاشتراك المميز قريباً!';
+
+  @override
+  String get searchMedicine => 'البحث عن الدواء';
+
+  @override
+  String get searchHint => 'ابحث عن دواء...';
+
+  @override
+  String get searchPrompt => 'ابحث عن دواء لرؤية النتائج';
+
+  @override
+  String get noResults => 'لم يتم العثور على نتائج لـ';
 
   @override
   String get plan_not_found => 'الخطة غير موجودة';

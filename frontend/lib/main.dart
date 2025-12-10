@@ -8,15 +8,14 @@ import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/data/repositories/user_repo.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/presentation/screens/Home/home_page.dart';
-
-
+import 'package:frontend/data/databases/db_helper.dart'; // Add this import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize database
   try {
-    await DBHelper.getDatabase();
+    await DBHelper.getDatabase(); // Now DBHelper is available
     debugPrint('✅ Database initialized successfully');
   } catch (e) {
     debugPrint('❌ Database initialization error: $e');
@@ -38,7 +37,7 @@ class MediGoApp extends StatefulWidget {
 }
 
 class _MediGoAppState extends State<MediGoApp> {
-  Locale _locale = const Locale('ar'); // Default to English
+  Locale _locale = const Locale('en'); // Default to Arabic
 
   @override
   void initState() {
@@ -48,7 +47,7 @@ class _MediGoAppState extends State<MediGoApp> {
 
   Future<void> _loadSavedLanguage() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedLanguage = prefs.getString('language') ?? 'en';
+    final savedLanguage = prefs.getString('language') ?? '';
     setState(() {
       _locale = Locale(savedLanguage);
     });
@@ -65,11 +64,10 @@ class _MediGoAppState extends State<MediGoApp> {
     return BlocProvider(
       create: (context) => UserCubit(UserRepository()),
       child: MaterialApp(
-      
-      title: 'MediGo',
-      theme: appTheme,
-      debugShowCheckedModeBanner: false,
-      locale: Locale('en'),
+        title: 'MediGo',
+        theme: appTheme,
+        debugShowCheckedModeBanner: false,
+        locale: _locale, // Use _locale variable instead of hardcoded 'en'
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -77,11 +75,7 @@ class _MediGoAppState extends State<MediGoApp> {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [Locale('en'), Locale('fr'), Locale('ar')],
-
-      home: MainScreen(),
-
-
-      //ReservationDetailsScreen(reservationId: 'res_002',),
+        home: MainScreen(),
       ),
     );
   }

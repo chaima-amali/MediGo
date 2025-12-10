@@ -290,5 +290,35 @@
   "medicine_calendar": "Calendrier des médicaments",
   "view_report": "Voir le rapport",
   "no_medicine_records_for_this_date": "Aucun enregistrement de médicament pour cette date",
-  "howManyTimesOnDay": " Combien de fois par jour ?"
+  "howManyTimesOnDay": " Combien de fois par jour ?",
+  "notifTitle": "Notifications",
+  "filterAll": "Tout",
+  "filterReminders": "Rappels",
+  "filterStock": "Stock/Réserv",
+  "labelToday": "Aujourd'hui",
+  "labelYesterday": "Hier",
+  
+  "notifMsg1": "C'est l'heure de votre médicament \"Aspirine\" — votre santé vous remerciera",
+  "notifMsg2": "Bonjour! N'oubliez pas votre dose de \"Telfast\" — de petits pas pour une meilleure santé.",
+  "notifMsg3": "Heure de la dose du soir — prenez votre médicament \"Aspirine\" et reposez-vous tranquillement ce soir",
+  "notifMsg4": "Bonjour! Il est temps de prendre votre médicament et de bien commencer votre journée.",
+  
+  "premiumTitle": "Fonctionnalité Premium",
+  "premiumDesc": "Le suivi du stock de médicaments et les notifications de réservation sont disponibles uniquement pour les membres Premium. Mettez à niveau maintenant pour débloquer cette fonctionnalité!",
+  "premiumBtn": "Obtenir Premium",
+  "premiumBenefitsTitle": "Avantages Premium:",
+  "premiumBenefit1": "Suivre le stock de médicaments en temps réel",
+  "premiumBenefit2": "Réserver des médicaments à l'avance",
+  "premiumBenefit3": "Recevoir des notifications prioritaires",
+  "premiumBenefit4": "Support prioritaire 24/7",
+  "searchMedicine": "Rechercher un médicament",
+  "searchHint": "Rechercher un médicament...",
+  "searchPrompt": "Recherchez un médicament pour voir les résultats",
+  "noResults": "Aucun résultat trouvé pour",
+  
+  "dialogTitle": "Passer à Premium",
+  "dialogMsg": "Débloquez toutes les fonctionnalités premium, y compris le suivi du stock de médicaments, les notifications de réservation et le support prioritaire.",
+  "btnCancel": "Annuler",
+  "btnSubscribe": "S'abonner",
+  "msgComingSoon": "Abonnement premium bientôt disponible!"
 }

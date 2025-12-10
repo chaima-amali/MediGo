@@ -293,6 +293,38 @@
   "confirm_action_message": "Are you sure you want to {action} this medicine?",
   "yes": "Yes",
   "no": "No",
+
+  "notifTitle": "Notifications",
+  "filterAll": "All",
+  "filterReminders": "Reminders",
+  "filterStock": "Stock/Reserv",
+  "labelToday": "Today",
+  "labelYesterday": "Yesterday",
+  
+  "notifMsg1": "Time for your medicine \"Aspirin\" — your health will thank you",
+  "notifMsg2": "Hey there! Don't forget your dose of \"Telfast\" small steps for a healthier you.",
+  "notifMsg3": "Evening dose time — take your medicine \"Aspirin\" and rest easy tonight",
+  "notifMsg4": "Good morning! It's time to take your medicine and start your day right.",
+  
+  "premiumTitle": "Premium Feature",
+  "premiumDesc": "Medicine stock tracking and reservation notifications are available for Premium members only. Upgrade now to unlock this feature!",
+  "premiumBtn": "Get Premium",
+  "premiumBenefitsTitle": "Premium Benefits:",
+  "premiumBenefit1": "Track medicine stock in real-time",
+  "premiumBenefit2": "Reserve medicines in advance",
+  "premiumBenefit3": "Get priority notifications",
+  "premiumBenefit4": "24/7 Priority support",
+  
+  "dialogTitle": "Upgrade to Premium",
+  "dialogMsg": "Unlock all premium features including medicine stock tracking, reservation notifications, and priority support.",
+  "btnCancel": "Cancel",
+  "btnSubscribe": "Subscribe",
+  "msgComingSoon": "Premium subscription coming soon!",
+  "searchMedicine": "Search Medicine",
+  "searchHint": "Search for medicine...",
+  "searchPrompt": "Search for a medicine to see results",
+  "noResults": "No results found for",
+
   "plan_not_found": "Plan not found",
   "unexpected_error": "Something went wrong",
   "medicine_calendar": "Medicine Calendar",
@@ -306,4 +338,5 @@
       }
     }
   }
+  
 }

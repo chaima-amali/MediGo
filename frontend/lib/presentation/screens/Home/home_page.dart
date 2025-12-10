@@ -7,7 +7,7 @@ import 'package:frontend/presentation/services/navigation_helper.dart' as nav_he
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/Bottom_Navbar.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import '../Search/Search_results_page.dart';
+import '../Search/search_page.dart';
 import '../notifications.dart' as notif_page;
 import '../reminders/tracking_page.dart';
 import '../Profile/profile_page.dart';
@@ -17,27 +17,6 @@ import 'package:frontend/data/models/user.dart';
 import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/controllers/pharmacy_controller.dart';
 import 'package:frontend/services/location_service.dart';
-
-void main() {
-  runApp(const MediGoApp());
-}
-
-class MediGoApp extends StatelessWidget {
-  const MediGoApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MediGo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.cyan,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      home: MainScreen(),
-    );
-  }
-}
 
 // Main Screen with Bottom Navigation
 class MainScreen extends StatefulWidget {
@@ -57,8 +36,8 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     userName = MockDataServices.getUserFirstName();
     _screens = [
-      const HomeScreen(),
-      const SearchScreen(),
+      HomeScreen(userName: userName),
+      SearchPage(),
       TrackingPage(key: nav_helper.trackingPageKey),
       const ProfilePage(),
     ];
@@ -87,294 +66,21 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// Search Screen with Pharmacy Search
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+// ADD THIS CLASS DEFINITION - PharmacyWithDistance
+class PharmacyWithDistance {
+  final Pharmacy pharmacy;
+  final double distance; // in kilometers
 
-  @override
-  State<SearchScreen> createState() => _SearchScreenState();
-}
+  PharmacyWithDistance({
+    required this.pharmacy,
+    required this.distance,
+  });
 
-class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  final PharmacyController _pharmacyController = PharmacyController();
-  List<Pharmacy> _searchResults = [];
-
-  void _performSearch(String query) {
-    setState(() {
-      if (query.trim().isEmpty) {
-        _searchResults = [];
-      } else {
-        _searchResults = _pharmacyController.searchPharmacies(query);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [AppColors.lightBlue.withOpacity(0.3), Colors.white],
-        ),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'MediGo',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.local_hospital,
-                        color: AppColors.primary,
-                        size: 24,
-                      ),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const notif_page.NotificationsPage(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightBlue.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Stack(
-                        children: [
-                          Icon(
-                            Icons.notifications_outlined,
-                            color: AppColors.primary,
-                            size: 24,
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-
-              // Title
-              Text(
-                'Search Pharmacy',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.darkBlue,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Search Bar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: AppColors.lightBlue, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.search, color: AppColors.primary, size: 24),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: _performSearch,
-                        decoration: InputDecoration(
-                          hintText: 'Search for pharmacy...',
-                          hintStyle: TextStyle(
-                            color: const Color.fromARGB(255, 161, 161, 161),
-                            fontSize: 13,
-                          ),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Search Results
-              Expanded(
-                child: _searchResults.isEmpty
-                    ? Center(
-                        child: Text(
-                          _searchController.text.isEmpty
-                              ? ''
-                              : loc.noResultsFound,
-                          style: TextStyle(
-                            color: AppColors.darkBlue.withOpacity(0.6),
-                            fontSize: 16,
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          final pharmacy = _searchResults[index];
-                          return _buildPharmacyCard(pharmacy);
-                        },
-                      ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPharmacyCard(Pharmacy pharmacy) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Pharmacy Name
-          GestureDetector(
-            onTap: () {
-              final pharmacyMap = pharmacy.toMap();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PharmacyDetailScreen(pharmacy: pharmacyMap),
-                ),
-              );
-            },
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    pharmacy.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.darkBlue,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Rating
-          Row(
-            children: [
-              const Icon(Icons.star, color: Colors.amber, size: 18),
-              const SizedBox(width: 4),
-              Text(
-                pharmacy.rating.toStringAsFixed(1),
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.darkBlue,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Phone
-          Row(
-            children: [
-              Icon(Icons.phone_outlined, color: AppColors.primary, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                pharmacy.phone,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Opening Hours
-          Row(
-            children: [
-              Icon(Icons.access_time,
-                  color: AppColors.darkBlue.withOpacity(0.6), size: 18),
-              const SizedBox(width: 8),
-              Text(
-                pharmacy.openingHours,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.darkBlue.withOpacity(0.6),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+  String get formattedDistance {
+    if (distance < 1) {
+      return '${(distance * 1000).round()} m';
+    }
+    return '${distance.toStringAsFixed(1)} km';
   }
 }
 
@@ -398,21 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   bool _isSearching = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadNearbyPharmacies();
-    
-    // Listen to search focus changes
-    _searchFocusNode.addListener(() {
-      if (!_searchFocusNode.hasFocus && _homeSearchController.text.isEmpty) {
-        setState(() {
-          _isSearching = false;
-          _searchResults = [];
-        });
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -421,30 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _loadNearbyPharmacies() {
-    final mockUser = User(
-      userId: 1,
-      name: widget.userName,
-      email: 'user@example.com',
-      phone: '+213555123456',
-      password: '',
-      gender: 'M',
-      dob: '1990-01-01',
-      latitude: 36.7538,
-      longitude: 3.0588,
-      premium: 'no',
-    );
-
-    final nearbyPharmacies = _pharmacyController.getNearestPharmacies(
-      user: mockUser,
-      limit: 4,
-    );
-
-    setState(() {
-      _nearbyPharmacies = nearbyPharmacies;
-      _isLoading = false;
-    });
-  }
+  
 
   void _performHomeSearch(String query) {
     setState(() {
@@ -467,13 +135,42 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchFocusNode.unfocus();
   }
 
+  // FIXED: Simple Image.asset for local images
+  Widget _buildPharmacyImage(String? imageUrl) {
+    // Default fallback image if no URL provided
+    final assetPath = imageUrl ?? 'assets/images/ph1.jpg';
+    
+    return Image.asset(
+      assetPath,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: 100,
+      errorBuilder: (context, error, stackTrace) {
+        print('❌ Error loading image: $assetPath');
+        return _buildFallbackIcon();
+      },
+    );
+  }
+
+  Widget _buildFallbackIcon() {
+    return Container(
+      color: AppColors.lightBlue.withOpacity(0.3),
+      child: Center(
+        child: Icon(
+          Icons.local_pharmacy,
+          size: 50,
+          color: AppColors.primary,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: GestureDetector(
         onTap: () {
-          // Unfocus search when tapping outside
           _searchFocusNode.unfocus();
         },
         child: Column(
@@ -545,13 +242,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightBlue.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ],
@@ -621,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Main Content - Search Results or Normal Home Content
+            // Main Content
             Expanded(
               child: _isSearching
                   ? _buildSearchResults()
@@ -633,7 +323,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Search Results View
   Widget _buildSearchResults() {
     return Container(
       color: Colors.grey[50],
@@ -686,70 +375,73 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            // Pharmacy Name
-            Text(
-              pharmacy.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.darkBlue,
+            // Pharmacy Image in Search Results
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: AppColors.lightBlue.withOpacity(0.3),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _buildPharmacyImage(pharmacy.imageUrl),
+              ),
             ),
-            const SizedBox(height: 12),
-
-            // Rating
-            Row(
-              children: [
-                const Icon(Icons.star, color: Colors.amber, size: 18),
-                const SizedBox(width: 4),
-                Text(
-                  pharmacy.rating.toStringAsFixed(1),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.darkBlue,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Pharmacy Name
+                  Text(
+                    pharmacy.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkBlue,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-            // Phone
-            Row(
-              children: [
-                Icon(Icons.phone_outlined, color: AppColors.primary, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  pharmacy.phone,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
+                  // Rating
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        pharmacy.rating.toStringAsFixed(1),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.darkBlue,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+                  const SizedBox(height: 4),
 
-            // Opening Hours
-            Row(
-              children: [
-                Icon(Icons.access_time,
-                    color: AppColors.darkBlue.withOpacity(0.6), size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  pharmacy.openingHours,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.darkBlue.withOpacity(0.6),
+                  // Phone
+                  Row(
+                    children: [
+                      Icon(Icons.phone_outlined, color: AppColors.primary, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        pharmacy.phone,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -757,7 +449,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Normal Home Content
   Widget _buildHomeContent(AppLocalizations loc) {
     return SingleChildScrollView(
       child: Padding(
@@ -923,19 +614,16 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Pharmacy Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 height: 100,
                 width: double.infinity,
-                color: AppColors.lightBlue.withOpacity(0.3),
-                child: Center(
-                  child: Icon(
-                    Icons.local_pharmacy,
-                    size: 50,
-                    color: AppColors.primary,
-                  ),
+                decoration: BoxDecoration(
+                  color: AppColors.lightBlue.withOpacity(0.3),
                 ),
+                child: _buildPharmacyImage(pharmacy.imageUrl),
               ),
             ),
             const SizedBox(height: 12),
@@ -999,37 +687,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// Placeholder Screens
-class CalendarScreen extends StatelessWidget {
-  const CalendarScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Center(
-      child: Text(
-        loc.calendarScreen,
-        style: TextStyle(fontSize: 24, color: AppColors.primary),
-      ),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Center(
-      child: Text(
-        loc.profileScreen,
-        style: TextStyle(fontSize: 24, color: AppColors.primary),
       ),
     );
   }
