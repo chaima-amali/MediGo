@@ -950,4 +950,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String howManyTimesOnDay(String day) {
     return ' Combien de fois par jour ?';
   }
+
+  @override
+  String get invalidQuantity =>
+      'Veuillez entrer une quantité valide (au moins 1)';
 }

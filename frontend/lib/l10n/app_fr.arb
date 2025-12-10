@@ -293,5 +293,6 @@
   "medicine_calendar": "Calendrier des médicaments",
   "view_report": "Voir le rapport",
   "no_medicine_records_for_this_date": "Aucun enregistrement de médicament pour cette date",
-  "howManyTimesOnDay": " Combien de fois par jour ?"
+  "howManyTimesOnDay": " Combien de fois par jour ?",
+  "invalidQuantity": "Veuillez entrer une quantité valide (au moins 1)"
 }

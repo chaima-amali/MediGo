@@ -3,11 +3,13 @@ import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 
-class ReservationFormScreen extends StatefulWidget {
-  final String pharmacyId;
-  final String pharmacyName;
+import 'package:frontend/data/models/pharmacy.dart';
 
-  ReservationFormScreen({required this.pharmacyId, required this.pharmacyName});
+class ReservationFormScreen extends StatefulWidget {
+  final Pharmacy pharmacy;
+  final String medicineName;
+
+  ReservationFormScreen({required this.pharmacy, required this.medicineName});
 
   @override
   _ReservationFormScreenState createState() => _ReservationFormScreenState();
@@ -15,10 +17,34 @@ class ReservationFormScreen extends StatefulWidget {
 
 class _ReservationFormScreenState extends State<ReservationFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  String medicineName = 'Aspirin';
   int quantity = 1;
   DateTime? pickupDate;
   TimeOfDay? pickupTime;
+  int? openHour;
+  int? closeHour;
+  @override
+  void initState() {
+    super.initState();
+    // Parse openingHours string, e.g. "8:00 AM - 9:00 PM"
+    final hours = widget.pharmacy.openingHours.split('-');
+    if (hours.length == 2) {
+      openHour = _parseHour(hours[0]);
+      closeHour = _parseHour(hours[1]);
+    }
+  }
+
+  int? _parseHour(String timeStr) {
+    final time = timeStr.trim();
+    final match = RegExp(r'(\d{1,2}):(\d{2})\s*(AM|PM)').firstMatch(time);
+    if (match != null) {
+      int hour = int.parse(match.group(1)!);
+      final ampm = match.group(3);
+      if (ampm == 'PM' && hour != 12) hour += 12;
+      if (ampm == 'AM' && hour == 12) hour = 0;
+      return hour;
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,11 +100,11 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.pharmacyName,
+                          widget.pharmacy.name,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         Text(
-                          'Rue de Didouch, Alger',
+                          widget.pharmacy.openingHours,
                           style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
@@ -96,10 +122,11 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
               ),
               SizedBox(height: 8),
               TextFormField(
-                initialValue: medicineName,
+                initialValue: widget.medicineName,
+                enabled: false,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -118,6 +145,19 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
               TextFormField(
                 initialValue: '1',
                 keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return AppLocalizations.of(context)!.enterQuantity;
+                  }
+                  final qty = int.tryParse(value);
+                  if (qty == null || qty < 1) {
+                    return AppLocalizations.of(context)!.invalidQuantity;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  quantity = int.tryParse(value) ?? 1;
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -257,11 +297,11 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'Mon-Sat: 8:00 AM - 9:00 PM',
+                      widget.pharmacy.openingHours,
                       style: TextStyle(fontSize: 12),
                     ),
                     Text(
-                      'Please select a pickup time during pharmacy hours',
+                      AppLocalizations.of(context)!.pickupTimeDuringHours,
                       style: TextStyle(fontSize: 10, color: Colors.grey),
                     ),
                   ],
@@ -276,13 +316,42 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
+                    if (pickupDate == null || pickupTime == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(context)!.selectDateAndTime,
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+                    // Validate pickup time within working hours
+                    final hour = pickupTime!.hour;
+                    if (openHour != null &&
+                        closeHour != null &&
+                        (hour < openHour! || hour >= closeHour!)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(context)!.pickupTimeDuringHours,
+                          ),
+                        ),
+                      );
+                      return;
+                    }
                     // Show success dialog
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text('Reservation Confirmed!'),
+                        title: Text(
+                          AppLocalizations.of(context)!.reservationConfirmed,
+                        ),
                         content: Text(
-                          'Your medicine has been reserved successfully.',
+                          AppLocalizations.of(context)!.readyForPickupMessage,
                         ),
                         actions: [
                           TextButton(
@@ -290,7 +359,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                               Navigator.pop(context);
                               Navigator.pop(context);
                             },
-                            child: Text('OK'),
+                            child: Text(AppLocalizations.of(context)!.ok),
                           ),
                         ],
                       ),

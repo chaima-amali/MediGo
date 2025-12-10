@@ -302,6 +302,7 @@
   "view_report": "View Report",
   "no_medicine_records_for_this_date": "No medicine records for this date",
   "howManyTimesOnDay": "How many times on {day}?",
+  "invalidQuantity": "Please enter a valid quantity (at least 1)",
   "@howManyTimesOnDay": {
     "placeholders": {
       "day": {

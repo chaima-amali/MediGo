@@ -933,4 +933,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String howManyTimesOnDay(String day) {
     return ' كم مرة في اليوم؟';
   }
+
+  @override
+  String get invalidQuantity => 'يرجى إدخال كمية صحيحة (على الأقل 1)';
 }

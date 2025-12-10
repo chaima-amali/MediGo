@@ -941,4 +941,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String howManyTimesOnDay(String day) {
     return 'How many times on $day?';
   }
+
+  @override
+  String get invalidQuantity => 'Please enter a valid quantity (at least 1)';
 }

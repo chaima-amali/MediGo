@@ -1857,6 +1857,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How many times on {day}?'**
   String howManyTimesOnDay(String day);
+
+  /// No description provided for @invalidQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid quantity (at least 1)'**
+  String get invalidQuantity;
 }
 
 class _AppLocalizationsDelegate
