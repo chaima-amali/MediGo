@@ -96,18 +96,20 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                       ),
                     ),
                     SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.pharmacy.name,
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          widget.pharmacy.openingHours,
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.pharmacy.name,
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            AppLocalizations.of(context)!.location,
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

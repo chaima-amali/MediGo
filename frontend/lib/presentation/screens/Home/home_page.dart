@@ -8,7 +8,6 @@ import 'package:frontend/presentation/services/navigation_helper.dart'
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/Bottom_Navbar.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/Search/Search_results_page.dart';
 import 'package:frontend/presentation/screens/Search/search.dart'
     as medicine_search;
 import '../notifications.dart' as notif_page;
@@ -129,6 +128,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   Row(
                     children: [
+                      Image.asset(
+                        'assets/images/logo.png',
+                        height: 32,
+                        width: 32,
+                      ),
+                      const SizedBox(width: 8),
                       Text(
                         'MediGo',
                         style: TextStyle(
@@ -136,12 +141,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.local_hospital,
-                        color: AppColors.primary,
-                        size: 24,
                       ),
                     ],
                   ),
@@ -795,17 +794,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           loc.medicineReminder,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         Text(
                           loc.reminderDescription,
-                          style: TextStyle(fontSize: 12, color: Colors.white),
+                          style: TextStyle(fontSize: 11, color: Colors.white),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
@@ -815,29 +816,33 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 8,
+                              horizontal: 20,
+                              vertical: 6,
                             ),
                           ),
                           child: Text(
                             loc.startNow,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
-                      Icons.medical_services,
-                      size: 50,
+                    child: Icon(
+                      Icons.medication_rounded,
                       color: Colors.white,
+                      size: 35,
                     ),
                   ),
                 ],
@@ -942,13 +947,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 100,
                 width: double.infinity,
                 color: AppColors.lightBlue.withOpacity(0.3),
-                child: Center(
-                  child: Icon(
-                    Icons.local_pharmacy,
-                    size: 50,
-                    color: AppColors.primary,
-                  ),
-                ),
+                child:
+                    (pharmacy.imageUrl != null && pharmacy.imageUrl!.isNotEmpty)
+                    ? Image.network(
+                        pharmacy.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Icon(
+                              Icons.local_pharmacy,
+                              size: 50,
+                              color: AppColors.primary,
+                            ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Icon(
+                          Icons.local_pharmacy,
+                          size: 50,
+                          color: AppColors.primary,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: 12),
