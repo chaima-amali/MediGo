@@ -103,6 +103,9 @@
   "billedAnnually": "Facturé annuellement",
   "yearly": "Annuel",
   "monthly": "Mensuel",
+  "premiumFeature": "Fonctionnalité Premium",
+  "premiumFeatureMessage": "La pré-commande et la réservation sont une fonctionnalité premium. Passez à Premium pour déverrouiller cette fonctionnalité et profiter d'une expérience sans publicité avec des alertes de réapprovisionnement instantanées.",
+  "later": "Plus tard",
   "billedMonthly": "Facturé mensuellement",
   "perMonth": "/mois",
   "perYear": "par an",
@@ -290,5 +293,6 @@
   "medicine_calendar": "Calendrier des médicaments",
   "view_report": "Voir le rapport",
   "no_medicine_records_for_this_date": "Aucun enregistrement de médicament pour cette date",
-  "howManyTimesOnDay": " Combien de fois par jour ?"
+  "howManyTimesOnDay": " Combien de fois par jour ?",
+  "invalidQuantity": "Veuillez entrer une quantité valide (au moins 1)"
 }

@@ -108,6 +108,9 @@
   "billedAnnually": "Billed annually",
   "yearly": "Yearly", 
   "monthly": "Monthly",
+  "premiumFeature": "Premium Feature",
+  "premiumFeatureMessage": "Pre-order and reservation is a premium feature. Upgrade to Premium to unlock this feature and enjoy an ad-free experience with instant restock alerts.",
+  "later": "Later",
   "billedMonthly": "Billed monthly",
   "perMonth": "/month",
   "perYear": "per year",   
@@ -299,6 +302,7 @@
   "view_report": "View Report",
   "no_medicine_records_for_this_date": "No medicine records for this date",
   "howManyTimesOnDay": "How many times on {day}?",
+  "invalidQuantity": "Please enter a valid quantity (at least 1)",
   "@howManyTimesOnDay": {
     "placeholders": {
       "day": {

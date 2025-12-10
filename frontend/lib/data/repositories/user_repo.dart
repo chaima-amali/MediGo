@@ -11,12 +11,15 @@ class UserRepository {
   Future<int> insertUser(User user) async {
     final db = await _db;
     final userData = user.toMap();
-    
-    return await db.insert(
+    print('💾 Inserting user data: $userData');
+
+    final userId = await db.insert(
       DBUserTable.table,
       userData,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    print('✅ User inserted with ID: $userId');
+    return userId;
   }
 
   // READ - Get user by ID
@@ -62,7 +65,7 @@ class UserRepository {
   Future<List<User>> getAllUsers() async {
     final db = await _db;
     final List<Map<String, dynamic>> maps = await db.query(DBUserTable.table);
-    
+
     return List.generate(maps.length, (i) {
       return User.fromMap(maps[i]);
     });
@@ -72,7 +75,7 @@ class UserRepository {
   Future<int> updateUser(User user) async {
     final db = await _db;
     final userData = user.toMap();
-    
+
     // Try to update with all fields
     try {
       return await db.update(
@@ -98,7 +101,12 @@ class UserRepository {
   }
 
   // UPDATE - Update user location
-  Future<int> updateUserLocation(int userId, double latitude, double longitude, {String? locationName}) async {
+  Future<int> updateUserLocation(
+    int userId,
+    double latitude,
+    double longitude, {
+    String? locationName,
+  }) async {
     final db = await _db;
     final updateData = {
       'latitude': latitude,
@@ -137,11 +145,16 @@ class UserRepository {
   // CHECK - Check if email exists
   Future<bool> emailExists(String email) async {
     final db = await _db;
+    print('🔍 Checking if email exists: $email');
     final List<Map<String, dynamic>> maps = await db.query(
       DBUserTable.table,
       where: 'email = ?',
       whereArgs: [email],
     );
+    print('📊 Found ${maps.length} users with email: $email');
+    if (maps.isNotEmpty) {
+      print('👤 Existing user data: ${maps.first}');
+    }
     return maps.isNotEmpty;
   }
 
@@ -159,13 +172,19 @@ class UserRepository {
   // AUTHENTICATION - Verify user credentials
   Future<User?> authenticateUser(String email, String password) async {
     final db = await _db;
+    print('🔐 Authenticating: email=$email, password=$password');
     final List<Map<String, dynamic>> maps = await db.query(
       DBUserTable.table,
       where: 'email = ? AND password = ?',
       whereArgs: [email, password],
     );
+    print('📊 Authentication query returned ${maps.length} results');
 
-    if (maps.isEmpty) return null;
+    if (maps.isEmpty) {
+      print('❌ No user found with provided credentials');
+      return null;
+    }
+    print('✅ Authentication successful');
     return User.fromMap(maps.first);
   }
 
@@ -177,7 +196,7 @@ class UserRepository {
       where: 'premium = ?',
       whereArgs: ['true'],
     );
-    
+
     return List.generate(maps.length, (i) {
       return User.fromMap(maps[i]);
     });
@@ -186,7 +205,9 @@ class UserRepository {
   // UTILITY - Count total users
   Future<int> getUserCount() async {
     final db = await _db;
-    final result = await db.rawQuery('SELECT COUNT(*) FROM ${DBUserTable.table}');
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) FROM ${DBUserTable.table}',
+    );
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
