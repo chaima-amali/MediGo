@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/logic/cubits/medicine_search_cubit.dart';
 import 'package:frontend/data/models/user.dart';
@@ -545,12 +546,24 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     // Navigate to reservation form
+    // Create pharmacy object with safe defaults
+    final pharmacy = Pharmacy(
+      pharmacyId: result['pharmacy_id'] as int?,
+      name: result['pharmacy_name'] as String? ?? 'Unknown Pharmacy',
+      latitude: (result['latitude'] as num?)?.toDouble(),
+      longitude: (result['longitude'] as num?)?.toDouble(),
+      phone:
+          result['phone_number'] as String? ?? result['phone'] as String? ?? '',
+      openingHours: result['opening_hours'] as String? ?? '8:00 AM - 9:00 PM',
+      rating: (result['rating'] as num?)?.toDouble() ?? 0.0,
+    );
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ReservationFormScreen(
-          pharmacyId: result['pharmacy_id'].toString(),
-          pharmacyName: result['pharmacy_name'] ?? '',
+          pharmacy: pharmacy,
+          medicineName: result['medicine_name'] ?? '',
         ),
       ),
     );
