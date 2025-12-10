@@ -325,6 +325,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get monthly => 'شهري';
 
   @override
+  String get premiumFeature => 'ميزة مميزة';
+
+  @override
+  String get premiumFeatureMessage =>
+      'الطلب المسبق والحجز هو ميزة مميزة. قم بالترقية إلى بريميوم لفتح هذه الميزة والاستمتاع بتجربة خالية من الإعلانات مع تنبيهات إعادة التخزين الفورية.';
+
+  @override
+  String get later => 'لاحقاً';
+
+  @override
   String get billedMonthly => 'يتم إصدار الفاتورة شهرياً';
 
   @override
@@ -923,4 +933,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String howManyTimesOnDay(String day) {
     return ' كم مرة في اليوم؟';
   }
+
+  @override
+  String get invalidQuantity => 'يرجى إدخال كمية صحيحة (على الأقل 1)';
 }

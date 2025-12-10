@@ -329,6 +329,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get monthly => 'Mensuel';
 
   @override
+  String get premiumFeature => 'Fonctionnalité Premium';
+
+  @override
+  String get premiumFeatureMessage =>
+      'La pré-commande et la réservation sont une fonctionnalité premium. Passez à Premium pour déverrouiller cette fonctionnalité et profiter d\'une expérience sans publicité avec des alertes de réapprovisionnement instantanées.';
+
+  @override
+  String get later => 'Plus tard';
+
+  @override
   String get billedMonthly => 'Facturé mensuellement';
 
   @override
@@ -940,4 +950,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String howManyTimesOnDay(String day) {
     return ' Combien de fois par jour ?';
   }
+
+  @override
+  String get invalidQuantity =>
+      'Veuillez entrer une quantité valide (au moins 1)';
 }

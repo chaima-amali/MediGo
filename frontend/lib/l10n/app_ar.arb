@@ -103,6 +103,9 @@
   "billedAnnually": "يتم إصدار الفاتورة سنوياً",
   "yearly": "سنوي",
   "monthly": "شهري",
+  "premiumFeature": "ميزة مميزة",
+  "premiumFeatureMessage": "الطلب المسبق والحجز هو ميزة مميزة. قم بالترقية إلى بريميوم لفتح هذه الميزة والاستمتاع بتجربة خالية من الإعلانات مع تنبيهات إعادة التخزين الفورية.",
+  "later": "لاحقاً",
   "billedMonthly": "يتم إصدار الفاتورة شهرياً",
   "perMonth": "/شهر",
   "perYear": "في السنة",
@@ -290,5 +293,6 @@
   "medicine_calendar": "تقويم الأدوية",
   "view_report": "عرض التقرير",
   "no_medicine_records_for_this_date": "لا توجد سجلات أدوية لهذا التاريخ",
-  "howManyTimesOnDay": " كم مرة في اليوم؟"
+  "howManyTimesOnDay": " كم مرة في اليوم؟",
+  "invalidQuantity": "يرجى إدخال كمية صحيحة (على الأقل 1)"
 }

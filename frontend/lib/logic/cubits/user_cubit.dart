@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/user_repo.dart';
 
@@ -66,33 +67,44 @@ class UserUnauthenticated extends UserState {}
 class UserCubit extends Cubit<UserState> {
   final UserRepository userRepository;
 
-  UserCubit(this.userRepository) : super(UserInitial());
+  UserCubit(this.userRepository) : super(UserInitial()) {
+    restoreSession();
+  }
 
   // Register new user
   Future<void> registerUser(User user) async {
     try {
       emit(UserLoading());
 
+      print('📝 Attempting to register user: ${user.email}');
+
       // Check if email already exists
       final emailExists = await userRepository.emailExists(user.email);
+      print('📧 Email exists check for ${user.email}: $emailExists');
       if (emailExists) {
+        print('❌ Registration failed: Email already registered');
         emit(const UserError('Email already registered'));
         return;
       }
 
       // Check if phone already exists
       final phoneExists = await userRepository.phoneExists(user.phone);
+      print('📱 Phone exists check for ${user.phone}: $phoneExists');
       if (phoneExists) {
+        print('❌ Registration failed: Phone already registered');
         emit(const UserError('Phone number already registered'));
         return;
       }
 
       // Insert user
-      await userRepository.insertUser(user);
-      
+      print('💾 Inserting user into database...');
+      final userId = await userRepository.insertUser(user);
+      print('✅ User inserted with ID: $userId');
+
       // After successful registration, load the user to set authenticated state
       final registeredUser = await userRepository.getUserByEmail(user.email);
       if (registeredUser != null) {
+        await _saveUserSession(registeredUser.userId!);
         emit(UserAuthenticated(registeredUser));
       } else {
         emit(const UserOperationSuccess('User registered successfully'));
@@ -108,13 +120,29 @@ class UserCubit extends Cubit<UserState> {
       emit(UserLoading());
 
       print('🔐 Attempting login for: $email');
+      print('🔑 Password provided: ${password.length} characters');
       final user = await userRepository.authenticateUser(email, password);
       if (user != null) {
         print('✅ Login successful: ${user.name} (ID: ${user.userId})');
         print('📍 User location: Lat=${user.latitude}, Lon=${user.longitude}');
+        await _saveUserSession(user.userId!);
         emit(UserAuthenticated(user));
       } else {
         print('❌ Login failed: Invalid credentials');
+        print('🔍 Checking if email exists...');
+        final emailExists = await userRepository.emailExists(email);
+        print('📧 Email exists: $emailExists');
+        if (emailExists) {
+          // Email exists but password wrong
+          final userByEmail = await userRepository.getUserByEmail(email);
+          if (userByEmail != null) {
+            print(
+              '👤 User found with email, stored password: ${userByEmail.password}',
+            );
+            print('🔐 Provided password: $password');
+            print('❓ Passwords match: ${userByEmail.password == password}');
+          }
+        }
         emit(const UserError('Invalid email or password'));
       }
     } catch (e) {
@@ -188,12 +216,24 @@ class UserCubit extends Cubit<UserState> {
   }
 
   // Update user location
-  Future<void> updateUserLocation(int userId, double latitude, double longitude, {String? locationName}) async {
+  Future<void> updateUserLocation(
+    int userId,
+    double latitude,
+    double longitude, {
+    String? locationName,
+  }) async {
     try {
       emit(UserLoading());
 
-      print('🔄 Updating location for user $userId: ($latitude, $longitude) - $locationName');
-      final result = await userRepository.updateUserLocation(userId, latitude, longitude, locationName: locationName);
+      print(
+        '🔄 Updating location for user $userId: ($latitude, $longitude) - $locationName',
+      );
+      final result = await userRepository.updateUserLocation(
+        userId,
+        latitude,
+        longitude,
+        locationName: locationName,
+      );
       print('💾 Update result: $result rows affected');
       if (result > 0) {
         print('✅ Location updated successfully');
@@ -201,7 +241,9 @@ class UserCubit extends Cubit<UserState> {
         // Reload user
         final user = await userRepository.getUserById(userId);
         if (user != null) {
-          print('👤 User reloaded: Lat=${user.latitude}, Lon=${user.longitude}');
+          print(
+            '👤 User reloaded: Lat=${user.latitude}, Lon=${user.longitude}',
+          );
           emit(UserLoaded(user));
         }
       } else {
@@ -220,11 +262,14 @@ class UserCubit extends Cubit<UserState> {
 
       final result = await userRepository.updateUserPremium(userId, premium);
       if (result > 0) {
-        emit(const UserOperationSuccess('Premium status updated successfully'));
         // Reload user
         final user = await userRepository.getUserById(userId);
         if (user != null) {
-          emit(UserLoaded(user));
+          emit(
+            UserAuthenticated(user),
+          ); // Keep user authenticated after premium upgrade
+        } else {
+          emit(const UserError('Failed to reload user after premium update'));
         }
       } else {
         emit(const UserError('Failed to update premium status'));
@@ -251,7 +296,8 @@ class UserCubit extends Cubit<UserState> {
   }
 
   // Logout user
-  void logoutUser() {
+  Future<void> logoutUser() async {
+    await _clearUserSession();
     emit(UserUnauthenticated());
   }
 
@@ -294,6 +340,62 @@ class UserCubit extends Cubit<UserState> {
     } catch (e) {
       emit(UserError('Failed to get user count: $e'));
       return 0;
+    }
+  }
+
+  // SESSION MANAGEMENT
+
+  // Save user session
+  Future<void> _saveUserSession(int userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('user_id', userId);
+      await prefs.setBool('is_logged_in', true);
+      print('💾 User session saved: userId=$userId');
+    } catch (e) {
+      print('❌ Failed to save user session: $e');
+    }
+  }
+
+  // Clear user session
+  Future<void> _clearUserSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('user_id');
+      await prefs.setBool('is_logged_in', false);
+      print('🗑️ User session cleared');
+    } catch (e) {
+      print('❌ Failed to clear user session: $e');
+    }
+  }
+
+  // Restore user session on app start
+  Future<void> restoreSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+      final userId = prefs.getInt('user_id');
+
+      print('🔄 Restoring session: isLoggedIn=$isLoggedIn, userId=$userId');
+
+      if (isLoggedIn && userId != null) {
+        print('📂 Loading user from database...');
+        final user = await userRepository.getUserById(userId);
+        if (user != null) {
+          print('✅ Session restored for: ${user.name}');
+          emit(UserAuthenticated(user));
+        } else {
+          print('⚠️ User not found in database, clearing session');
+          await _clearUserSession();
+          emit(UserUnauthenticated());
+        }
+      } else {
+        print('ℹ️ No active session found');
+        emit(UserUnauthenticated());
+      }
+    } catch (e) {
+      print('❌ Failed to restore session: $e');
+      emit(UserUnauthenticated());
     }
   }
 }

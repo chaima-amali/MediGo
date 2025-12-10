@@ -1,120 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/data/models/pharmacy.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
+import 'package:frontend/logic/cubits/medicine_search_cubit.dart';
+import 'package:frontend/data/models/user.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
+import 'package:frontend/services/location_service.dart';
+import 'package:frontend/data/repositories/medicine_search_history_repo.dart';
+import 'package:frontend/data/repositories/medicine_find_repo.dart';
 import '../notifications.dart' as notif_page;
 import 'pharmacy_details_screen.dart';
 import '../Reservations/reservations_form.dart';
-
-// App Colors
-class AppColors {
-  static const Color primary = Color(0xFF4ECDC4);
-  static const Color lightBlue = Color(0xFFB8F3F0);
-  static const Color pink = Color(0xFFFFB6C1);
-  static const Color background = Color(0xFFF8F9FA);
-  static const Color textDark = Color(0xFF2D3436);
-  static const Color textLight = Color(0xFF636E72);
-  static const Color green = Color(0xFF90EE90);
-  static const Color red = Color(0xFFFFB6C1);
-}
-
-// Mock Database
-class MockDatabase {
-  static List<Map<String, dynamic>> _getAllInventory() {
-    return [
-      {
-        "inventory_id": "inv_001",
-        "pharmacy_id": "pharm_002",
-        "medicine_id": "med_001",
-        "in_stock": true,
-        "quantity": 150,
-        "price": 250.00,
-      },
-      {
-        "inventory_id": "inv_002",
-        "pharmacy_id": "pharm_002",
-        "medicine_id": "med_002",
-        "in_stock": false,
-        "quantity": 0,
-        "price": 450.00,
-      },
-      {
-        "inventory_id": "inv_003",
-        "pharmacy_id": "pharm_001",
-        "medicine_id": "med_001",
-        "in_stock": true,
-        "quantity": 80,
-        "price": 240.00,
-      },
-    ];
-  }
-
-  static List<Map<String, dynamic>> _getAllMedicines() {
-    return [
-      {
-        "medicine_id": "med_001",
-        "name": "Aspirin",
-        "description": "Pain reliever and fever reducer",
-      },
-      {
-        "medicine_id": "med_002",
-        "name": "Ibuprofen",
-        "description": "Anti-inflammatory drug",
-      },
-    ];
-  }
-
-  static List<Map<String, dynamic>> _getAllPharmacies() {
-    return [
-      {
-        "pharmacy_id": "pharm_001",
-        "name": "HealthPlus Pharmacy",
-        "address": "Rue de didouche",
-        "distance": "0.5 km",
-        "phone": "(+231)782758436",
-      },
-      {
-        "pharmacy_id": "pharm_002",
-        "name": "HealthPlus Pharmacy",
-        "address": "Rue de didouche",
-        "distance": "0.5 km",
-        "phone": "(+231)782758436",
-      },
-    ];
-  }
-
-  static List<Map<String, dynamic>> searchMedicine(String query) {
-    if (query.isEmpty) return [];
-
-    final inventory = _getAllInventory();
-    final medicines = _getAllMedicines();
-    final pharmacies = _getAllPharmacies();
-
-    List<Map<String, dynamic>> results = [];
-
-    for (var med in medicines) {
-      if (med['name'].toString().toLowerCase().contains(query.toLowerCase())) {
-        for (var inv in inventory) {
-          if (inv['medicine_id'] == med['medicine_id']) {
-            var pharmacy = pharmacies.firstWhere(
-              (p) => p['pharmacy_id'] == inv['pharmacy_id'],
-            );
-
-            results.add({
-              'medicine_name': med['name'],
-              'pharmacy_id': pharmacy['pharmacy_id'],
-              'pharmacy_name': pharmacy['name'],
-              'address': pharmacy['address'],
-              'distance': pharmacy['distance'],
-              'phone': pharmacy['phone'],
-              'in_stock': inv['in_stock'],
-              'price': inv['price'],
-            });
-          }
-        }
-      }
-    }
-
-    return results;
-  }
-}
+import '../Profile/subscription_page.dart';
 
 // Search Screen
 class SearchScreen extends StatefulWidget {
@@ -126,12 +24,13 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> _searchResults = [];
 
   void _performSearch(String query) {
-    setState(() {
-      _searchResults = MockDatabase.searchMedicine(query);
-    });
+    if (query.trim().isEmpty) {
+      context.read<MedicineSearchCubit>().clearSearch();
+    } else {
+      context.read<MedicineSearchCubit>().searchMedicine(query);
+    }
   }
 
   @override
@@ -179,22 +78,22 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightBlue.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const notif_page.NotificationsPage(),
-                            ),
-                          );
-                        },
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const notif_page.NotificationsPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.lightBlue.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Stack(
                           children: [
                             Icon(
@@ -223,12 +122,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 const SizedBox(height: 30),
 
                 // Title
-                const Text(
-                  'Find your medicine',
+                Text(
+                  AppLocalizations.of(context)!.searchMedicines,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                    color: AppColors.darkBlue,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -257,10 +156,12 @@ class _SearchScreenState extends State<SearchScreen> {
                           controller: _searchController,
                           onChanged: _performSearch,
                           decoration: InputDecoration(
-                            hintText: 'Aspirin',
+                            hintText: AppLocalizations.of(
+                              context,
+                            )!.searchMedicinePrompt,
                             hintStyle: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 16,
+                              color: const Color.fromARGB(255, 161, 161, 161),
+                              fontSize: 13,
                             ),
                             border: InputBorder.none,
                           ),
@@ -273,25 +174,130 @@ class _SearchScreenState extends State<SearchScreen> {
 
                 // Search Results
                 Expanded(
-                  child: _searchResults.isEmpty
-                      ? Center(
-                          child: Text(
-                            _searchController.text.isEmpty
-                                ? ''
-                                : 'No results found',
-                            style: TextStyle(
-                              color: AppColors.textLight,
-                              fontSize: 16,
+                  child: BlocBuilder<MedicineSearchCubit, MedicineSearchState>(
+                    builder: (context, state) {
+                      if (state is MedicineSearchInitial) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.medication_outlined,
+                                size: 80,
+                                color: AppColors.darkBlue.withOpacity(0.3),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.searchMedicinesDescription,
+                                style: TextStyle(
+                                  color: AppColors.darkBlue.withOpacity(0.6),
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (state is MedicineSearchLoading) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        );
+                      }
+
+                      if (state is MedicineSearchEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.inventory_2_outlined,
+                                  size: 80,
+                                  color: AppColors.darkBlue.withOpacity(0.3),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  state.message,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: AppColors.darkBlue.withOpacity(0.6),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  'Get notified when "${state.searchQuery}" is back in stock',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: AppColors.darkBlue,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton.icon(
+                                  onPressed: () => _handleRestockNotification(
+                                    context,
+                                    state.searchQuery,
+                                  ),
+                                  icon: const Icon(Icons.notifications_active),
+                                  label: const Text('Notify Me'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.premiumOrange,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        )
-                      : ListView.builder(
-                          itemCount: _searchResults.length,
-                          itemBuilder: (context, index) {
-                            final result = _searchResults[index];
-                            return _buildPharmacyCard(result);
-                          },
-                        ),
+                        );
+                      }
+
+                      if (state is MedicineSearchError) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.error_outline,
+                                size: 80,
+                                color: Colors.red.withOpacity(0.5),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                state.error,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (state is MedicineSearchLoaded) {
+                        return _buildSearchResults(context, state.results);
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ),
               ],
             ),
@@ -301,7 +307,51 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildPharmacyCard(Map<String, dynamic> data) {
+  Widget _buildSearchResults(
+    BuildContext context,
+    List<Map<String, dynamic>> results,
+  ) {
+    // Get user location for distance calculation
+    User? currentUser;
+    final userState = context.watch<UserCubit>().state;
+    if (userState is UserAuthenticated) {
+      currentUser = userState.user;
+    } else if (userState is UserLoaded) {
+      currentUser = userState.user;
+    }
+
+    return ListView.builder(
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        final result = results[index];
+
+        // Calculate distance if user has location
+        double? distance;
+        if (currentUser != null &&
+            currentUser.latitude != null &&
+            currentUser.longitude != null &&
+            result['latitude'] != null &&
+            result['longitude'] != null) {
+          distance = LocationService.calculateDistance(
+            currentUser.latitude!,
+            currentUser.longitude!,
+            result['latitude'],
+            result['longitude'],
+          );
+        }
+
+        return _buildPharmacyCard(context, result, distance);
+      },
+    );
+  }
+
+  Widget _buildPharmacyCard(
+    BuildContext context,
+    Map<String, dynamic> result,
+    double? distance,
+  ) {
+    final inStock = (result['stock'] as int) > 0;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -319,17 +369,29 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Pharmacy Name and Stock Status
+          // Medicine Name
+          Text(
+            result['medicine_name'] ?? '',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Pharmacy Name
           GestureDetector(
             onTap: () {
-              // Open pharmacy detail page when the card header is tapped
-              final pid = data['pharmacy_id'] ?? '';
               final pharmacyMap = {
-                'pharmacy_id': pid,
-                'name': data['pharmacy_name'],
-                'address': data['address'],
-                'distance_km': data['distance'],
-                'phone_number': data['phone'],
+                'pharmacy_id': result['pharmacy_id'],
+                'name': result['pharmacy_name'],
+                'latitude': result['latitude'],
+                'longitude': result['longitude'],
+                'phone': result['phone'],
+                'opening_hours': result['opening_hours'],
+                'rating': result['rating'],
+                if (distance != null) 'distance_km': distance,
               };
               Navigator.push(
                 context,
@@ -342,37 +404,14 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    data['pharmacy_name'] ?? '',
+                    result['pharmacy_name'] ?? '',
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AppColors.darkBlue,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: data['in_stock']
-                        ? AppColors.green.withOpacity(0.3)
-                        : AppColors.red.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    data['in_stock'] ? 'In stock' : 'Out of stock',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: data['in_stock']
-                          ? Colors.green[700]
-                          : Colors.red[700],
-                    ),
                   ),
                 ),
               ],
@@ -380,81 +419,382 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Address
-          Row(
-            children: [
-              Icon(
-                Icons.location_on_outlined,
-                color: AppColors.textLight,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${data['distance']} ${data['address']}',
-                style: TextStyle(fontSize: 13, color: AppColors.textLight),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
+          // Distance
+          if (distance != null)
+            Row(
+              children: [
+                Icon(Icons.navigation, color: AppColors.primary, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  LocationService.formatDistance(distance),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.darkBlue.withOpacity(0.6),
+                  ),
+                ),
+              ],
+            ),
+          if (distance != null) const SizedBox(height: 8),
 
-          // Phone
+          // Stock Status and Price
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.phone_outlined, color: AppColors.primary, size: 18),
-              const SizedBox(width: 8),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: inStock
+                          ? AppColors.inStock.withOpacity(0.1)
+                          : AppColors.outOfStock.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      inStock
+                          ? AppLocalizations.of(context)!.inStock
+                          : AppLocalizations.of(context)!.outOfStock,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: inStock
+                            ? AppColors.inStock
+                            : AppColors.outOfStock,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  if (inStock) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '${result['stock']} ${AppLocalizations.of(context)!.inStock.toLowerCase()}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.darkBlue.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
               Text(
-                data['phone'],
+                '${result['price']} DZD',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                   color: AppColors.primary,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 12),
 
-          // Pre Order Button (only if in stock)
-          if (data['in_stock']) ...[
-            const SizedBox(height: 16),
+          // Pre-Order Button
+          if (inStock)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Open reservation form for this pharmacy
-                  final pid = data['pharmacy_id'] ?? '';
-                  final pname = data['pharmacy_name'] ?? '';
-                  if (pid.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Pharmacy id missing')),
-                    );
-                    return;
-                  }
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ReservationFormScreen(
-                        pharmacyId: pid,
-                        pharmacyName: pname,
-                      ),
-                    ),
-                  );
-                },
+                onPressed: () => _handlePreOrder(context, result),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.lightBlue,
-                  foregroundColor: AppColors.primary,
-                  elevation: 0,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text(
-                  'Pre Order',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                child: Text(
+                  AppLocalizations.of(context)!.preOrder,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _handlePreOrder(BuildContext context, Map<String, dynamic> result) {
+    // Check if user is premium
+    final userState = context.read<UserCubit>().state;
+    User? currentUser;
+
+    if (userState is UserAuthenticated) {
+      currentUser = userState.user;
+    } else if (userState is UserLoaded) {
+      currentUser = userState.user;
+    }
+
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.logIn),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Check premium status
+    if (currentUser.premium.toLowerCase() != 'premium') {
+      _showPremiumRequiredDialog(context);
+      return;
+    }
+
+    // Navigate to reservation form
+    // Create pharmacy object with safe defaults
+    final pharmacy = Pharmacy(
+      pharmacyId: result['pharmacy_id'] as int?,
+      name: result['pharmacy_name'] as String? ?? 'Unknown Pharmacy',
+      latitude: (result['latitude'] as num?)?.toDouble(),
+      longitude: (result['longitude'] as num?)?.toDouble(),
+      phone:
+          result['phone_number'] as String? ?? result['phone'] as String? ?? '',
+      openingHours: result['opening_hours'] as String? ?? '8:00 AM - 9:00 PM',
+      rating: (result['rating'] as num?)?.toDouble() ?? 0.0,
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ReservationFormScreen(
+          pharmacy: pharmacy,
+          medicineName: result['medicine_name'] ?? '',
+        ),
+      ),
+    );
+  }
+
+  void _showPremiumRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.workspace_premium, color: AppColors.premiumOrange),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.premiumFeature,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.darkBlue,
                 ),
               ),
             ),
           ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.premiumFeatureMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: AppColors.darkBlue),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SubscriptionPage()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.premiumOrange,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              AppLocalizations.of(context)!.upgradeToPremium,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Handle restock notification request
+  void _handleRestockNotification(
+    BuildContext context,
+    String medicineName,
+  ) async {
+    // Check if user is logged in
+    final userState = context.read<UserCubit>().state;
+    User? currentUser;
+
+    if (userState is UserAuthenticated) {
+      currentUser = userState.user;
+    } else if (userState is UserLoaded) {
+      currentUser = userState.user;
+    }
+
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.logIn),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Check premium status
+    if (currentUser.premium.toLowerCase() != 'premium') {
+      _showPremiumRequiredForNotification(context);
+      return;
+    }
+
+    // User is premium - save restock notification
+    try {
+      // First, find the medicine by name
+      final medicineFindRepo = MedicineFindRepository();
+      final medicines = await medicineFindRepo.searchMedicinesByName(
+        medicineName,
+      );
+
+      if (medicines.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Medicine not found in catalog'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final medicine = medicines.first;
+
+      // Save restock notification request
+      final historyRepo = MedicineSearchHistoryRepository();
+      if (medicine.medicineFindId == null) {
+        throw Exception('Medicine ID is null');
+      }
+      await historyRepo.saveSearchWithNotification(
+        userId: currentUser.userId!,
+        medicineId: medicine.medicineFindId!,
+        notifyRestock: true,
+      );
+
+      // Show success message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'You\'ll be notified when "$medicineName" is back in stock',
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.inStock,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      print('❌ Error saving restock notification: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save notification: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showPremiumRequiredForNotification(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.workspace_premium, color: AppColors.premiumOrange),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.premiumFeature,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.darkBlue,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.notifications_active,
+                size: 60,
+                color: AppColors.premiumOrange,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Restock notifications are a premium feature. Upgrade to get instant alerts when out-of-stock medicines become available!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: AppColors.darkBlue),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: const TextStyle(color: Colors.grey),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SubscriptionPage()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.premiumOrange,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              AppLocalizations.of(context)!.upgradeToPremium,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
         ],
       ),
     );
