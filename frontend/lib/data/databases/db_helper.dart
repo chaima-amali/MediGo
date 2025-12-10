@@ -48,6 +48,8 @@ class DBHelper {
         for (final sql in _tableSQL) {
           await db.execute(sql);
         }
+        // Insert initial mock data
+        await _insertMockData(db);
       },
       onOpen: (db) async {
         // Ensure any missing columns from older schemas are added so
@@ -55,6 +57,8 @@ class DBHelper {
         // on every open because ALTER TABLE ADD COLUMN is idempotent
         // when guarded by an existence check below.
         await _ensureSchema(db);
+        // Ensure mock data exists
+        await _ensureMockData(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         // Handle schema migrations here if needed in future
@@ -125,6 +129,74 @@ class DBHelper {
         await db.execute(
           'ALTER TABLE medicine_tracking ADD COLUMN medicine_track_id INTEGER',
         );
+      }
+    } catch (_) {}
+  }
+
+  // Insert mock pharmacy data near Mahelma, Algiers
+  static Future<void> _insertMockData(Database db) async {
+    // Mahelma coordinates: approximately 36.7538° N, 3.0588° E
+    final mockPharmacies = [
+      {
+        'name': 'Pharmacie Mahelma Centre',
+        'latitude': 36.7538,
+        'longitude': 3.0588,
+        'phone': '+213 23 45 67 89',
+        'opening_hours': 'Mon-Sat: 8:00 AM - 9:00 PM',
+        'rating': 4.5,
+      },
+      {
+        'name': 'Pharmacie El Harrach',
+        'latitude': 36.7450,
+        'longitude': 3.0620,
+        'phone': '+213 23 45 67 90',
+        'opening_hours': 'Mon-Sun: 8:00 AM - 10:00 PM',
+        'rating': 4.7,
+      },
+      {
+        'name': 'Pharmacie Sidi Moussa',
+        'latitude': 36.7600,
+        'longitude': 3.0500,
+        'phone': '+213 23 45 67 91',
+        'opening_hours': 'Mon-Sat: 9:00 AM - 8:00 PM',
+        'rating': 4.3,
+      },
+      {
+        'name': 'Pharmacie Bab Ezzouar',
+        'latitude': 36.7480,
+        'longitude': 3.0700,
+        'phone': '+213 23 45 67 92',
+        'opening_hours': 'Mon-Fri: 8:30 AM - 7:30 PM',
+        'rating': 4.6,
+      },
+      {
+        'name': 'Pharmacie Oued Smar',
+        'latitude': 36.7350,
+        'longitude': 3.0450,
+        'phone': '+213 23 45 67 93',
+        'opening_hours': 'Mon-Sat: 8:00 AM - 9:00 PM',
+        'rating': 4.4,
+      },
+    ];
+
+    for (final pharmacy in mockPharmacies) {
+      await db.insert(
+        DBPharmacyTable.table,
+        pharmacy,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+  }
+
+  // Ensure mock data exists (for existing databases)
+  static Future<void> _ensureMockData(Database db) async {
+    try {
+      final count = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM ${DBPharmacyTable.table}'),
+      );
+
+      if (count == null || count == 0) {
+        await _insertMockData(db);
       }
     } catch (_) {}
   }

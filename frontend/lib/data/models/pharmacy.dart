@@ -1,5 +1,5 @@
 class Pharmacy {
-  final String? pharmacyId;
+  final int? pharmacyId;
   final String name;
   final double? latitude;
   final double? longitude;
@@ -18,7 +18,7 @@ class Pharmacy {
   });
 
   Pharmacy copyWith({
-    String? pharmacyId,
+    int? pharmacyId,
     String? name,
     double? latitude,
     double? longitude,
@@ -39,7 +39,7 @@ class Pharmacy {
 
   factory Pharmacy.fromMap(Map<String, dynamic> map) {
     return Pharmacy(
-      pharmacyId: map['pharmacy_id'] as String?,
+      pharmacyId: map['pharmacy_id'] as int?,
       name: map['name'] as String,
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),

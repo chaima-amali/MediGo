@@ -8,7 +8,9 @@ import 'package:frontend/presentation/services/navigation_helper.dart'
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/Bottom_Navbar.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
-import '../Search/Search_results_page.dart';
+import 'package:frontend/presentation/screens/Search/Search_results_page.dart';
+import 'package:frontend/presentation/screens/Search/search.dart'
+    as medicine_search;
 import '../notifications.dart' as notif_page;
 import '../reminders/tracking_page.dart';
 import '../Profile/profile_page.dart';
@@ -45,9 +47,15 @@ class _MainScreenState extends State<MainScreen> {
 
         final List<Widget> screens = [
           HomeScreen(key: ValueKey(userName), userName: userName),
-          const SearchScreen(),
+          const medicine_search.SearchScreen(),
           TrackingPage(key: nav_helper.trackingPageKey),
-          const ProfilePage(),
+          ProfilePage(
+            onBackToHome: () {
+              setState(() {
+                _currentIndex = 0; // Switch to home tab
+              });
+            },
+          ),
         ];
 
         return Scaffold(
@@ -79,14 +87,17 @@ class _SearchScreenState extends State<SearchScreen> {
   final PharmacyController _pharmacyController = PharmacyController();
   List<Pharmacy> _searchResults = [];
 
-  void _performSearch(String query) {
-    setState(() {
-      if (query.trim().isEmpty) {
+  Future<void> _performSearch(String query) async {
+    if (query.trim().isEmpty) {
+      setState(() {
         _searchResults = [];
-      } else {
-        _searchResults = _pharmacyController.searchPharmacies(query);
-      }
-    });
+      });
+    } else {
+      final results = await _pharmacyController.searchPharmacies(query);
+      setState(() {
+        _searchResults = results;
+      });
+    }
   }
 
   @override
@@ -360,6 +371,16 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
+/* Old Pharmacy Search Screen - No longer used, replaced with medicine search
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+... (commented out to avoid conflicts)
+*/
+
 // Home Screen with Pharmacy Search in Search Bar
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -403,22 +424,34 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _loadNearbyPharmacies() {
-    final mockUser = User(
-      userId: 1,
-      name: widget.userName,
-      email: 'user@example.com',
-      phone: '+213555123456',
-      password: '',
-      gender: 'M',
-      dob: '1990-01-01',
-      latitude: 36.7538,
-      longitude: 3.0588,
-      premium: 'no',
-    );
+  Future<void> _loadNearbyPharmacies() async {
+    // Get actual logged-in user
+    User? currentUser;
+    final userState = context.read<UserCubit>().state;
+    if (userState is UserAuthenticated) {
+      currentUser = userState.user;
+    } else if (userState is UserLoaded) {
+      currentUser = userState.user;
+    }
 
-    final nearbyPharmacies = _pharmacyController.getNearestPharmacies(
-      user: mockUser,
+    // Use actual user or fallback to default location
+    final user =
+        currentUser ??
+        User(
+          userId: 1,
+          name: widget.userName,
+          email: 'user@example.com',
+          phone: '+213555123456',
+          password: '',
+          gender: 'M',
+          dob: '1990-01-01',
+          latitude: 36.7538,
+          longitude: 3.0588,
+          premium: 'no',
+        );
+
+    final nearbyPharmacies = await _pharmacyController.getNearestPharmacies(
+      user: user,
       limit: 4,
     );
 
@@ -428,16 +461,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _performHomeSearch(String query) {
-    setState(() {
-      if (query.trim().isEmpty) {
+  Future<void> _performHomeSearch(String query) async {
+    if (query.trim().isEmpty) {
+      setState(() {
         _searchResults = [];
         _isSearching = false;
-      } else {
-        _searchResults = _pharmacyController.searchPharmacies(query);
+      });
+    } else {
+      final results = await _pharmacyController.searchPharmacies(query);
+      setState(() {
+        _searchResults = results;
         _isSearching = true;
-      }
-    });
+      });
+    }
   }
 
   void _clearSearch() {
@@ -873,11 +909,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return GestureDetector(
       onTap: () {
+        // Pass pharmacy data with calculated distance
+        final pharmacyMap = pharmacy.toMap();
+        pharmacyMap['distance_km'] = pharmacyData.distance;
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                PharmacyDetailScreen(pharmacy: pharmacy.toMap()),
+            builder: (context) => PharmacyDetailScreen(pharmacy: pharmacyMap),
           ),
         );
       },
