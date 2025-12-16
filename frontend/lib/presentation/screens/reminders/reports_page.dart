@@ -6,7 +6,7 @@ import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
 
 class ReportsScreen extends StatefulWidget {
-  const ReportsScreen({Key? key}) : super(key: key);
+  const ReportsScreen({super.key});
 
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();

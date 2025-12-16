@@ -20,13 +20,10 @@ class EditPage extends StatefulWidget {
 class _EditPageState extends State<EditPage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: EditContent(),
-        ),
+    return const SafeArea(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+        child: EditContent(),
       ),
     );
   }
@@ -84,6 +81,10 @@ class _EditContentState extends State<EditContent> {
 
   @override
   Widget build(BuildContext context) {
+    if (_cubit == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     Widget content = SingleChildScrollView(
       child: Column(
         children: [
@@ -193,15 +194,6 @@ class _EditContentState extends State<EditContent> {
                                     GestureDetector(
                                       onTap: () async {
                                         if (occ.id == null) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Cannot update this item',
-                                              ),
-                                            ),
-                                          );
                                           return;
                                         }
 
@@ -218,22 +210,6 @@ class _EditContentState extends State<EditContent> {
                                         );
 
                                         setState(() => _taking.remove(occ.id!));
-
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              success
-                                                  ? (newValue == 1
-                                                        ? 'Marked as done'
-                                                        : 'Unmarked')
-                                                  : (newValue == 1
-                                                        ? 'Failed to mark as done'
-                                                        : 'Failed to unmark'),
-                                            ),
-                                          ),
-                                        );
                                       },
                                       child: Container(
                                         width: 36,
@@ -289,17 +265,12 @@ class _EditContentState extends State<EditContent> {
                             GestureDetector(
                               onTap: () async {
                                 if (occ.id == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Cannot edit this item'),
-                                    ),
-                                  );
                                   return;
                                 }
 
                                 int? planId = occ.planId;
 
-                                if (planId == null || planId == 0) {
+                                if (planId == 0) {
                                   final repo = OccurrenceRepository();
                                   planId = await repo.getPlanIdForOccurrence(
                                     occ.id ?? 0,
@@ -307,13 +278,6 @@ class _EditContentState extends State<EditContent> {
                                 }
 
                                 if (planId == null || planId == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Could not find plan for this occurrence',
-                                      ),
-                                    ),
-                                  );
                                   return;
                                 }
 
@@ -379,17 +343,7 @@ class _EditContentState extends State<EditContent> {
                                 if (confirm != true) return;
                                 if (occ.id == null) return;
 
-                                final ok = await _cubit!.deleteOccurrence(
-                                  occ.id!,
-                                );
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      ok ? 'Removed' : 'Failed to remove',
-                                    ),
-                                  ),
-                                );
+                                await _cubit!.deleteOccurrence(occ.id!);
                               },
                               child: const Icon(
                                 Icons.delete_outline,

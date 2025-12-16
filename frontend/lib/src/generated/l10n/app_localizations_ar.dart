@@ -936,4 +936,93 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invalidQuantity => 'يرجى إدخال كمية صحيحة (على الأقل 1)';
+
+  @override
+  String get cannot_mark_future_time => 'لا يمكن تحديد وقت مستقبلي';
+
+  @override
+  String get all => 'الكل';
+
+  @override
+  String get reminders => 'التذكيرات';
+
+  @override
+  String get medstock_reserv => 'المخزون/الحجز';
+
+  @override
+  String get no_notifications_yet => 'لا توجد إشعارات بعد';
+
+  @override
+  String get add_medicines_to_see_reminders => 'أضف أدوية لرؤية التذكيرات هنا';
+
+  @override
+  String get no_medstock_or_reservation_notifications =>
+      'لا توجد إشعارات مخزون أو حجز للأدوية';
+
+  @override
+  String get today => 'اليوم';
+
+  @override
+  String get yesterday => 'أمس';
+
+  @override
+  String days_ago(int count) {
+    return 'منذ $count أيام';
+  }
+
+  @override
+  String get delete_medicine => 'حذف الدواء';
+
+  @override
+  String get confirm_delete_medicine =>
+      'هل أنت متأكد أنك تريد حذف هذا الدواء والجدول الكامل له؟';
+
+  @override
+  String get medicine_deleted => 'تم حذف الدواء بنجاح';
+
+  @override
+  String get medicine_name => 'اسم الدواء';
+
+  @override
+  String get medicine_type => 'نوع الدواء';
+
+  @override
+  String get dosage => 'الجرعة';
+
+  @override
+  String get times_per_day => 'عدد المرات لليوم';
+
+  @override
+  String get medicine_times => 'أوقات الدواء';
+
+  @override
+  String get start_date => 'تاريخ البداية';
+
+  @override
+  String get end_date => 'تاريخ النهاية';
+
+  @override
+  String notification_message_1(String medicineName) {
+    return 'حان لتناول دواؤك \"$medicineName\" — صحتك ستشكرك';
+  }
+
+  @override
+  String notification_message_2(String medicineName) {
+    return 'مرحبا! لا تنس من التزام جرعتك من \"$medicineName\" خطوات صغيرة لحياة أصحر للا.';
+  }
+
+  @override
+  String notification_message_3(String medicineName) {
+    return 'حان الوقت لتناول دواؤك \"$medicineName\" وابق بصحة جيدة.';
+  }
+
+  @override
+  String notification_message_4(String medicineName) {
+    return 'تذكير جيد! تناول \"$medicineName\" كما هو مبرمج.';
+  }
+
+  @override
+  String notification_message_5(String medicineName) {
+    return 'لا تفوت جرعتك من \"$medicineName\" — رفاهيتك مهمة!';
+  }
 }
