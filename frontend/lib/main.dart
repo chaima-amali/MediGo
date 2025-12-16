@@ -78,7 +78,7 @@ class _MediGoAppState extends State<MediGoApp> {
         title: 'MediGo',
         theme: appTheme,
         debugShowCheckedModeBanner: false,
-        locale: Locale('en'),
+        locale: _locale,
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

@@ -1863,6 +1863,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a valid quantity (at least 1)'**
   String get invalidQuantity;
+
+  /// No description provided for @cannot_mark_future_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot mark future time'**
+  String get cannot_mark_future_time;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get reminders;
+
+  /// No description provided for @medstock_reserv.
+  ///
+  /// In en, this message translates to:
+  /// **'medstock/Reserv'**
+  String get medstock_reserv;
+
+  /// No description provided for @no_notifications_yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get no_notifications_yet;
+
+  /// No description provided for @add_medicines_to_see_reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Add medicines to see reminders here'**
+  String get add_medicines_to_see_reminders;
+
+  /// No description provided for @no_medstock_or_reservation_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicine stock or reservation notifications'**
+  String get no_medstock_or_reservation_notifications;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @days_ago.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String days_ago(int count);
+
+  /// No description provided for @delete_medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Medicine'**
+  String get delete_medicine;
+
+  /// No description provided for @confirm_delete_medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this medicine and its entire schedule?'**
+  String get confirm_delete_medicine;
+
+  /// No description provided for @medicine_deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine deleted successfully'**
+  String get medicine_deleted;
+
+  /// No description provided for @medicine_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Name'**
+  String get medicine_name;
+
+  /// No description provided for @medicine_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Type'**
+  String get medicine_type;
+
+  /// No description provided for @dosage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage'**
+  String get dosage;
+
+  /// No description provided for @times_per_day.
+  ///
+  /// In en, this message translates to:
+  /// **'Times Per Day'**
+  String get times_per_day;
+
+  /// No description provided for @medicine_times.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Times'**
+  String get medicine_times;
+
+  /// No description provided for @start_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get start_date;
+
+  /// No description provided for @end_date.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get end_date;
+
+  /// No description provided for @notification_message_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for your medicine \"{medicineName}\" — your health will thank you'**
+  String notification_message_1(String medicineName);
+
+  /// No description provided for @notification_message_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey there! Don\'t forget your dose of \"{medicineName}\" small steps for a healthier you.'**
+  String notification_message_2(String medicineName);
+
+  /// No description provided for @notification_message_3.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time to take your medicine \"{medicineName}\" and stay healthy.'**
+  String notification_message_3(String medicineName);
+
+  /// No description provided for @notification_message_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Good reminder! Take your \"{medicineName}\" as scheduled.'**
+  String notification_message_4(String medicineName);
+
+  /// No description provided for @notification_message_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t miss your dose of \"{medicineName}\" — your wellness matters!'**
+  String notification_message_5(String medicineName);
 }
 
 class _AppLocalizationsDelegate
