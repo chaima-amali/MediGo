@@ -21,7 +21,7 @@ import 'package:frontend/logic/cubits/tracking_cubit.dart';
 class StatisticsPage extends StatelessWidget {
   final VoidCallback? onBack;
 
-  const StatisticsPage({Key? key, this.onBack}) : super(key: key);
+  const StatisticsPage({super.key, this.onBack});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class StatisticsPage extends StatelessWidget {
 /// Embeddable panel version of statistics (no Scaffold) suitable for inline
 /// embedding inside other screens such as `TrackingPage`.
 class StatisticsPanel extends StatelessWidget {
-  const StatisticsPanel({Key? key}) : super(key: key);
+  const StatisticsPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +219,7 @@ class StatisticsPanel extends StatelessWidget {
 class _StatisticsContent extends StatelessWidget {
   final VoidCallback? onBack;
 
-  const _StatisticsContent({Key? key, this.onBack}) : super(key: key);
+  const _StatisticsContent({super.key, this.onBack});
 
   @override
   Widget build(BuildContext context) {

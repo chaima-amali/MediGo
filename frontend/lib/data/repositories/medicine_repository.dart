@@ -5,6 +5,7 @@ import '../models/medicine_plan.dart';
 import '../models/occurrence_plan.dart';
 import '../databases/db_helper.dart';
 import 'database_change_notifier.dart';
+import 'occurrence_repository.dart';
 
 class MedicineRepository {
   final Future<Database> dbFuture = DBHelper.getDatabase();
@@ -324,6 +325,95 @@ class MedicineRepository {
       }
       return rows > 0;
     } catch (_) {
+      return false;
+    }
+  }
+
+  /// Delete a medicine plan and all its occurrences
+  Future<bool> deleteMedicinePlan(int planId) async {
+    final db = await dbFuture;
+    try {
+      // First, delete all occurrences for this plan
+      final occRepo = OccurrenceRepository();
+      final occurrences = await db.query(
+        'occurrence_plan',
+        where: 'plan_id = ?',
+        whereArgs: [planId],
+      );
+
+      for (final occ in occurrences) {
+        final occId = occ['id'] ?? occ['occurrence_id'] ?? occ['rowid'];
+        if (occId != null) {
+          await occRepo.deleteOccurrence(occId as int);
+        }
+      }
+
+      // Then delete the plan itself
+      final rows = await db.delete(
+        'medicine_plan',
+        where: 'plan_id = ?',
+        whereArgs: [planId],
+      );
+
+      if (rows > 0) {
+        try {
+          DatabaseChangeNotifier.instance.notify();
+        } catch (_) {}
+      }
+      return rows > 0;
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error deleting medicine plan: $e');
+      return false;
+    }
+  }
+
+  /// Regenerate occurrences for a plan when dates or times change
+  Future<bool> regenerateOccurrences({
+    required int planId,
+    required DateTime startDate,
+    required DateTime endDate,
+    required List<String> times,
+  }) async {
+    final db = await dbFuture;
+    try {
+      final occRepo = OccurrenceRepository();
+
+      // Delete all existing occurrences for this plan
+      final occurrences = await db.query(
+        'occurrence_plan',
+        where: 'plan_id = ?',
+        whereArgs: [planId],
+      );
+
+      for (final occ in occurrences) {
+        final occId = occ['id'] ?? occ['occurrence_id'] ?? occ['rowid'];
+        if (occId != null) {
+          await occRepo.deleteOccurrence(occId as int);
+        }
+      }
+
+      // Generate new occurrences
+      DateTime current = startDate;
+      while (current.isBefore(endDate) || current.isAtSameMomentAs(endDate)) {
+        for (final time in times) {
+          await db.insert('occurrence_plan', {
+            'plan_id': planId,
+            'date': current.toIso8601String().split('T')[0],
+            'time': time,
+            'is_taken': 0,
+          });
+        }
+        current = current.add(const Duration(days: 1));
+      }
+
+      try {
+        DatabaseChangeNotifier.instance.notify();
+      } catch (_) {}
+      return true;
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error regenerating occurrences: $e');
       return false;
     }
   }

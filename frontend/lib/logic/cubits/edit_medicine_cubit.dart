@@ -106,4 +106,55 @@ class EditMedicineCubit extends Cubit<EditMedicineState> {
       emit(state.copyWith(saving: false, error: e.toString()));
     }
   }
+
+  Future<void> deletePlan(int planId) async {
+    emit(state.copyWith(saving: true, error: null, success: false));
+    try {
+      final ok = await _repo.deleteMedicinePlan(planId);
+      if (ok) {
+        // notify tracking cubit to reload
+        try {
+          _trackingCubit?.loadDay(DateTime.now());
+        } catch (_) {}
+        try {
+          DatabaseChangeNotifier.instance.notify();
+        } catch (_) {}
+        emit(state.copyWith(saving: false, success: true));
+      } else {
+        emit(state.copyWith(saving: false, error: 'Failed to delete'));
+      }
+    } catch (e) {
+      emit(state.copyWith(saving: false, error: e.toString()));
+    }
+  }
+
+  Future<void> regenerateOccurrences({
+    required int planId,
+    required DateTime startDate,
+    required DateTime endDate,
+    required List<String> times,
+  }) async {
+    emit(state.copyWith(saving: true, error: null, success: false));
+    try {
+      final ok = await _repo.regenerateOccurrences(
+        planId: planId,
+        startDate: startDate,
+        endDate: endDate,
+        times: times,
+      );
+      if (ok) {
+        try {
+          _trackingCubit?.loadDay(DateTime.now());
+        } catch (_) {}
+        try {
+          DatabaseChangeNotifier.instance.notify();
+        } catch (_) {}
+        emit(state.copyWith(saving: false, success: true));
+      } else {
+        emit(state.copyWith(saving: false, error: 'Failed to regenerate'));
+      }
+    } catch (e) {
+      emit(state.copyWith(saving: false, error: e.toString()));
+    }
+  }
 }

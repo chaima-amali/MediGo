@@ -944,4 +944,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidQuantity => 'Please enter a valid quantity (at least 1)';
+
+  @override
+  String get cannot_mark_future_time => 'Cannot mark future time';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get reminders => 'Reminders';
+
+  @override
+  String get medstock_reserv => 'medstock/Reserv';
+
+  @override
+  String get no_notifications_yet => 'No notifications yet';
+
+  @override
+  String get add_medicines_to_see_reminders =>
+      'Add medicines to see reminders here';
+
+  @override
+  String get no_medstock_or_reservation_notifications =>
+      'No medicine stock or reservation notifications';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String days_ago(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String get delete_medicine => 'Delete Medicine';
+
+  @override
+  String get confirm_delete_medicine =>
+      'Are you sure you want to delete this medicine and its entire schedule?';
+
+  @override
+  String get medicine_deleted => 'Medicine deleted successfully';
+
+  @override
+  String get medicine_name => 'Medicine Name';
+
+  @override
+  String get medicine_type => 'Medicine Type';
+
+  @override
+  String get dosage => 'Dosage';
+
+  @override
+  String get times_per_day => 'Times Per Day';
+
+  @override
+  String get medicine_times => 'Medicine Times';
+
+  @override
+  String get start_date => 'Start Date';
+
+  @override
+  String get end_date => 'End Date';
+
+  @override
+  String notification_message_1(String medicineName) {
+    return 'Time for your medicine \"$medicineName\" — your health will thank you';
+  }
+
+  @override
+  String notification_message_2(String medicineName) {
+    return 'Hey there! Don\'t forget your dose of \"$medicineName\" small steps for a healthier you.';
+  }
+
+  @override
+  String notification_message_3(String medicineName) {
+    return 'It\'s time to take your medicine \"$medicineName\" and stay healthy.';
+  }
+
+  @override
+  String notification_message_4(String medicineName) {
+    return 'Good reminder! Take your \"$medicineName\" as scheduled.';
+  }
+
+  @override
+  String notification_message_5(String medicineName) {
+    return 'Don\'t miss your dose of \"$medicineName\" — your wellness matters!';
+  }
 }

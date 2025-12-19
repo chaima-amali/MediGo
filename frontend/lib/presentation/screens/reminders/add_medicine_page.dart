@@ -26,7 +26,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   String? _selectedFrequency;
   String? _selectedUnit;
   int _timesPerDay = 1;
-  List<TimeOfDay> _selectedTimes = [const TimeOfDay(hour: 9, minute: 0)];
+  final List<TimeOfDay> _selectedTimes = [const TimeOfDay(hour: 9, minute: 0)];
   Color? _selectedImportanceColor = AppColors.primary;
   DateTime? _startDate;
   DateTime? _endDate;
@@ -263,8 +263,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                             Icons.medication_outlined,
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().isEmpty)
+                            if (v == null || v.trim().isEmpty) {
                               return loc.name_is_required;
+                            }
                             return null;
                           },
                         ),
@@ -281,7 +282,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
                           decoration: _dropdownDecoration(icon: Icons.category),
-                          value: _selectedType,
+                          initialValue: _selectedType,
                           validator: (v) => (v == null || v.isEmpty)
                               ? AppLocalizations.of(context)!.type_is_required
                               : null,
@@ -316,8 +317,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           ),
                           validator: (v) {
                             final d = double.tryParse(v ?? '');
-                            if (d == null || d <= 0)
+                            if (d == null || d <= 0) {
                               return loc.dose_must_be_greater_than_zero;
+                            }
                             return null;
                           },
                         ),
@@ -335,7 +337,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           decoration: _dropdownDecoration(
                             icon: Icons.straighten_outlined,
                           ),
-                          value: _selectedUnit,
+                          initialValue: _selectedUnit,
                           validator: (v) => (v == null || v.isEmpty)
                               ? AppLocalizations.of(context)!.unit_is_required
                               : null,
@@ -363,7 +365,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           decoration: _dropdownDecoration(
                             icon: Icons.calendar_today_outlined,
                           ),
-                          value: _selectedFrequency,
+                          initialValue: _selectedFrequency,
                           validator: (v) => (v == null || v.isEmpty)
                               ? AppLocalizations.of(
                                   context,
@@ -468,7 +470,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                             decoration: _dropdownDecoration(
                                               icon: Icons.repeat,
                                             ),
-                                            value: _weekDayTimesCount[day] ?? 1,
+                                            initialValue: _weekDayTimesCount[day] ?? 1,
                                             items:
                                                 List.generate(6, (i) => i + 1)
                                                     .map(
@@ -484,15 +486,17 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                                 _weekDayTimesCount[day] = count;
                                                 final list =
                                                     _weekDayTimes[day] ?? [];
-                                                while (list.length < count)
+                                                while (list.length < count) {
                                                   list.add(
                                                     const TimeOfDay(
                                                       hour: 9,
                                                       minute: 0,
                                                     ),
                                                   );
-                                                while (list.length > count)
+                                                }
+                                                while (list.length > count) {
                                                   list.removeLast();
+                                                }
                                                 _weekDayTimes[day] = list;
                                               });
                                             },
@@ -550,12 +554,13 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                                         );
                                                       },
                                                     );
-                                                    if (picked != null)
+                                                    if (picked != null) {
                                                       setState(
                                                         () =>
                                                             _weekDayTimes[day]![i] =
                                                                 picked,
                                                       );
+                                                    }
                                                   },
                                                   child: Container(
                                                     height: 44,
@@ -615,7 +620,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
 
                         DropdownButtonFormField<int>(
                           decoration: _dropdownDecoration(icon: Icons.repeat),
-                          value: _timesPerDay,
+                          initialValue: _timesPerDay,
                           validator: (v) => (v == null || v <= 0)
                               ? AppLocalizations.of(
                                   context,
@@ -681,8 +686,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                       );
                                     },
                                   );
-                                  if (t != null)
+                                  if (t != null) {
                                     setState(() => _selectedTimes[i] = t);
+                                  }
                                 },
                                 child: Container(
                                   height: 48,
@@ -744,8 +750,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                 );
                               },
                             );
-                            if (picked != null)
+                            if (picked != null) {
                               setState(() => _startDate = picked);
+                            }
                           },
                           child: Container(
                             height: 48,
@@ -803,8 +810,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                 );
                               },
                             );
-                            if (picked != null)
+                            if (picked != null) {
                               setState(() => _endDate = picked);
+                            }
                           },
                           child: Container(
                             height: 48,
@@ -919,8 +927,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                 onPressed: _isSaving
                                     ? null
                                     : () async {
-                                        if (!_formKey.currentState!.validate())
+                                        if (!_formKey.currentState!.validate()) {
                                           return;
+                                        }
                                         // validate dates
                                         if (_startDate == null ||
                                             _endDate == null) {
@@ -1078,8 +1087,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                             );
                                           }
                                         } finally {
-                                          if (mounted)
+                                          if (mounted) {
                                             setState(() => _isSaving = false);
+                                          }
                                         }
                                       },
                                 style: ElevatedButton.styleFrom(

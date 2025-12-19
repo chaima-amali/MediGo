@@ -309,5 +309,77 @@
         "type": "String"
       }
     }
+  },
+  "cannot_mark_future_time": "Cannot mark future time",
+  "notifications": "Notifications",
+  "all": "All",
+  "reminders": "Reminders",
+  "medstock_reserv": "medstock/Reserv",
+  "no_notifications_yet": "No notifications yet",
+  "add_medicines_to_see_reminders": "Add medicines to see reminders here",
+  "no_medstock_or_reservation_notifications": "No medicine stock or reservation notifications",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "days_ago": "{count} days ago",
+  "@days_ago": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "delete_medicine": "Delete Medicine",
+  "confirm_delete_medicine": "Are you sure you want to delete this medicine and its entire schedule?",
+  "delete": "Delete",
+  "medicine_deleted": "Medicine deleted successfully",
+  "medicine_name": "Medicine Name",
+  "medicine_type": "Medicine Type",
+  "dosage": "Dosage",
+  "unit": "Unit",
+  "frequency": "Frequency",
+  "times_per_day": "Times Per Day",
+  "medicine_times": "Medicine Times",
+  "start_date": "Start Date",
+  "end_date": "End Date",
+  "save": "Save",
+  "notification_message_1": "Time for your medicine \"{medicineName}\" — your health will thank you",
+  "notification_message_2": "Hey there! Don't forget your dose of \"{medicineName}\" small steps for a healthier you.",
+  "notification_message_3": "It's time to take your medicine \"{medicineName}\" and stay healthy.",
+  "notification_message_4": "Good reminder! Take your \"{medicineName}\" as scheduled.",
+  "notification_message_5": "Don't miss your dose of \"{medicineName}\" — your wellness matters!",
+  "@notification_message_1": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_2": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_3": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_4": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_5": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
   }
 }

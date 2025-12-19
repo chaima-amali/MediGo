@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
-import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
+import 'package:frontend/data/repositories/occurrence_repository.dart';
+import 'package:frontend/data/models/occurrence_plan.dart';
 import 'reports_page.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 import '../notifications.dart' as notif_page hide CustomBackArrow;
@@ -18,68 +19,90 @@ class MedicineCalendarScreen extends StatefulWidget {
 class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<String, dynamic> _calendarData = {};
-  List<Map<String, dynamic>> _selectedDayMedicines = [];
+  final OccurrenceRepository _occurrenceRepo = OccurrenceRepository();
+  List<Occurrence> _selectedDayMedicines = [];
+  Map<DateTime, List<Occurrence>> _monthOccurrences = {};
 
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    _loadCalendarData();
-    _loadMedicinesForSelectedDay();
+    _loadMonthOccurrences();
   }
 
-  void _loadCalendarData() {
-    // Load calendar data from mock service
-    final data = MockDataService.getMedicineCalendar(
-      _focusedDay.month,
-      _focusedDay.year,
-    );
+  Future<void> _loadMonthOccurrences() async {
+    final Map<DateTime, List<Occurrence>> occurrenceMap = {};
+
+    // Load occurrences for the entire month
+    final firstDay = DateTime(_focusedDay.year, _focusedDay.month, 1);
+    final lastDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
+
+    for (int day = firstDay.day; day <= lastDay.day; day++) {
+      final date = DateTime(_focusedDay.year, _focusedDay.month, day);
+      final occurrences = await _occurrenceRepo.getOccurrencesByDate(date);
+      if (occurrences.isNotEmpty) {
+        occurrenceMap[DateTime(date.year, date.month, date.day)] = occurrences;
+      }
+    }
+
     setState(() {
-      _calendarData = data;
+      _monthOccurrences = occurrenceMap;
+      _loadMedicinesForSelectedDay();
     });
   }
 
   void _loadMedicinesForSelectedDay() {
     if (_selectedDay == null) return;
 
-    final dayKey = _selectedDay!.day.toString();
-    final medicines =
-        _calendarData[dayKey]?['medicines'] as List<dynamic>? ?? [];
-
+    final normalized = DateTime(
+      _selectedDay!.year,
+      _selectedDay!.month,
+      _selectedDay!.day,
+    );
     setState(() {
-      _selectedDayMedicines = medicines
-          .map(
-            (med) => {
-              'medicine_name': med['medicine_name'],
-              'dosage': med['dosage'],
-              'frequency': med['frequency'],
-              'status': med['status'],
-              'color': med['color'],
-            },
-          )
-          .toList();
+      _selectedDayMedicines = _monthOccurrences[normalized] ?? [];
     });
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'taken':
-        return AppColors.success;
-      case 'delayed':
-        return AppColors.warning;
-      case 'missed':
-        return AppColors.error;
-      default:
-        return AppColors.darkBlue.withOpacity(0.3);
+  Color _getStatusColor(Occurrence occurrence) {
+    if (occurrence.isTaken == 1) {
+      return AppColors.success; // taken
     }
+
+    final now = DateTime.now();
+    final occDate = occurrence.date;
+    final occTime = occurrence.time;
+
+    try {
+      final timeParts = occTime.split(':');
+      final hour = int.tryParse(timeParts[0]) ?? 0;
+      final minute = int.tryParse(timeParts[1]) ?? 0;
+      final scheduledDateTime = DateTime(
+        occDate.year,
+        occDate.month,
+        occDate.day,
+        hour,
+        minute,
+      );
+
+      if (now.isAfter(scheduledDateTime)) {
+        // Past time, not taken
+        final diff = now.difference(scheduledDateTime);
+        if (diff.inHours < 2) {
+          return AppColors.warning; // delayed
+        } else {
+          return AppColors.error; // missed
+        }
+      }
+    } catch (_) {}
+
+    return AppColors.darkBlue.withOpacity(0.3); // pending/future
   }
 
   bool _hasMedicinesOnDay(DateTime day) {
-    final dayKey = day.day.toString();
-    final medicines =
-        _calendarData[dayKey]?['medicines'] as List<dynamic>? ?? [];
-    return medicines.isNotEmpty;
+    final normalized = DateTime(day.year, day.month, day.day);
+    return _monthOccurrences.containsKey(normalized) &&
+        _monthOccurrences[normalized]!.isNotEmpty;
   }
 
   @override
@@ -304,7 +327,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                   setState(() {
                                     _focusedDay = focusedDay;
                                   });
-                                  _loadCalendarData();
+                                  _loadMonthOccurrences();
                                 },
                                 calendarStyle: CalendarStyle(
                                   outsideDaysVisible: false,
@@ -490,7 +513,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        children: _selectedDayMedicines.map((medicine) {
+        children: _selectedDayMedicines.map((occurrence) {
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
@@ -509,7 +532,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        medicine['medicine_name'],
+                        occurrence.medicineName ?? 'Unnamed Medicine',
                         style: AppText.bold.copyWith(
                           fontSize: 16,
                           color: AppColors.darkBlue,
@@ -517,7 +540,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '(${medicine['dosage']}, ${medicine['frequency']})',
+                        occurrence.time,
                         style: AppText.regular.copyWith(
                           fontSize: 12,
                           color: AppColors.darkBlue.withOpacity(0.6),
@@ -530,7 +553,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                   width: 16,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: _getStatusColor(medicine['status']),
+                    color: _getStatusColor(occurrence),
                     shape: BoxShape.circle,
                   ),
                 ),
