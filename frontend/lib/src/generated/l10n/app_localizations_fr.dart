@@ -954,4 +954,95 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get invalidQuantity =>
       'Veuillez entrer une quantité valide (au moins 1)';
+
+  @override
+  String get cannot_mark_future_time =>
+      'Impossible de marquer une heure future';
+
+  @override
+  String get all => 'Tout';
+
+  @override
+  String get reminders => 'Rappels';
+
+  @override
+  String get medstock_reserv => 'Stock/Réserv';
+
+  @override
+  String get no_notifications_yet => 'Aucune notification pour le moment';
+
+  @override
+  String get add_medicines_to_see_reminders =>
+      'Ajoutez des médicaments pour voir les rappels ici';
+
+  @override
+  String get no_medstock_or_reservation_notifications =>
+      'Aucune notification de stock ou de réservation de médicaments';
+
+  @override
+  String get today => 'Aujourd\'hui';
+
+  @override
+  String get yesterday => 'Hier';
+
+  @override
+  String days_ago(int count) {
+    return 'Il y a $count jours';
+  }
+
+  @override
+  String get delete_medicine => 'Supprimer le médicament';
+
+  @override
+  String get confirm_delete_medicine =>
+      'Êtes-vous sûr de vouloir supprimer ce médicament et son horaire complet ?';
+
+  @override
+  String get medicine_deleted => 'Médicament supprimé avec succès';
+
+  @override
+  String get medicine_name => 'Nom du médicament';
+
+  @override
+  String get medicine_type => 'Type de médicament';
+
+  @override
+  String get dosage => 'Dosage';
+
+  @override
+  String get times_per_day => 'Nombre de fois par jour';
+
+  @override
+  String get medicine_times => 'Heures des médicaments';
+
+  @override
+  String get start_date => 'Date de début';
+
+  @override
+  String get end_date => 'Date de fin';
+
+  @override
+  String notification_message_1(String medicineName) {
+    return 'C\'est l\'heure de prendre votre médicament \"$medicineName\" — votre santé vous en remerciera';
+  }
+
+  @override
+  String notification_message_2(String medicineName) {
+    return 'Hé! N\'oubliez pas votre dose de \"$medicineName\" de petits pas pour une vie plus saine.';
+  }
+
+  @override
+  String notification_message_3(String medicineName) {
+    return 'C\'est l\'heure de prendre votre médicament \"$medicineName\" et restez en bonne santé.';
+  }
+
+  @override
+  String notification_message_4(String medicineName) {
+    return 'Bon rappel! Prenez votre \"$medicineName\" comme prévu.';
+  }
+
+  @override
+  String notification_message_5(String medicineName) {
+    return 'Ne manquez pas votre dose de \"$medicineName\" — votre bien-être compte!';
+  }
 }

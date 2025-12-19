@@ -42,6 +42,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -53,253 +54,260 @@ class _SearchScreenState extends State<SearchScreen> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'MediGo',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.local_hospital,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const notif_page.NotificationsPage(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.lightBlue.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Stack(
-                          children: [
-                            Icon(
-                              Icons.notifications_outlined,
-                              color: AppColors.primary,
-                              size: 24,
-                            ),
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
-                // Title
-                Text(
-                  AppLocalizations.of(context)!.searchMedicines,
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue,
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Search Bar
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: AppColors.lightBlue, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.search, color: AppColors.primary, size: 24),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: _performSearch,
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(
-                              context,
-                            )!.searchMedicinePrompt,
-                            hintStyle: TextStyle(
-                              color: const Color.fromARGB(255, 161, 161, 161),
-                              fontSize: 13,
+                      Row(
+                        children: [
+                          Text(
+                            'MediGo',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
                             ),
-                            border: InputBorder.none,
                           ),
-                        ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.local_hospital,
+                            color: AppColors.primary,
+                            size: 24,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Search Results
-                Expanded(
-                  child: BlocBuilder<MedicineSearchCubit, MedicineSearchState>(
-                    builder: (context, state) {
-                      if (state is MedicineSearchInitial) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const notif_page.NotificationsPage(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightBlue.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Stack(
                             children: [
                               Icon(
-                                Icons.medication_outlined,
-                                size: 80,
-                                color: AppColors.darkBlue.withOpacity(0.3),
+                                Icons.notifications_outlined,
+                                color: AppColors.primary,
+                                size: 24,
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!.searchMedicinesDescription,
-                                style: TextStyle(
-                                  color: AppColors.darkBlue.withOpacity(0.6),
-                                  fontSize: 16,
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
-                        );
-                      }
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
 
-                      if (state is MedicineSearchLoading) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
+                  // Title
+                  Text(
+                    AppLocalizations.of(context)!.searchMedicines,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkBlue,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Search Bar
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: AppColors.lightBlue, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search, color: AppColors.primary, size: 24),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: _performSearch,
+                            decoration: InputDecoration(
+                              hintText: AppLocalizations.of(
+                                context,
+                              )!.searchMedicinePrompt,
+                              hintStyle: TextStyle(
+                                color: const Color.fromARGB(255, 161, 161, 161),
+                                fontSize: 13,
+                              ),
+                              border: InputBorder.none,
+                            ),
                           ),
-                        );
-                      }
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-                      if (state is MedicineSearchEmpty) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
+                  // Search Results
+                  SizedBox(
+                    height: 400,
+                    child: BlocBuilder<MedicineSearchCubit, MedicineSearchState>(
+                      builder: (context, state) {
+                        if (state is MedicineSearchInitial) {
+                          return Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.inventory_2_outlined,
+                                  Icons.medication_outlined,
                                   size: 80,
                                   color: AppColors.darkBlue.withOpacity(0.3),
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  state.message,
-                                  textAlign: TextAlign.center,
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.searchMedicinesDescription,
                                   style: TextStyle(
                                     color: AppColors.darkBlue.withOpacity(0.6),
                                     fontSize: 16,
                                   ),
-                                ),
-                                const SizedBox(height: 24),
-                                Text(
-                                  'Get notified when "${state.searchQuery}" is back in stock',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppColors.darkBlue,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        if (state is MedicineSearchLoading) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
+                        }
+
+                        if (state is MedicineSearchEmpty) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.inventory_2_outlined,
+                                    size: 80,
+                                    color: AppColors.darkBlue.withOpacity(0.3),
                                   ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    state.message,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.darkBlue.withOpacity(
+                                        0.6,
+                                      ),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Text(
+                                    'Get notified when "${state.searchQuery}" is back in stock',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.darkBlue,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton.icon(
+                                    onPressed: () => _handleRestockNotification(
+                                      context,
+                                      state.searchQuery,
+                                    ),
+                                    icon: const Icon(
+                                      Icons.notifications_active,
+                                    ),
+                                    label: const Text('Notify Me'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.premiumOrange,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        if (state is MedicineSearchError) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 80,
+                                  color: Colors.red.withOpacity(0.5),
                                 ),
                                 const SizedBox(height: 16),
-                                ElevatedButton.icon(
-                                  onPressed: () => _handleRestockNotification(
-                                    context,
-                                    state.searchQuery,
-                                  ),
-                                  icon: const Icon(Icons.notifications_active),
-                                  label: const Text('Notify Me'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.premiumOrange,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                      vertical: 12,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                Text(
+                                  state.error,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 14,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        );
-                      }
+                          );
+                        }
 
-                      if (state is MedicineSearchError) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.error_outline,
-                                size: 80,
-                                color: Colors.red.withOpacity(0.5),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                state.error,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
+                        if (state is MedicineSearchLoaded) {
+                          return _buildSearchResults(context, state.results);
+                        }
 
-                      if (state is MedicineSearchLoaded) {
-                        return _buildSearchResults(context, state.results);
-                      }
-
-                      return const SizedBox.shrink();
-                    },
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -667,32 +675,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
     // User is premium - save restock notification
     try {
-      // First, find the medicine by name
-      final medicineFindRepo = MedicineFindRepository();
-      final medicines = await medicineFindRepo.searchMedicinesByName(
-        medicineName,
-      );
-
-      if (medicines.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Medicine not found in catalog'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      final medicine = medicines.first;
-
-      // Save restock notification request
+      // Save restock notification request with medicine name
+      // We use medicine name as the identifier since medicine_id references
+      // the catalog which may not have this out-of-stock medicine
       final historyRepo = MedicineSearchHistoryRepository();
-      if (medicine.medicineFindId == null) {
-        throw Exception('Medicine ID is null');
-      }
       await historyRepo.saveSearchWithNotification(
         userId: currentUser.userId!,
-        medicineId: medicine.medicineFindId!,
+        medicineName: medicineName,
         notifyRestock: true,
       );
 

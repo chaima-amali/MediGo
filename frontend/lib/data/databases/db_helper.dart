@@ -17,7 +17,8 @@ import 'db_reservation.dart';
 
 class DBHelper {
   static const _databaseName = "medic_app.db";
-  static const _databaseVersion = 2; // Incremented for schema change
+  static const _databaseVersion =
+      4; // Incremented for schema change (medicine_id -> medicine_name)
   static Database? _database;
 
   // List all table create statements in order
@@ -65,6 +66,18 @@ class DBHelper {
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         // Handle schema migrations here if needed in future
+        if (oldVersion < 3) {
+          // Version 3: Fix medicine_search_history foreign key constraint
+          // Drop and recreate the table without the medicine FK
+          await db.execute('DROP TABLE IF EXISTS medicine_search_history');
+          await db.execute(DBMedicineFindTable.sql_code);
+        }
+        if (oldVersion < 4) {
+          // Version 4: Change medicine_id to medicine_name
+          // Drop and recreate the table with new schema
+          await db.execute('DROP TABLE IF EXISTS medicine_search_history');
+          await db.execute(DBMedicineFindTable.sql_code);
+        }
       },
     );
     return _database!;
