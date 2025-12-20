@@ -8,10 +8,11 @@ import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/data/repositories/user_repo.dart';
 import 'package:frontend/data/repositories/medicine_find_repo.dart';
 import 'package:frontend/data/repositories/pharmacy_medicine_repo.dart';
+import 'package:frontend/data/repositories/reservation_repo.dart';
 import 'package:frontend/data/databases/db_helper.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/logic/cubits/medicine_search_cubit.dart';
-import 'package:frontend/presentation/screens/Home/home_page.dart';
+import 'package:frontend/logic/cubits/reservation_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +73,9 @@ class _MediGoAppState extends State<MediGoApp> {
             pharmacyMedicineRepository: PharmacyMedicineRepository(),
             medicineFindRepository: MedicineFindRepository(),
           ),
+        ),
+        BlocProvider(
+          create: (context) => ReservationCubit(ReservationRepository()),
         ),
       ],
       child: MaterialApp(

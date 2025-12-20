@@ -1,11 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
+import 'package:frontend/presentation/theme/app_text.dart';
+import 'package:frontend/data/repositories/reservation_repo.dart';
+import 'package:frontend/data/repositories/pharmacy_repo.dart';
+import 'package:frontend/data/models/reservation.dart';
+import 'package:frontend/data/models/pharmacy.dart';
 
-class ReservationComplete extends StatelessWidget {
-  const ReservationComplete({Key? key}) : super(key: key);
+class ReservationCompletePage extends StatefulWidget {
+  final int reservationId;
+
+  const ReservationCompletePage({Key? key, required this.reservationId})
+    : super(key: key);
+
+  @override
+  State<ReservationCompletePage> createState() =>
+      _ReservationCompletePageState();
+}
+
+class _ReservationCompletePageState extends State<ReservationCompletePage> {
+  final ReservationRepository _reservationRepo = ReservationRepository();
+  final PharmacyRepository _pharmacyRepo = PharmacyRepository();
+  Reservation? reservationData;
+  Pharmacy? pharmacyData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReservationData();
+  }
+
+  Future<void> _loadReservationData() async {
+    final reservation = await _reservationRepo.getReservationById(
+      widget.reservationId,
+    );
+
+    Pharmacy? pharmacy;
+    if (reservation != null && reservation.pharmacyId != null) {
+      pharmacy = await _pharmacyRepo.getPharmacyById(reservation.pharmacyId!);
+    }
+
+    setState(() {
+      reservationData = reservation;
+      pharmacyData = pharmacy;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF0F9FA),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (reservationData == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF0F9FA),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: CustomBackArrow(),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+              const SizedBox(height: 16),
+              Text(
+                AppLocalizations.of(context)!.reservationNotFound,
+                style: AppText.medium.copyWith(fontSize: 18),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final String medicineName = reservationData!.medicineName ?? 'Medicine';
+    final int quantity = reservationData!.quantity;
+    final String pickupDate = reservationData!.day;
+    final String pickupTime = reservationData!.time;
+    final String pharmacyName = pharmacyData?.name ?? 'Pharmacy';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0F9FA),
       body: SafeArea(
@@ -103,18 +183,15 @@ class ReservationComplete extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Ibuprofen 400mg',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  medicineName,
+                                  style: AppText.bold.copyWith(fontSize: 16),
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  '${AppLocalizations.of(context)!.quantity}: 1',
-                                  style: TextStyle(
+                                  'Quantity: $quantity',
+                                  style: AppText.regular.copyWith(
                                     fontSize: 14,
-                                    color: Colors.grey,
+                                    color: Colors.grey[600],
                                   ),
                                 ),
                               ],
@@ -163,7 +240,7 @@ class ReservationComplete extends StatelessWidget {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      'samedi 1 novembre 2025',
+                                      pickupDate,
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w500,
@@ -196,7 +273,7 @@ class ReservationComplete extends StatelessWidget {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      '10:10',
+                                      pickupTime,
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w500,
@@ -244,7 +321,7 @@ class ReservationComplete extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  'HealthCare Plus',
+                                  pharmacyName,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -252,70 +329,64 @@ class ReservationComplete extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '1.2km away',
-                                style: TextStyle(
-                                  fontSize: 14,
+                            ],
+                          ),
+                          if (pharmacyData != null) ...[
+                            SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  size: 20,
                                   color: Colors.grey,
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Boulevard Mohamed V, Alger',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.phone_outlined,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  '+93 555 768 012',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0xFF00BCD4),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    pharmacyData!.name,
+                                    style: TextStyle(fontSize: 14),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.access_time_outlined,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Open 24 hours',
-                                  style: TextStyle(fontSize: 14),
+                              ],
+                            ),
+                            SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.phone_outlined,
+                                  size: 20,
+                                  color: Colors.grey,
                                 ),
-                              ),
-                            ],
-                          ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    pharmacyData!.phone,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF00BCD4),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time_outlined,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    pharmacyData!.openingHours,
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -359,7 +430,9 @@ class ReservationComplete extends StatelessWidget {
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  AppLocalizations.of(context)!.pickedUpSuccessfully,
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.pickedUpSuccessfully,
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Color(0xFF1976D2),
@@ -374,58 +447,38 @@ class ReservationComplete extends StatelessWidget {
 
                     SizedBox(height: 20),
 
-                    // Reservation Details
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
+                    // Reservation Created Date
+                    if (reservationData!.createdAt != null)
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!.created,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              reservationData!.createdAt!,
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!.reservationId,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Text(
-                                '1761667440166',
-                                style: TextStyle(fontSize: 13),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!.created,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Text(
-                                '28/10/2025 17:12:20',
-                                style: TextStyle(fontSize: 13),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),

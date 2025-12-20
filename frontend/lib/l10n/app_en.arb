@@ -381,5 +381,26 @@
         "type": "String"
       }
     }
-  }
+  },
+  "unableToValidatePharmacyHours": "Unable to validate pharmacy hours",
+  "pickupTimeCannotBeInPast": "Pickup time cannot be in the past",
+  "userNotAuthenticated": "User not authenticated",
+  "codeCopiedToClipboard": "Code copied to clipboard",
+  "qrCode": "QR Code",
+  "close": "Close",
+  "markAsCompleted": "Mark as Completed",
+  "confirmReservationQuestion": "Confirm Reservation?",
+  "confirmReservationMessage": "Are you sure you want to confirm this reservation?",
+  "yesConfirm": "Yes, Confirm",
+  "reservationConfirmedSuccess": "Reservation confirmed successfully",
+  "deleteReservationQuestion": "Delete Reservation?",
+  "deleteReservationMessage": "Are you sure you want to delete this reservation? This action cannot be undone.",
+  "yesDelete": "Yes, Delete",
+  "reservationDeletedSuccess": "Reservation deleted successfully",
+  "medicine": "Medicine",
+  "pharmacy": "Pharmacy",
+  "pharmacyNotAvailable": "Pharmacy not available",
+  "reservationCancelled": "Reservation Cancelled",
+  "reservationCancelledMessage": "This reservation has been cancelled. You can delete it from your records.",
+  "awaitingPharmacyConfirmation": "Awaiting Pharmacy Confirmation"
 }

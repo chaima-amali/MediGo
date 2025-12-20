@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/logic/cubits/notifications_cubit.dart';
 import 'package:frontend/data/repositories/occurrence_repository.dart';
-import 'package:frontend/models/notification_item.dart';
+import 'package:frontend/data/models/notification_item.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
 class NotificationsPage extends StatelessWidget {
@@ -31,7 +31,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       backgroundColor: Color(0xFFE0F7FA),
       body: SafeArea(
@@ -59,38 +59,42 @@ class _NotificationsViewState extends State<_NotificationsView> {
             // Filter Buttons
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  FilterButton(
-                    label: l10n.all,
-                    isSelected: selectedFilter == 'All',
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = 'All';
-                      });
-                    },
-                  ),
-                  SizedBox(width: 8),
-                  FilterButton(
-                    label: l10n.reminders,
-                    isSelected: selectedFilter == 'Reminders',
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = 'Reminders';
-                      });
-                    },
-                  ),
-                  SizedBox(width: 8),
-                  FilterButton(
-                    label: l10n.medstock_reserv,
-                    isSelected: selectedFilter == 'medicine stock/Reservation',
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = 'medicine stock/Reservation';
-                      });
-                    },
-                  ),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    FilterButton(
+                      label: l10n.all,
+                      isSelected: selectedFilter == 'All',
+                      onTap: () {
+                        setState(() {
+                          selectedFilter = 'All';
+                        });
+                      },
+                    ),
+                    SizedBox(width: 8),
+                    FilterButton(
+                      label: l10n.reminders,
+                      isSelected: selectedFilter == 'Reminders',
+                      onTap: () {
+                        setState(() {
+                          selectedFilter = 'Reminders';
+                        });
+                      },
+                    ),
+                    SizedBox(width: 8),
+                    FilterButton(
+                      label: l10n.medstock_reserv,
+                      isSelected:
+                          selectedFilter == 'medicine stock/Reservation',
+                      onTap: () {
+                        setState(() {
+                          selectedFilter = 'medicine stock/Reservation';
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -123,8 +127,11 @@ class _NotificationsViewState extends State<_NotificationsView> {
                   // Filter notifications based on selected filter
                   final filteredGroups =
                       selectedFilter == 'medicine stock/Reservation'
-                      ? <GroupedNotifications>[] // Empty list for medstock/reserv (no medicine reminders)
-                      : state.groupedNotifications; // Show all for 'All' and 'Reminders'
+                      ? <
+                          GroupedNotifications
+                        >[] // Empty list for medstock/reserv (no medicine reminders)
+                      : state
+                            .groupedNotifications; // Show all for 'All' and 'Reminders'
 
                   if (filteredGroups.isEmpty) {
                     return Center(
@@ -169,7 +176,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
                       itemCount: filteredGroups.length,
                       itemBuilder: (context, index) {
                         final group = filteredGroups[index];
-                        
+
                         // Translate group labels
                         String translatedLabel;
                         if (group.label == 'Today') {
@@ -181,7 +188,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
                         } else {
                           translatedLabel = group.label;
                         }
-                        
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -200,24 +207,36 @@ class _NotificationsViewState extends State<_NotificationsView> {
                               String message = '';
                               switch (notification.messageIndex) {
                                 case 1:
-                                  message = l10n.notification_message_1(notification.medicineName);
+                                  message = l10n.notification_message_1(
+                                    notification.medicineName,
+                                  );
                                   break;
                                 case 2:
-                                  message = l10n.notification_message_2(notification.medicineName);
+                                  message = l10n.notification_message_2(
+                                    notification.medicineName,
+                                  );
                                   break;
                                 case 3:
-                                  message = l10n.notification_message_3(notification.medicineName);
+                                  message = l10n.notification_message_3(
+                                    notification.medicineName,
+                                  );
                                   break;
                                 case 4:
-                                  message = l10n.notification_message_4(notification.medicineName);
+                                  message = l10n.notification_message_4(
+                                    notification.medicineName,
+                                  );
                                   break;
                                 case 5:
-                                  message = l10n.notification_message_5(notification.medicineName);
+                                  message = l10n.notification_message_5(
+                                    notification.medicineName,
+                                  );
                                   break;
                                 default:
-                                  message = l10n.notification_message_1(notification.medicineName);
+                                  message = l10n.notification_message_1(
+                                    notification.medicineName,
+                                  );
                               }
-                              
+
                               return NotificationCard(
                                 time: notification.formattedTime,
                                 message: message,
@@ -282,7 +301,7 @@ class NotificationCard extends StatelessWidget {
   final String message;
 
   const NotificationCard({Key? key, required this.time, required this.message})
-      : super(key: key);
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {

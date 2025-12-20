@@ -18,7 +18,7 @@ import 'db_reservation.dart';
 class DBHelper {
   static const _databaseName = "medic_app.db";
   static const _databaseVersion =
-      4; // Incremented for schema change (medicine_id -> medicine_name)
+      5; // Incremented for reservation table schema change (pharmacy_id, medicine_name, created_at)
   static Database? _database;
 
   // List all table create statements in order
@@ -145,6 +145,25 @@ class DBHelper {
         await db.execute(
           'ALTER TABLE medicine_tracking ADD COLUMN medicine_track_id INTEGER',
         );
+      }
+    } catch (_) {}
+
+    // reservation: ensure new columns exist
+    try {
+      final resCols = await columns('reservation');
+      final resNames = resCols.map((r) => r['name'] as String).toSet();
+      if (!resNames.contains('pharmacy_id')) {
+        await db.execute(
+          'ALTER TABLE reservation ADD COLUMN pharmacy_id INTEGER',
+        );
+      }
+      if (!resNames.contains('medicine_name')) {
+        await db.execute(
+          'ALTER TABLE reservation ADD COLUMN medicine_name TEXT',
+        );
+      }
+      if (!resNames.contains('created_at')) {
+        await db.execute('ALTER TABLE reservation ADD COLUMN created_at TEXT');
       }
     } catch (_) {}
   }

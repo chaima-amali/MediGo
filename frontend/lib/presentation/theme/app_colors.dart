@@ -25,6 +25,10 @@ class AppColors {
   static const Color inStock = Color(0xFF4CAF50);
   static const Color outOfStock = Color(0xFFFF5252);
 
+  // Text colors
+  static const Color textDark = Color(0xFF2D3436);
+  static const Color textLight = Color(0xFF636E72);
+
   // Subscription badges
   static const Color premiumOrange = Color(0xFFFF9800);
   static const Color premiumGold = Color(0xFFFFD700);

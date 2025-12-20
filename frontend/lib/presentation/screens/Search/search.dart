@@ -6,7 +6,7 @@ import 'package:frontend/logic/cubits/medicine_search_cubit.dart';
 import 'package:frontend/data/models/user.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
-import 'package:frontend/services/location_service.dart';
+import 'package:frontend/presentation/services/location_service.dart';
 import 'package:frontend/data/repositories/medicine_search_history_repo.dart';
 import 'package:frontend/data/repositories/medicine_find_repo.dart';
 import '../notifications.dart' as notif_page;
