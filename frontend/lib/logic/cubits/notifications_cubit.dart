@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/repositories/occurrence_repository.dart';
-import 'package:frontend/models/notification_item.dart';
+import '../../data/models/notification_item.dart';
 
 class NotificationsState {
   final List<GroupedNotifications> groupedNotifications;

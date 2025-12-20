@@ -1,6 +1,4 @@
 // lib/data/mock/pharmacy_mock_data.dart
-
-import '../../data/models/pharmacy.dart';
 import 'dart:math';
 
 class MockDataServices {
