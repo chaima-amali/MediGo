@@ -18,7 +18,7 @@ import '../Reservations/reservations_form.dart';
 import 'package:frontend/data/models/user.dart';
 import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/controllers/pharmacy_controller.dart';
-import 'package:frontend/services/location_service.dart';
+import 'package:frontend/presentation/services/location_service.dart';
 
 // Main Screen with Bottom Navigation
 class MainScreen extends StatefulWidget {

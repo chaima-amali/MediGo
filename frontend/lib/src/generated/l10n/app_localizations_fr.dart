@@ -1045,4 +1045,73 @@ class AppLocalizationsFr extends AppLocalizations {
   String notification_message_5(String medicineName) {
     return 'Ne manquez pas votre dose de \"$medicineName\" — votre bien-être compte!';
   }
+
+  @override
+  String get unableToValidatePharmacyHours =>
+      'Impossible de valider les heures de pharmacie';
+
+  @override
+  String get pickupTimeCannotBeInPast =>
+      'L\'heure de retrait ne peut pas être dans le passé';
+
+  @override
+  String get userNotAuthenticated => 'Utilisateur non authentifié';
+
+  @override
+  String get codeCopiedToClipboard => 'Code copié dans le presse-papiers';
+
+  @override
+  String get qrCode => 'Code QR';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get markAsCompleted => 'Marquer comme terminé';
+
+  @override
+  String get confirmReservationQuestion => 'Confirmer la réservation?';
+
+  @override
+  String get confirmReservationMessage =>
+      'Êtes-vous sûr de vouloir confirmer cette réservation?';
+
+  @override
+  String get yesConfirm => 'Oui, confirmer';
+
+  @override
+  String get reservationConfirmedSuccess => 'Réservation confirmée avec succès';
+
+  @override
+  String get deleteReservationQuestion => 'Supprimer la réservation?';
+
+  @override
+  String get deleteReservationMessage =>
+      'Êtes-vous sûr de vouloir supprimer cette réservation? Cette action ne peut pas être annulée.';
+
+  @override
+  String get yesDelete => 'Oui, supprimer';
+
+  @override
+  String get reservationDeletedSuccess => 'Réservation supprimée avec succès';
+
+  @override
+  String get medicine => 'Médicament';
+
+  @override
+  String get pharmacy => 'Pharmacie';
+
+  @override
+  String get pharmacyNotAvailable => 'Pharmacie non disponible';
+
+  @override
+  String get reservationCancelled => 'Réservation annulée';
+
+  @override
+  String get reservationCancelledMessage =>
+      'Cette réservation a été annulée. Vous pouvez la supprimer de vos dossiers.';
+
+  @override
+  String get awaitingPharmacyConfirmation =>
+      'En attente de confirmation de la pharmacie';
 }

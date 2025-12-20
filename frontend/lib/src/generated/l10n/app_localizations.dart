@@ -2013,6 +2013,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don\'t miss your dose of \"{medicineName}\" — your wellness matters!'**
   String notification_message_5(String medicineName);
+
+  /// No description provided for @unableToValidatePharmacyHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to validate pharmacy hours'**
+  String get unableToValidatePharmacyHours;
+
+  /// No description provided for @pickupTimeCannotBeInPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup time cannot be in the past'**
+  String get pickupTimeCannotBeInPast;
+
+  /// No description provided for @userNotAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'User not authenticated'**
+  String get userNotAuthenticated;
+
+  /// No description provided for @codeCopiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied to clipboard'**
+  String get codeCopiedToClipboard;
+
+  /// No description provided for @qrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Code'**
+  String get qrCode;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @markAsCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Completed'**
+  String get markAsCompleted;
+
+  /// No description provided for @confirmReservationQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Reservation?'**
+  String get confirmReservationQuestion;
+
+  /// No description provided for @confirmReservationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to confirm this reservation?'**
+  String get confirmReservationMessage;
+
+  /// No description provided for @yesConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Confirm'**
+  String get yesConfirm;
+
+  /// No description provided for @reservationConfirmedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation confirmed successfully'**
+  String get reservationConfirmedSuccess;
+
+  /// No description provided for @deleteReservationQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Reservation?'**
+  String get deleteReservationQuestion;
+
+  /// No description provided for @deleteReservationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this reservation? This action cannot be undone.'**
+  String get deleteReservationMessage;
+
+  /// No description provided for @yesDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Delete'**
+  String get yesDelete;
+
+  /// No description provided for @reservationDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation deleted successfully'**
+  String get reservationDeletedSuccess;
+
+  /// No description provided for @medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine'**
+  String get medicine;
+
+  /// No description provided for @pharmacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy'**
+  String get pharmacy;
+
+  /// No description provided for @pharmacyNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy not available'**
+  String get pharmacyNotAvailable;
+
+  /// No description provided for @reservationCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation Cancelled'**
+  String get reservationCancelled;
+
+  /// No description provided for @reservationCancelledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This reservation has been cancelled. You can delete it from your records.'**
+  String get reservationCancelledMessage;
+
+  /// No description provided for @awaitingPharmacyConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting Pharmacy Confirmation'**
+  String get awaitingPharmacyConfirmation;
 }
 
 class _AppLocalizationsDelegate

@@ -1025,4 +1025,72 @@ class AppLocalizationsAr extends AppLocalizations {
   String notification_message_5(String medicineName) {
     return 'لا تفوت جرعتك من \"$medicineName\" — رفاهيتك مهمة!';
   }
+
+  @override
+  String get unableToValidatePharmacyHours =>
+      'غير قادر على التحقق من ساعات الصيدلية';
+
+  @override
+  String get pickupTimeCannotBeInPast =>
+      'لا يمكن أن يكون وقت الاستلام في الماضي';
+
+  @override
+  String get userNotAuthenticated => 'المستخدم غير مصادق عليه';
+
+  @override
+  String get codeCopiedToClipboard => 'تم نسخ الرمز إلى الحافظة';
+
+  @override
+  String get qrCode => 'رمز الاستجابة السريعة';
+
+  @override
+  String get close => 'إغلاق';
+
+  @override
+  String get markAsCompleted => 'وضع علامة كمكتمل';
+
+  @override
+  String get confirmReservationQuestion => 'تأكيد الحجز؟';
+
+  @override
+  String get confirmReservationMessage =>
+      'هل أنت متأكد أنك تريد تأكيد هذا الحجز؟';
+
+  @override
+  String get yesConfirm => 'نعم، تأكيد';
+
+  @override
+  String get reservationConfirmedSuccess => 'تم تأكيد الحجز بنجاح';
+
+  @override
+  String get deleteReservationQuestion => 'حذف الحجز؟';
+
+  @override
+  String get deleteReservationMessage =>
+      'هل أنت متأكد أنك تريد حذف هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get yesDelete => 'نعم، احذف';
+
+  @override
+  String get reservationDeletedSuccess => 'تم حذف الحجز بنجاح';
+
+  @override
+  String get medicine => 'دواء';
+
+  @override
+  String get pharmacy => 'صيدلية';
+
+  @override
+  String get pharmacyNotAvailable => 'الصيدلية غير متوفرة';
+
+  @override
+  String get reservationCancelled => 'تم إلغاء الحجز';
+
+  @override
+  String get reservationCancelledMessage =>
+      'تم إلغاء هذا الحجز. يمكنك حذفه من سجلاتك.';
+
+  @override
+  String get awaitingPharmacyConfirmation => 'في انتظار تأكيد الصيدلية';
 }

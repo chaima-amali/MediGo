@@ -1,5 +1,5 @@
 import 'dart:math';
-import '../data/models/pharmacy.dart';
+import '../../data/models/pharmacy.dart';
 
 class LocationService {
   // Calculate distance between two coordinates using Haversine formula

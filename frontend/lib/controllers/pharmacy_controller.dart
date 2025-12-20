@@ -1,7 +1,7 @@
 import '../data/models/pharmacy.dart';
 import '../data/models/user.dart';
 import '../data/repositories/pharmacy_repo.dart';
-import '../services/location_service.dart';
+import '../presentation/services/location_service.dart';
 
 class PharmacyController {
   final PharmacyRepository _repository = PharmacyRepository();
