@@ -1034,4 +1034,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String notification_message_5(String medicineName) {
     return 'Don\'t miss your dose of \"$medicineName\" — your wellness matters!';
   }
+
+  @override
+  String get unableToValidatePharmacyHours =>
+      'Unable to validate pharmacy hours';
+
+  @override
+  String get pickupTimeCannotBeInPast => 'Pickup time cannot be in the past';
+
+  @override
+  String get userNotAuthenticated => 'User not authenticated';
+
+  @override
+  String get codeCopiedToClipboard => 'Code copied to clipboard';
+
+  @override
+  String get qrCode => 'QR Code';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get markAsCompleted => 'Mark as Completed';
+
+  @override
+  String get confirmReservationQuestion => 'Confirm Reservation?';
+
+  @override
+  String get confirmReservationMessage =>
+      'Are you sure you want to confirm this reservation?';
+
+  @override
+  String get yesConfirm => 'Yes, Confirm';
+
+  @override
+  String get reservationConfirmedSuccess =>
+      'Reservation confirmed successfully';
+
+  @override
+  String get deleteReservationQuestion => 'Delete Reservation?';
+
+  @override
+  String get deleteReservationMessage =>
+      'Are you sure you want to delete this reservation? This action cannot be undone.';
+
+  @override
+  String get yesDelete => 'Yes, Delete';
+
+  @override
+  String get reservationDeletedSuccess => 'Reservation deleted successfully';
+
+  @override
+  String get medicine => 'Medicine';
+
+  @override
+  String get pharmacy => 'Pharmacy';
+
+  @override
+  String get pharmacyNotAvailable => 'Pharmacy not available';
+
+  @override
+  String get reservationCancelled => 'Reservation Cancelled';
+
+  @override
+  String get reservationCancelledMessage =>
+      'This reservation has been cancelled. You can delete it from your records.';
+
+  @override
+  String get awaitingPharmacyConfirmation => 'Awaiting Pharmacy Confirmation';
 }

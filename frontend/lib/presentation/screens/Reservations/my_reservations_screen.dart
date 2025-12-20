@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
-import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
+import 'package:frontend/logic/cubits/reservation_cubit.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
+import 'package:frontend/data/models/reservation.dart';
 import 'reservation_details.dart';
 
 class MyReservationsScreen extends StatefulWidget {
@@ -15,8 +18,6 @@ class MyReservationsScreen extends StatefulWidget {
 
 class _MyReservationsScreenState extends State<MyReservationsScreen> {
   String _selectedTab = 'active'; // Use lowercase keys for consistency
-  List<Map<String, dynamic>> _reservations = [];
-  // Using modal bottom sheet now; no local bool required
 
   @override
   void initState() {
@@ -25,22 +26,18 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   }
 
   void _loadReservations() {
-    final allReservations = MockDataService.getUserReservations();
-    setState(() {
-      if (_selectedTab == 'active') {
-        _reservations = allReservations
-            .where((r) => r['status'] == 'pending')
-            .toList();
-      } else if (_selectedTab == 'completed') {
-        _reservations = allReservations
-            .where((r) => r['status'] == 'completed')
-            .toList();
-      } else if (_selectedTab == 'cancelled') {
-        _reservations = allReservations
-            .where((r) => r['status'] == 'cancelled')
-            .toList();
-      }
-    });
+    final userState = context.read<UserCubit>().state;
+    int userId = 0;
+
+    if (userState is UserAuthenticated) {
+      userId = userState.user.userId!;
+    } else if (userState is UserLoaded) {
+      userId = userState.user.userId!;
+    }
+
+    if (userId != 0) {
+      context.read<ReservationCubit>().loadUserReservations(userId);
+    }
   }
 
   Color _getStatusColor(String status) {
@@ -48,7 +45,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
       case 'pending':
         return const Color(0xFFFFF4D6);
       case 'confirmed':
-        return const Color(0xFFD6F5F5);
+        return const Color(0xFFE8F5E9); // Light green background
       case 'completed':
         return const Color(0xFFE3F2FD);
       case 'cancelled':
@@ -91,198 +88,243 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final totalReservations = MockDataService.getUserReservations().length;
 
-    return Scaffold(
-      // Full-bleed pale cyan header background to match design
-      backgroundColor: AppColors.lightBlue,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header (styled)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Row(
-                children: [
-                  CustomBackArrow(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    // mint background for the rounded back bubble (matches design)
-                    backgroundColor: AppColors.mint,
-                    iconColor: AppColors.darkBlue,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          loc.myReservations,
-                          style: AppText.bold.copyWith(
-                            fontSize: 22,
-                            color: AppColors.darkBlue,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$totalReservations total',
-                          style: AppText.regular.copyWith(
-                            fontSize: 13,
-                            color: AppColors.darkBlue.withOpacity(0.6),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Content (white rounded sheet overlapping header)
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(top: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.darkBlue.withOpacity(0.04),
-                      blurRadius: 20,
-                      offset: const Offset(0, -6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    // Total reservations
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              '$totalReservations total reservations',
+    return BlocBuilder<ReservationCubit, ReservationState>(
+      builder: (context, state) {
+        List<Reservation> allReservations = [];
+
+        if (state is ReservationLoaded) {
+          allReservations = state.reservations;
+        }
+
+        // Filter by selected tab
+        List<Reservation> filteredReservations = [];
+        if (_selectedTab == 'active') {
+          // Active tab shows both pending and confirmed reservations
+          filteredReservations = allReservations
+              .where((r) => r.status == 'pending' || r.status == 'confirmed')
+              .toList();
+        } else if (_selectedTab == 'completed') {
+          filteredReservations = allReservations
+              .where((r) => r.status == 'completed')
+              .toList();
+        } else if (_selectedTab == 'cancelled') {
+          filteredReservations = allReservations
+              .where((r) => r.status == 'cancelled')
+              .toList();
+        }
+
+        final totalReservations = allReservations.length;
+
+        return Scaffold(
+          // Full-bleed pale cyan header background to match design
+          backgroundColor: AppColors.lightBlue,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Header (styled)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Row(
+                    children: [
+                      CustomBackArrow(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        // mint background for the rounded back bubble (matches design)
+                        backgroundColor: AppColors.mint,
+                        iconColor: AppColors.darkBlue,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              loc.myReservations,
+                              style: AppText.bold.copyWith(
+                                fontSize: 22,
+                                color: AppColors.darkBlue,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '$totalReservations total',
                               style: AppText.regular.copyWith(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: AppColors.darkBlue.withOpacity(0.6),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Tabs
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: AppColors.darkBlue.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(child: _buildTab('active', loc.active)),
-                            Expanded(child: _buildTab('completed', loc.completed)),
-                            Expanded(child: _buildTab('cancelled', loc.cancelled)),
                           ],
                         ),
                       ),
+                    ],
+                  ),
+                ),
+                // Content (white rounded sheet overlapping header)
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.darkBlue.withOpacity(0.04),
+                          blurRadius: 20,
+                          offset: const Offset(0, -6),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 24),
-                    // Reservations list
-                    Expanded(
-                      child: _reservations.isEmpty
-                          ? _buildEmptyState()
-                          : ListView.builder(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                              ),
-                              itemCount: _reservations.length,
-                              itemBuilder: (context, index) {
-                                final res = _reservations[index];
-                                return InkWell(
-                                  onTap: () {
-                                    // Navigate to details screen with reservation id
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            ReservationDetailsScreen(
-                                              reservationId:
-                                                  res['reservation_id'],
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                  child: _buildReservationCard(res),
-                                );
-                              },
-                            ),
-                    ),
-                    // Status Guide Button
-                    Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: GestureDetector(
-                        onTap: () {
-                          // Open modal bottom sheet; it can be dismissed by tapping outside or swiping down
-                          showModalBottomSheet<void>(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (BuildContext ctx) {
-                              return SafeArea(child: _buildStatusGuideSheet());
-                            },
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.primary.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        // Total reservations
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(
-                                Icons.bar_chart,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                loc.statusGuide,
-                                style: AppText.medium.copyWith(
-                                  fontSize: 14,
-                                  color: AppColors.primary,
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '$totalReservations total reservations',
+                                  style: AppText.regular.copyWith(
+                                    fontSize: 14,
+                                    color: AppColors.darkBlue.withOpacity(0.6),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        // Tabs
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.darkBlue.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildTab('active', loc.active),
+                                ),
+                                Expanded(
+                                  child: _buildTab('completed', loc.completed),
+                                ),
+                                Expanded(
+                                  child: _buildTab('cancelled', loc.cancelled),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Reservations list
+                        Expanded(
+                          child: state is ReservationLoading
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.primary,
+                                  ),
+                                )
+                              : filteredReservations.isEmpty
+                              ? _buildEmptyState()
+                              : ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                  ),
+                                  itemCount: filteredReservations.length,
+                                  itemBuilder: (context, index) {
+                                    final res = filteredReservations[index];
+                                    return InkWell(
+                                      onTap: () async {
+                                        // Navigate to details screen with reservation id
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                ReservationDetailsScreen(
+                                                  reservationId: res
+                                                      .reservationId!
+                                                      .toString(),
+                                                ),
+                                          ),
+                                        );
+                                        // Reload reservations after returning from details
+                                        _loadReservations();
+                                      },
+                                      child: _buildReservationCard(res),
+                                    );
+                                  },
+                                ),
+                        ),
+                        // Status Guide Button
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Open modal bottom sheet; it can be dismissed by tapping outside or swiping down
+                              showModalBottomSheet<void>(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (BuildContext ctx) {
+                                  return SafeArea(
+                                    child: _buildStatusGuideSheet(),
+                                  );
+                                },
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.bar_chart,
+                                    color: AppColors.primary,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    loc.statusGuide,
+                                    style: AppText.medium.copyWith(
+                                      fontSize: 14,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -325,7 +367,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
     );
   }
 
-  Widget _buildReservationCard(Map<String, dynamic> reservation) {
+  Widget _buildReservationCard(Reservation reservation) {
     final loc = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -353,7 +395,8 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      reservation['medicine_name'],
+                      reservation.medicineName ??
+                          'Reservation #${reservation.reservationId}',
                       style: AppText.bold.copyWith(
                         fontSize: 16,
                         color: AppColors.darkBlue,
@@ -361,7 +404,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${loc.quantity}: ${reservation['quantity']}',
+                      '${loc.quantity}: ${reservation.quantity}',
                       style: AppText.regular.copyWith(
                         fontSize: 12,
                         color: AppColors.darkBlue.withOpacity(0.6),
@@ -376,14 +419,14 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(reservation['status']),
+                  color: _getStatusColor(reservation.status),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  _getLocalizedStatus(reservation['status'], loc),
+                  _getLocalizedStatus(reservation.status, loc),
                   style: AppText.medium.copyWith(
                     fontSize: 12,
-                    color: _getStatusTextColor(reservation['status']),
+                    color: _getStatusTextColor(reservation.status),
                   ),
                 ),
               ),
@@ -393,31 +436,13 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
           Row(
             children: [
               Icon(
-                Icons.location_on_outlined,
-                size: 16,
-                color: AppColors.darkBlue.withOpacity(0.6),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                reservation['pharmacy_name'] ?? 'PharmSync',
-                style: AppText.regular.copyWith(
-                  fontSize: 12,
-                  color: AppColors.darkBlue.withOpacity(0.6),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(
                 Icons.calendar_today_outlined,
                 size: 16,
                 color: AppColors.darkBlue.withOpacity(0.6),
               ),
               const SizedBox(width: 4),
               Text(
-                '${loc.pickup}: ${reservation['pickup_date']} ${loc.at} ${reservation['pickup_time']}',
+                '${loc.pickup}: ${reservation.day} ${loc.at} ${reservation.time}',
                 style: AppText.regular.copyWith(
                   fontSize: 12,
                   color: AppColors.darkBlue.withOpacity(0.6),
@@ -440,7 +465,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
     } else {
       emptyMessage = loc.noCancelledReservations;
     }
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
