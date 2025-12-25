@@ -1198,12 +1198,6 @@ abstract class AppLocalizations {
   /// **'Copy Code'**
   String get copyCode;
 
-  /// No description provided for @showQRCode.
-  ///
-  /// In en, this message translates to:
-  /// **'Show QR Code for Scanning'**
-  String get showQRCode;
-
   /// No description provided for @showQrCode.
   ///
   /// In en, this message translates to:
@@ -2139,6 +2133,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Awaiting Pharmacy Confirmation'**
   String get awaitingPharmacyConfirmation;
+
+  /// No description provided for @medicationReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Reports'**
+  String get medicationReports;
+
+  /// No description provided for @adherenceReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence Reports'**
+  String get adherenceReports;
+
+  /// No description provided for @trackMedicationAdherence.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your medication adherence over time'**
+  String get trackMedicationAdherence;
+
+  /// No description provided for @weeklyReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Report'**
+  String get weeklyReport;
+
+  /// No description provided for @viewAdherenceLast7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'View adherence data for the last 7 days'**
+  String get viewAdherenceLast7Days;
+
+  /// No description provided for @monthlyReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Report'**
+  String get monthlyReport;
+
+  /// No description provided for @viewAdherenceLast30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'View adherence data for the last 30 days'**
+  String get viewAdherenceLast30Days;
+
+  /// No description provided for @customReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Report'**
+  String get customReport;
+
+  /// No description provided for @generateCustomDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a report for a custom date range'**
+  String get generateCustomDateRange;
+
+  /// No description provided for @patientInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Information'**
+  String get patientInformation;
+
+  /// No description provided for @reportGeneratedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Generated On'**
+  String get reportGeneratedOn;
+
+  /// No description provided for @reportPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Period'**
+  String get reportPeriod;
+
+  /// No description provided for @adherenceSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence Summary'**
+  String get adherenceSummary;
+
+  /// No description provided for @medicinesNotTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines Not Taken'**
+  String get medicinesNotTaken;
+
+  /// No description provided for @averageTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Taken'**
+  String get averageTaken;
+
+  /// No description provided for @fullyAdherent.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully Adherent'**
+  String get fullyAdherent;
+
+  /// No description provided for @medicinesMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines Missed'**
+  String get medicinesMissed;
+
+  /// No description provided for @weeklyProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Progress'**
+  String get weeklyProgress;
+
+  /// No description provided for @medicationSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Summary'**
+  String get medicationSummary;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @detailedIntakeLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed Intake Log'**
+  String get detailedIntakeLog;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get taken;
+
+  /// No description provided for @missed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get missed;
+
+  /// No description provided for @skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skipped;
+
+  /// No description provided for @scheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get scheduled;
+
+  /// No description provided for @ongoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get ongoing;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @noMedicationDataFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No medication data found for this period.\n\nPlease add medicines and mark them as taken/missed to see reports.'**
+  String get noMedicationDataFound;
+
+  /// No description provided for @noUserDataFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No user data found. Please add your profile information first.'**
+  String get noUserDataFound;
+
+  /// No description provided for @loadingReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Report...'**
+  String get loadingReport;
+
+  /// No description provided for @selectDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date Range'**
+  String get selectDateRange;
+
+  /// No description provided for @selectStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Start Date'**
+  String get selectStartDate;
+
+  /// No description provided for @selectEndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select End Date'**
+  String get selectEndDate;
+
+  /// No description provided for @generateReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Report'**
+  String get generateReport;
+
+  /// No description provided for @quickSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Select'**
+  String get quickSelect;
+
+  /// No description provided for @lastWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Week'**
+  String get lastWeek;
+
+  /// No description provided for @lastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Month'**
+  String get lastMonth;
+
+  /// No description provided for @last3Months.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 3 Months'**
+  String get last3Months;
+
+  /// No description provided for @medicineAdherenceReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Adherence Report'**
+  String get medicineAdherenceReport;
+
+  /// No description provided for @generatingPDF.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating PDF...'**
+  String get generatingPDF;
+
+  /// No description provided for @pdfGeneratedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF generated successfully!'**
+  String get pdfGeneratedSuccessfully;
+
+  /// No description provided for @failedToGeneratePDF.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to generate PDF'**
+  String get failedToGeneratePDF;
+
+  /// No description provided for @totalScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Scheduled'**
+  String get totalScheduled;
+
+  /// No description provided for @shareReportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export your reports to share with your doctor or family members'**
+  String get shareReportDescription;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
+
+  /// No description provided for @shareReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Reports'**
+  String get shareReports;
 }
 
 class _AppLocalizationsDelegate
