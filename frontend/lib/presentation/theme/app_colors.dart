@@ -32,6 +32,12 @@ class AppColors {
   // Subscription badges
   static const Color premiumOrange = Color(0xFFFF9800);
   static const Color premiumGold = Color(0xFFFFD700);
+
+  // Dark mode variants
+  static const Color backgroundDark = Color(0xFF0B0B0B);
+  static const Color surfaceDark = Color(0xFF121212);
+  static const Color onSurfaceDark = Color(0xFFECECEC);
+  static const Color onPrimary = Color(0xFFFFFFFF);
 }
 
 /*

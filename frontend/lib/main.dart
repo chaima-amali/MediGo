@@ -13,6 +13,7 @@ import 'package:frontend/data/databases/db_helper.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/logic/cubits/medicine_search_cubit.dart';
 import 'package:frontend/logic/cubits/reservation_cubit.dart';
+import 'package:frontend/logic/cubits/theme_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,16 +33,16 @@ class MediGoApp extends StatefulWidget {
   const MediGoApp({super.key});
 
   static void setLocale(BuildContext context, Locale newLocale) {
-    _MediGoAppState? state = context.findAncestorStateOfType<_MediGoAppState>();
+    MediGoAppState? state = context.findAncestorStateOfType<MediGoAppState>();
     state?.setLocale(newLocale);
   }
 
   @override
-  State<MediGoApp> createState() => _MediGoAppState();
+  State<MediGoApp> createState() => MediGoAppState();
 }
 
-class _MediGoAppState extends State<MediGoApp> {
-  Locale _locale = const Locale('ar'); // Default to English
+class MediGoAppState extends State<MediGoApp> {
+  Locale _locale = const Locale('ar'); // Default to Arabic
 
   @override
   void initState() {
@@ -63,37 +64,65 @@ class _MediGoAppState extends State<MediGoApp> {
     });
   }
 
+  static MediGoAppState? of(BuildContext context) {
+    return context.findAncestorStateOfType<MediGoAppState>();
+  }
+
   @override
   Widget build(BuildContext context) {
+    debugPrint('🎨 Building MediGoApp widget...');
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => UserCubit(UserRepository())),
         BlocProvider(
-          create: (context) => MedicineSearchCubit(
-            pharmacyMedicineRepository: PharmacyMedicineRepository(),
-            medicineFindRepository: MedicineFindRepository(),
-          ),
+          create: (context) {
+            debugPrint('👤 Creating UserCubit...');
+            return UserCubit(UserRepository());
+          },
         ),
         BlocProvider(
-          create: (context) => ReservationCubit(ReservationRepository()),
+          create: (context) {
+            debugPrint('💊 Creating MedicineSearchCubit...');
+            return MedicineSearchCubit(
+              pharmacyMedicineRepository: PharmacyMedicineRepository(),
+              medicineFindRepository: MedicineFindRepository(),
+            );
+          },
+        ),
+        BlocProvider(
+          create: (context) {
+            debugPrint('📋 Creating ReservationCubit...');
+            return ReservationCubit(ReservationRepository());
+          },
+        ),
+        BlocProvider(
+          create: (context) {
+            debugPrint('🎨 Creating ThemeCubit...');
+            return ThemeCubit();
+          },
         ),
       ],
-      child: MaterialApp(
-        title: 'MediGo',
-        theme: appTheme,
-        debugShowCheckedModeBanner: false,
-        locale: _locale,
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('en'), Locale('fr'), Locale('ar')],
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp(
+            title: 'MediGo',
+            theme: appTheme,
+            darkTheme: darkTheme,
+            themeMode: themeState.themeMode,
+            debugShowCheckedModeBanner: false,
+            locale: _locale,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('fr'), Locale('ar')],
 
-        home: SplashScreen(),
+            home: SplashScreen(),
 
-        //ReservationDetailsScreen(reservationId: 'res_002',),
+            //ReservationDetailsScreen(reservationId: 'res_002',),
+          );
+        },
       ),
     );
   }

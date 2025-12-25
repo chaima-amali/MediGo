@@ -26,19 +26,25 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         leading: CustomBackArrow(),
         automaticallyImplyLeading: false,
         title: Text(
           l10n.weeklyReport,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white),
+            icon: Icon(
+              Icons.refresh,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             onPressed: () {
               context.read<AdherenceReportCubit>().loadWeeklyReport();
             },
@@ -49,18 +55,27 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
         builder: (context, state) {
           if (state is AdherenceReportLoading) {
             return Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             );
           } else if (state is AdherenceReportError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 60, color: AppColors.error),
+                  Icon(
+                    Icons.error_outline,
+                    size: 60,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                   SizedBox(height: 16),
                   Text(
                     state.message,
-                    style: TextStyle(color: AppColors.textDark, fontSize: 16),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 16),
@@ -68,11 +83,13 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                     onPressed: () =>
                         context.read<AdherenceReportCubit>().loadWeeklyReport(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                     ),
                     child: Text(
                       l10n.retry,
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                   ),
                 ],
@@ -207,7 +224,9 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFFE8F4FF),
+              color:
+                  Theme.of(context).colorScheme.surfaceVariant ??
+                  Color(0xFFE8F4FF),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -233,7 +252,12 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                 SizedBox(height: 8),
                 Text(
                   l10n.shareReportDescription,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
                 SizedBox(height: 16),
                 Row(
@@ -244,13 +268,17 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                         icon: Icon(Icons.download, size: 18),
                         label: Text('PDF'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.primary,
+                          backgroundColor: Theme.of(context).cardColor,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           elevation: 0,
                           padding: EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(color: Colors.grey[300]!),
+                            side: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                            ),
                           ),
                         ),
                       ),
@@ -262,13 +290,17 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                         icon: Icon(Icons.share, size: 18),
                         label: Text(l10n.share),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.primary,
+                          backgroundColor: Theme.of(context).cardColor,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           elevation: 0,
                           padding: EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(color: Colors.grey[300]!),
+                            side: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                            ),
                           ),
                         ),
                       ),
@@ -287,7 +319,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -305,7 +337,12 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
             children: [
               Text(
                 label,
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                ),
               ),
               Container(
                 padding: EdgeInsets.all(8),
@@ -323,7 +360,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -335,7 +372,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -359,7 +396,10 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
           Expanded(
             child: Text(
               label,
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
           ),
           Text(
@@ -367,7 +407,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -380,9 +420,9 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -390,10 +430,14 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(Icons.medication, color: AppColors.primary, size: 24),
+            child: Icon(
+              Icons.medication,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
           ),
           SizedBox(width: 12),
           Expanded(
@@ -405,13 +449,18 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 4),
                 Text(
                   dosage,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
               ],
             ),
@@ -419,7 +468,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -427,7 +476,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
@@ -455,14 +504,14 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
             '${l10n.pdfGeneratedSuccessfully}\nSaved to: Downloads/${pdfFile.path.split('/').last}',
           ),
           duration: Duration(seconds: 4),
-          backgroundColor: AppColors.success,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${l10n.failedToGeneratePDF}: ${e.toString()}'),
-          backgroundColor: AppColors.error,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     }
