@@ -4,6 +4,7 @@ import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../../../logic/cubits/adherence_report_cubit.dart';
 import '../../../data/repositories/adherence_report_repo.dart';
 import '../../theme/app_colors.dart';
+import 'package:frontend/presentation/widgets/back_arrow.dart';
 import 'weekly_report_page.dart';
 import 'monthly_report_page.dart';
 import 'date_range_selector_dialog.dart';
@@ -16,17 +17,21 @@ class ReportsHubPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor:
+            Theme.of(context).appBarTheme.backgroundColor ??
+            Theme.of(context).colorScheme.primary,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: CustomBackArrow(onPressed: () => Navigator.pop(context)),
         title: Text(
           l10n.medicationReports,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color:
+                Theme.of(context).appBarTheme.foregroundColor ??
+                Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: Padding(
@@ -39,13 +44,20 @@ class ReportsHubPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textDark,
+                color:
+                    Theme.of(context).textTheme.titleLarge?.color ??
+                    Theme.of(context).colorScheme.onBackground,
               ),
             ),
             SizedBox(height: 8),
             Text(
               l10n.trackMedicationAdherence,
-              style: TextStyle(fontSize: 14, color: AppColors.textLight),
+              style: TextStyle(
+                fontSize: 14,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+              ),
             ),
             SizedBox(height: 32),
             _buildReportCard(
@@ -94,7 +106,7 @@ class ReportsHubPage extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withOpacity(0.08),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: color.withOpacity(0.3)),
         ),
@@ -106,7 +118,11 @@ class ReportsHubPage extends StatelessWidget {
                 color: color,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: Colors.white, size: 28),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.onPrimary,
+                size: 28,
+              ),
             ),
             SizedBox(width: 16),
             Expanded(
@@ -118,13 +134,22 @@ class ReportsHubPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color:
+                          Theme.of(context).textTheme.bodyLarge?.color ??
+                          Theme.of(context).colorScheme.onBackground,
                     ),
                   ),
                   SizedBox(height: 4),
                   Text(
                     description,
-                    style: TextStyle(fontSize: 12, color: AppColors.textLight),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color:
+                          Theme.of(context).textTheme.bodySmall?.color ??
+                          Theme.of(
+                            context,
+                          ).colorScheme.onBackground.withOpacity(0.7),
+                    ),
                   ),
                 ],
               ),

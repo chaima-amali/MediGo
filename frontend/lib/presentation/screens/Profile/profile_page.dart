@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
+import 'package:frontend/logic/cubits/theme_cubit.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
@@ -12,6 +14,7 @@ import 'Edit_password.dart';
 import '../Home/splash_screen.dart';
 import '../Home/home_page.dart';
 import '../Reservations/my_reservations_screen.dart';
+import 'package:frontend/data/repositories/reservation_repo.dart';
 
 class ProfilePage extends StatefulWidget {
   final VoidCallback? onBackToHome;
@@ -26,11 +29,57 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _notificationsEnabled = false;
   bool _darkModeEnabled = false;
   String _currentLanguage = 'English';
+  int _activeReservationsCount = 0;
 
   @override
   void initState() {
     super.initState();
     _loadCurrentLanguage();
+    // Load reservations after frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadActiveReservations();
+      }
+    });
+  }
+
+  Future<void> _loadActiveReservations() async {
+    if (!mounted) return;
+
+    try {
+      final userCubit = context.read<UserCubit>();
+      final userState = userCubit.state;
+
+      if (userState is UserAuthenticated || userState is UserLoaded) {
+        final user = userState is UserAuthenticated
+            ? userState.user
+            : (userState as UserLoaded).user;
+
+        // Use userId field from User model
+        if (user.userId != null) {
+          final reservationRepo = ReservationRepository();
+          final reservations = await reservationRepo.getUserReservations(
+            user.userId!,
+          );
+          final activeCount = reservations
+              .where(
+                (r) =>
+                    r.status.toLowerCase() == 'pending' ||
+                    r.status.toLowerCase() == 'active',
+              )
+              .length;
+
+          if (mounted) {
+            setState(() {
+              _activeReservationsCount = activeCount;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading reservations count: $e');
+      // Fail silently, keep count at 0
+    }
   }
 
   Future<void> _loadCurrentLanguage() async {
@@ -100,13 +149,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   ? state.user
                   : (state as UserAuthenticated).user;
 
-              // Null-safety for latitude/longitude
+              // Null-safety for location
               String address = 'Not specified';
-              if (user.latitude != null && user.longitude != null) {
+              if (user.locationName != null && user.locationName!.isNotEmpty) {
+                address = user.locationName!;
+              } else if (user.latitude != null && user.longitude != null) {
                 address =
                     'Lat: ${user.latitude!.toStringAsFixed(4)}, Lng: ${user.longitude!.toStringAsFixed(4)}';
-              } else if (user.locationName != null) {
-                address = user.locationName!;
               }
 
               // Handle subscription type safely
@@ -122,7 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
@@ -319,7 +368,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         iconColor: const Color(0xFF4DD0E1),
                         backgroundColor: const Color(0xFFE0F7FA),
                         title: loc.myReservations,
-                        subtitle: loc.activeReservations,
+                        subtitle: _activeReservationsCount == 1
+                            ? '1 pending reservation'
+                            : '$_activeReservationsCount pending reservations',
                         onTap: () {
                           Navigator.push(
                             context,
@@ -347,20 +398,24 @@ class _ProfilePageState extends State<ProfilePage> {
                         onTap: () {},
                       ),
                       const SizedBox(height: 8),
-                      _buildSettingTile(
-                        icon: Icons.dark_mode_outlined,
-                        iconColor: const Color(0xFFBA68C8),
-                        backgroundColor: const Color(0xFFF3E5F5),
-                        title: loc.darkMode,
-                        subtitle: loc.darkModeDescription,
-                        showSwitch: true,
-                        switchValue: _darkModeEnabled,
-                        onSwitchChanged: (value) {
-                          setState(() {
-                            _darkModeEnabled = value;
-                          });
+                      BlocBuilder<ThemeCubit, ThemeState>(
+                        builder: (context, themeState) {
+                          return _buildSettingTile(
+                            icon: Icons.dark_mode_outlined,
+                            iconColor: const Color(0xFFBA68C8),
+                            backgroundColor: const Color(0xFFF3E5F5),
+                            title: loc.darkMode,
+                            subtitle: loc.darkModeDescription,
+                            showSwitch: true,
+                            switchValue: themeState.isDark,
+                            onSwitchChanged: (value) async {
+                              await context.read<ThemeCubit>().setDarkMode(
+                                value,
+                              );
+                            },
+                            onTap: () {},
+                          );
                         },
-                        onTap: () {},
                       ),
                       const SizedBox(height: 8),
                       _buildSettingTile(
@@ -540,12 +595,20 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: Colors.black87),
+        Icon(
+          icon,
+          size: 20,
+          color:
+              Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black87,
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+            ),
           ),
         ),
       ],
@@ -565,7 +628,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
