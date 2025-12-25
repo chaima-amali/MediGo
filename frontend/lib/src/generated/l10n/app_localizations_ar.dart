@@ -579,9 +579,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get copyCode => 'نسخ الرمز';
 
   @override
-  String get showQRCode => 'إظهار رمز الاستجابة السريعة للمسح';
-
-  @override
   String get showQrCode => 'إظهار رمز الاستجابة السريعة للمسح';
 
   @override
@@ -733,7 +730,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get startDate => 'تاريخ البداية';
 
   @override
-  String get endDate => 'تاريخ الانتهاء';
+  String get endDate => 'تاريخ النهاية';
 
   @override
   String get selectDate => 'اختر التاريخ';
@@ -1093,4 +1090,158 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get awaitingPharmacyConfirmation => 'في انتظار تأكيد الصيدلية';
+
+  @override
+  String get medicationReports => 'تقارير الأدوية';
+
+  @override
+  String get adherenceReports => 'تقارير الالتزام';
+
+  @override
+  String get trackMedicationAdherence =>
+      'تتبع التزامك بتناول الأدوية عبر الزمن';
+
+  @override
+  String get weeklyReport => 'التقرير الأسبوعي';
+
+  @override
+  String get viewAdherenceLast7Days => 'عرض بيانات الالتزام لآخر 7 أيام';
+
+  @override
+  String get monthlyReport => 'التقرير الشهري';
+
+  @override
+  String get viewAdherenceLast30Days => 'عرض بيانات الالتزام لآخر 30 يوماً';
+
+  @override
+  String get customReport => 'تقرير مخصص';
+
+  @override
+  String get generateCustomDateRange => 'إنشاء تقرير لنطاق زمني مخصص';
+
+  @override
+  String get patientInformation => 'معلومات المريض';
+
+  @override
+  String get reportGeneratedOn => 'تم إنشاء التقرير في';
+
+  @override
+  String get reportPeriod => 'فترة التقرير';
+
+  @override
+  String get adherenceSummary => 'ملخص الالتزام';
+
+  @override
+  String get medicinesNotTaken => 'الأدوية غير المأخوذة';
+
+  @override
+  String get averageTaken => 'المتوسط المأخوذ';
+
+  @override
+  String get fullyAdherent => 'الالتزام الكامل';
+
+  @override
+  String get medicinesMissed => 'الأدوية الفائتة';
+
+  @override
+  String get weeklyProgress => 'التقدم الأسبوعي';
+
+  @override
+  String get medicationSummary => 'ملخص الأدوية';
+
+  @override
+  String get duration => 'المدة';
+
+  @override
+  String get status => 'الحالة';
+
+  @override
+  String get detailedIntakeLog => 'سجل التناول التفصيلي';
+
+  @override
+  String get date => 'التاريخ';
+
+  @override
+  String get taken => 'مأخوذ';
+
+  @override
+  String get missed => 'فائت';
+
+  @override
+  String get skipped => 'متجاوز';
+
+  @override
+  String get scheduled => 'مجدول';
+
+  @override
+  String get ongoing => 'جاري';
+
+  @override
+  String get share => 'مشاركة';
+
+  @override
+  String get download => 'تحميل';
+
+  @override
+  String get noMedicationDataFound =>
+      'لم يتم العثور على بيانات دواء لهذه الفترة.\n\nالرجاء إضافة الأدوية ووضع علامة عليها كمأخوذة/فائتة لرؤية التقارير.';
+
+  @override
+  String get noUserDataFound =>
+      'لم يتم العثور على بيانات المستخدم. الرجاء إضافة معلومات ملفك الشخصي أولاً.';
+
+  @override
+  String get loadingReport => 'جاري تحميل التقرير...';
+
+  @override
+  String get selectDateRange => 'اختر نطاق التاريخ';
+
+  @override
+  String get selectStartDate => 'اختر تاريخ البداية';
+
+  @override
+  String get selectEndDate => 'اختر تاريخ النهاية';
+
+  @override
+  String get generateReport => 'إنشاء التقرير';
+
+  @override
+  String get quickSelect => 'اختيار سريع';
+
+  @override
+  String get lastWeek => 'الأسبوع الماضي';
+
+  @override
+  String get lastMonth => 'الشهر الماضي';
+
+  @override
+  String get last3Months => 'آخر 3 أشهر';
+
+  @override
+  String get medicineAdherenceReport => 'تقرير الالتزام بالدواء';
+
+  @override
+  String get generatingPDF => 'جاري إنشاء PDF...';
+
+  @override
+  String get pdfGeneratedSuccessfully => 'تم إنشاء PDF بنجاح!';
+
+  @override
+  String get failedToGeneratePDF => 'فشل إنشاء PDF';
+
+  @override
+  String get totalScheduled => 'إجمالي المجدول';
+
+  @override
+  String get shareReportDescription =>
+      'قم بتصدير تقاريرك لمشاركتها مع طبيبك أو أفراد عائلتك';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get comingSoon => 'قريباً';
+
+  @override
+  String get shareReports => 'مشاركة التقارير';
 }

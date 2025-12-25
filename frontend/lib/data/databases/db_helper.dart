@@ -14,11 +14,12 @@ import 'db_medicine_find.dart';
 import 'db_pharmacy.dart';
 import 'db_pharmacy_medicine.dart';
 import 'db_reservation.dart';
+import 'db_medication_intake_log.dart';
 
 class DBHelper {
   static const _databaseName = "medic_app.db";
   static const _databaseVersion =
-      5; // Incremented for reservation table schema change (pharmacy_id, medicine_name, created_at)
+      6; // Incremented for medication_intake_log table for adherence reports
   static Database? _database;
 
   // List all table create statements in order
@@ -34,6 +35,8 @@ class DBHelper {
     DBPharmacyTable.sql_code,
     DBPharmacyMedicineTable.sql_code, // Inventory references both
     DBReservationTable.sql_code,
+    DBMedicationIntakeLogTable
+        .sql_code, // Medication intake tracking for reports
   ];
 
   static Future<Database> getDatabase() async {
@@ -78,6 +81,10 @@ class DBHelper {
           await db.execute('DROP TABLE IF EXISTS medicine_search_history');
           await db.execute(DBMedicineFindTable.sql_code);
         }
+        if (oldVersion < 6) {
+          // Version 6: Add medication_intake_log table for adherence reports
+          await db.execute(DBMedicationIntakeLogTable.sql_code);
+        }
       },
     );
     return _database!;
@@ -86,6 +93,18 @@ class DBHelper {
   static Future<void> _ensureSchema(Database db) async {
     Future<List<Map<String, Object?>>> columns(String table) async {
       return await db.rawQuery('PRAGMA table_info($table)');
+    }
+
+    // Check if medication_intake_log table exists, if not create it
+    try {
+      final tables = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='medication_intake_log'",
+      );
+      if (tables.isEmpty) {
+        await db.execute(DBMedicationIntakeLogTable.sql_code);
+      }
+    } catch (e) {
+      print('Error checking medication_intake_log table: $e');
     }
 
     // occurrence_plan: ensure 'date' and 'is_taken' exist

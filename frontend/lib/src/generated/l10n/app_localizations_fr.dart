@@ -591,9 +591,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get copyCode => 'Copier le code';
 
   @override
-  String get showQRCode => 'Afficher le code QR pour scanner';
-
-  @override
   String get showQrCode => 'Afficher le code QR pour scanner';
 
   @override
@@ -1114,4 +1111,161 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get awaitingPharmacyConfirmation =>
       'En attente de confirmation de la pharmacie';
+
+  @override
+  String get medicationReports => 'Rapports de médicaments';
+
+  @override
+  String get adherenceReports => 'Rapports d\'observance';
+
+  @override
+  String get trackMedicationAdherence =>
+      'Suivez votre observance médicamenteuse au fil du temps';
+
+  @override
+  String get weeklyReport => 'Rapport hebdomadaire';
+
+  @override
+  String get viewAdherenceLast7Days =>
+      'Voir les données d\'observance des 7 derniers jours';
+
+  @override
+  String get monthlyReport => 'Rapport mensuel';
+
+  @override
+  String get viewAdherenceLast30Days =>
+      'Voir les données d\'observance des 30 derniers jours';
+
+  @override
+  String get customReport => 'Rapport personnalisé';
+
+  @override
+  String get generateCustomDateRange =>
+      'Générer un rapport pour une plage de dates personnalisée';
+
+  @override
+  String get patientInformation => 'Informations du patient';
+
+  @override
+  String get reportGeneratedOn => 'Rapport généré le';
+
+  @override
+  String get reportPeriod => 'Période du rapport';
+
+  @override
+  String get adherenceSummary => 'Résumé de l\'observance';
+
+  @override
+  String get medicinesNotTaken => 'Médicaments non pris';
+
+  @override
+  String get averageTaken => 'Moyenne prise';
+
+  @override
+  String get fullyAdherent => 'Pleinement observant';
+
+  @override
+  String get medicinesMissed => 'Médicaments manqués';
+
+  @override
+  String get weeklyProgress => 'Progrès hebdomadaire';
+
+  @override
+  String get medicationSummary => 'Résumé des médicaments';
+
+  @override
+  String get duration => 'Durée';
+
+  @override
+  String get status => 'Statut';
+
+  @override
+  String get detailedIntakeLog => 'Journal de prise détaillé';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get taken => 'Pris';
+
+  @override
+  String get missed => 'Manqué';
+
+  @override
+  String get skipped => 'Ignoré';
+
+  @override
+  String get scheduled => 'Programmé';
+
+  @override
+  String get ongoing => 'En cours';
+
+  @override
+  String get share => 'Partager';
+
+  @override
+  String get download => 'Télécharger';
+
+  @override
+  String get noMedicationDataFound =>
+      'Aucune donnée de médicament trouvée pour cette période.\n\nVeuillez ajouter des médicaments et les marquer comme pris/manqués pour voir les rapports.';
+
+  @override
+  String get noUserDataFound =>
+      'Aucune donnée utilisateur trouvée. Veuillez d\'abord ajouter vos informations de profil.';
+
+  @override
+  String get loadingReport => 'Chargement du rapport...';
+
+  @override
+  String get selectDateRange => 'Sélectionner la plage de dates';
+
+  @override
+  String get selectStartDate => 'Sélectionner la date de début';
+
+  @override
+  String get selectEndDate => 'Sélectionner la date de fin';
+
+  @override
+  String get generateReport => 'Générer le rapport';
+
+  @override
+  String get quickSelect => 'Sélection rapide';
+
+  @override
+  String get lastWeek => 'Semaine dernière';
+
+  @override
+  String get lastMonth => 'Mois dernier';
+
+  @override
+  String get last3Months => '3 derniers mois';
+
+  @override
+  String get medicineAdherenceReport => 'Rapport d\'observance médicamenteuse';
+
+  @override
+  String get generatingPDF => 'Génération du PDF...';
+
+  @override
+  String get pdfGeneratedSuccessfully => 'PDF généré avec succès !';
+
+  @override
+  String get failedToGeneratePDF => 'Échec de la génération du PDF';
+
+  @override
+  String get totalScheduled => 'Total Programmé';
+
+  @override
+  String get shareReportDescription =>
+      'Exportez vos rapports pour les partager avec votre médecin ou les membres de votre famille';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get comingSoon => 'Bientôt Disponible';
+
+  @override
+  String get shareReports => 'Partager les Rapports';
 }

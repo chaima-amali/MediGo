@@ -5,7 +5,7 @@ import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/data/repositories/occurrence_repository.dart';
 import 'package:frontend/data/models/occurrence_plan.dart';
-import 'reports_page.dart';
+import 'reports_hub_page.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 import '../notifications.dart' as notif_page hide CustomBackArrow;
 
@@ -261,7 +261,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              const ReportsScreen(),
+                                              const ReportsHubPage(),
                                         ),
                                       );
                                     },

@@ -584,9 +584,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyCode => 'Copy Code';
 
   @override
-  String get showQRCode => 'Show QR Code for Scanning';
-
-  @override
   String get showQrCode => 'Show QR Code for Scanning';
 
   @override
@@ -1102,4 +1099,161 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get awaitingPharmacyConfirmation => 'Awaiting Pharmacy Confirmation';
+
+  @override
+  String get medicationReports => 'Medication Reports';
+
+  @override
+  String get adherenceReports => 'Adherence Reports';
+
+  @override
+  String get trackMedicationAdherence =>
+      'Track your medication adherence over time';
+
+  @override
+  String get weeklyReport => 'Weekly Report';
+
+  @override
+  String get viewAdherenceLast7Days =>
+      'View adherence data for the last 7 days';
+
+  @override
+  String get monthlyReport => 'Monthly Report';
+
+  @override
+  String get viewAdherenceLast30Days =>
+      'View adherence data for the last 30 days';
+
+  @override
+  String get customReport => 'Custom Report';
+
+  @override
+  String get generateCustomDateRange =>
+      'Generate a report for a custom date range';
+
+  @override
+  String get patientInformation => 'Patient Information';
+
+  @override
+  String get reportGeneratedOn => 'Report Generated On';
+
+  @override
+  String get reportPeriod => 'Report Period';
+
+  @override
+  String get adherenceSummary => 'Adherence Summary';
+
+  @override
+  String get medicinesNotTaken => 'Medicines Not Taken';
+
+  @override
+  String get averageTaken => 'Average Taken';
+
+  @override
+  String get fullyAdherent => 'Fully Adherent';
+
+  @override
+  String get medicinesMissed => 'Medicines Missed';
+
+  @override
+  String get weeklyProgress => 'Weekly Progress';
+
+  @override
+  String get medicationSummary => 'Medication Summary';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get detailedIntakeLog => 'Detailed Intake Log';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get taken => 'Taken';
+
+  @override
+  String get missed => 'Missed';
+
+  @override
+  String get skipped => 'Skipped';
+
+  @override
+  String get scheduled => 'Scheduled';
+
+  @override
+  String get ongoing => 'Ongoing';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get noMedicationDataFound =>
+      'No medication data found for this period.\n\nPlease add medicines and mark them as taken/missed to see reports.';
+
+  @override
+  String get noUserDataFound =>
+      'No user data found. Please add your profile information first.';
+
+  @override
+  String get loadingReport => 'Loading Report...';
+
+  @override
+  String get selectDateRange => 'Select Date Range';
+
+  @override
+  String get selectStartDate => 'Select Start Date';
+
+  @override
+  String get selectEndDate => 'Select End Date';
+
+  @override
+  String get generateReport => 'Generate Report';
+
+  @override
+  String get quickSelect => 'Quick Select';
+
+  @override
+  String get lastWeek => 'Last Week';
+
+  @override
+  String get lastMonth => 'Last Month';
+
+  @override
+  String get last3Months => 'Last 3 Months';
+
+  @override
+  String get medicineAdherenceReport => 'Medicine Adherence Report';
+
+  @override
+  String get generatingPDF => 'Generating PDF...';
+
+  @override
+  String get pdfGeneratedSuccessfully => 'PDF generated successfully!';
+
+  @override
+  String get failedToGeneratePDF => 'Failed to generate PDF';
+
+  @override
+  String get totalScheduled => 'Total Scheduled';
+
+  @override
+  String get shareReportDescription =>
+      'Export your reports to share with your doctor or family members';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
+  String get shareReports => 'Share Reports';
 }
