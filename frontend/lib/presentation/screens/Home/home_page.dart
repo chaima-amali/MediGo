@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
-import 'package:frontend/presentation/services/mock_database_service.dart';
-import 'package:frontend/presentation/services/pharmacies.dart';
 import 'package:frontend/presentation/services/navigation_helper.dart'
     as nav_helper;
 import 'package:frontend/presentation/theme/app_colors.dart';
@@ -14,7 +12,6 @@ import '../notifications.dart' as notif_page;
 import '../reminders/tracking_page.dart';
 import '../Profile/profile_page.dart';
 import '../Search/pharmacy_details_screen.dart';
-import '../Reservations/reservations_form.dart';
 import 'package:frontend/data/models/user.dart';
 import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/controllers/pharmacy_controller.dart';
@@ -30,6 +27,12 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+
+  void switchToTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,12 +111,22 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradientColors = isDark
+        ? [
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).colorScheme.background,
+          ]
+        : [
+            Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            Theme.of(context).colorScheme.background,
+          ];
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.lightBlue.withOpacity(0.3), Colors.white],
+          colors: gradientColors,
         ),
       ),
       child: SafeArea(
@@ -132,6 +145,21 @@ class _SearchScreenState extends State<SearchScreen> {
                         'assets/images/logo.png',
                         height: 32,
                         width: 32,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            Icons.medication,
+                            size: 20,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -139,7 +167,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ],
@@ -156,14 +184,16 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.lightBlue.withOpacity(0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Stack(
                         children: [
                           Icon(
                             Icons.notifications_outlined,
-                            color: AppColors.primary,
+                            color: Theme.of(context).colorScheme.primary,
                             size: 24,
                           ),
                           Positioned(
@@ -172,8 +202,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: Container(
                               width: 8,
                               height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.error,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -192,7 +222,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.darkBlue,
+                  color:
+                      Theme.of(context).textTheme.titleLarge?.color ??
+                      Theme.of(context).colorScheme.onBackground,
                 ),
               ),
               const SizedBox(height: 20),
@@ -201,12 +233,19 @@ class _SearchScreenState extends State<SearchScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: AppColors.lightBlue, width: 2),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.12),
+                    width: 2,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.06),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -214,7 +253,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.search, color: AppColors.primary, size: 24),
+                    Icon(
+                      Icons.search,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: TextField(
@@ -223,7 +266,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Search for pharmacy...',
                           hintStyle: TextStyle(
-                            color: const Color.fromARGB(255, 161, 161, 161),
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                const Color.fromARGB(255, 161, 161, 161),
                             fontSize: 13,
                           ),
                           border: InputBorder.none,
@@ -244,7 +289,9 @@ class _SearchScreenState extends State<SearchScreen> {
                               ? ''
                               : loc.noResultsFound,
                           style: TextStyle(
-                            color: AppColors.darkBlue.withOpacity(0.6),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
                             fontSize: 16,
                           ),
                         ),
@@ -269,11 +316,11 @@ class _SearchScreenState extends State<SearchScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
+            color: Theme.of(context).dividerColor.withOpacity(0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -298,10 +345,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 Expanded(
                   child: Text(
                     pharmacy.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.darkBlue,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -319,10 +366,10 @@ class _SearchScreenState extends State<SearchScreen> {
               const SizedBox(width: 4),
               Text(
                 pharmacy.rating.toStringAsFixed(1),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.darkBlue,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -332,13 +379,17 @@ class _SearchScreenState extends State<SearchScreen> {
           // Phone
           Row(
             children: [
-              Icon(Icons.phone_outlined, color: AppColors.primary, size: 18),
+              Icon(
+                Icons.phone_outlined,
+                color: Theme.of(context).colorScheme.primary,
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Text(
                 pharmacy.phone,
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -351,7 +402,7 @@ class _SearchScreenState extends State<SearchScreen> {
             children: [
               Icon(
                 Icons.access_time,
-                color: AppColors.darkBlue.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 size: 18,
               ),
               const SizedBox(width: 8),
@@ -359,7 +410,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 pharmacy.openingHours,
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.darkBlue.withOpacity(0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -514,13 +567,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(width: 4),
                             Icon(
                               Icons.local_hospital,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                               size: 24,
                             ),
                           ],
@@ -538,14 +591,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.lightBlue.withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.12),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Stack(
                               children: [
                                 Icon(
                                   Icons.notifications_outlined,
-                                  color: AppColors.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                   size: 24,
                                 ),
                                 Positioned(
@@ -571,16 +626,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Greeting
                     RichText(
                       text: TextSpan(
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
-                          color: AppColors.darkBlue,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         children: [
                           TextSpan(text: loc.hi),
                           TextSpan(
                             text: widget.userName,
-                            style: const TextStyle(
-                              color: AppColors.primary,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -594,13 +649,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: AppColors.lightBlue),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.12),
+                        ),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.search, color: AppColors.primary),
+                          Icon(
+                            Icons.search,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: TextField(
@@ -619,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: _clearSearch,
                               child: Icon(
                                 Icons.close,
-                                color: AppColors.primary,
+                                color: Theme.of(context).colorScheme.primary,
                                 size: 20,
                               ),
                             ),
@@ -654,7 +716,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text(
                   'No pharmacies found',
                   style: TextStyle(
-                    color: AppColors.darkBlue.withOpacity(0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
                     fontSize: 16,
                   ),
                 ),
@@ -676,11 +740,11 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
+            color: Theme.of(context).dividerColor.withOpacity(0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -702,10 +766,10 @@ class _HomeScreenState extends State<HomeScreen> {
             // Pharmacy Name
             Text(
               pharmacy.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.darkBlue,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -719,10 +783,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 4),
                 Text(
                   pharmacy.rating.toStringAsFixed(1),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.darkBlue,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -732,13 +796,17 @@ class _HomeScreenState extends State<HomeScreen> {
             // Phone
             Row(
               children: [
-                Icon(Icons.phone_outlined, color: AppColors.primary, size: 18),
+                Icon(
+                  Icons.phone_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   pharmacy.phone,
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -751,7 +819,9 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Icon(
                   Icons.access_time,
-                  color: AppColors.darkBlue.withOpacity(0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   size: 18,
                 ),
                 const SizedBox(width: 8),
@@ -759,7 +829,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   pharmacy.openingHours,
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.darkBlue.withOpacity(0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
               ],
@@ -782,7 +854,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.reminderBox,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -796,22 +868,32 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           loc.reminderDescription,
-                          style: TextStyle(fontSize: 11, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Switch to tracking tab (index 2)
+                            nav_helper.switchMainTab(2);
+                          },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.pink,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -825,6 +907,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
@@ -832,17 +915,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.medication_rounded,
-                      color: Colors.white,
-                      size: 35,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      'assets/images/reminder.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.medication_rounded,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 35,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -856,7 +952,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.darkBlue,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -867,7 +963,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(40.0),
                       child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   )
@@ -878,7 +974,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Text(
                         'No nearby pharmacies found',
                         style: TextStyle(
-                          color: AppColors.darkBlue.withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
                           fontSize: 14,
                         ),
                       ),
@@ -928,11 +1026,11 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Theme.of(context).dividerColor.withOpacity(0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -946,7 +1044,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 height: 100,
                 width: double.infinity,
-                color: AppColors.lightBlue.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
                 child:
                     (pharmacy.imageUrl != null && pharmacy.imageUrl!.isNotEmpty)
                     ? Image.network(
@@ -957,7 +1055,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Icon(
                               Icons.local_pharmacy,
                               size: 50,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           );
                         },
@@ -966,7 +1064,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Icon(
                           Icons.local_pharmacy,
                           size: 50,
-                          color: AppColors.primary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
               ),
@@ -992,14 +1090,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.lightBlue.withOpacity(0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     pharmacyData.formattedDistance,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1013,9 +1113,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 4),
                 Text(
                   pharmacy.rating.toStringAsFixed(1),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.darkBlue,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -1023,7 +1123,10 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 4),
             Text(
               pharmacy.phone,
-              style: const TextStyle(fontSize: 10, color: AppColors.darkBlue),
+              style: TextStyle(
+                fontSize: 10,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -1044,7 +1147,10 @@ class CalendarScreen extends StatelessWidget {
     return Center(
       child: Text(
         loc.calendarScreen,
-        style: TextStyle(fontSize: 24, color: AppColors.primary),
+        style: TextStyle(
+          fontSize: 24,
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
   }
@@ -1059,7 +1165,10 @@ class ProfileScreen extends StatelessWidget {
     return Center(
       child: Text(
         loc.profileScreen,
-        style: TextStyle(fontSize: 24, color: AppColors.primary),
+        style: TextStyle(
+          fontSize: 24,
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
   }
