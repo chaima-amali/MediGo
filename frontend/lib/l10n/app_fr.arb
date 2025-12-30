@@ -401,5 +401,6 @@
   "shareReportDescription": "Exportez vos rapports pour les partager avec votre médecin ou les membres de votre famille",
   "retry": "Réessayer",
   "comingSoon": "Bientôt Disponible",
-  "shareReports": "Partager les Rapports"
+  "shareReports": "Partager les Rapports",
+  "delayed": "Retardé"
 }

@@ -162,12 +162,18 @@ class CommonTopSection extends StatelessWidget {
     required bool isActive,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color selectedColor = Colors.green;
+    final Color unselectedDark = Colors.black;
+    final Color unselectedLight = Colors.white;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primary : AppColors.white,
+          color: isActive
+              ? selectedColor
+              : (isDark ? unselectedDark : unselectedLight),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -180,7 +186,7 @@ class CommonTopSection extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? Colors.white : AppColors.darkBlue,
+            color: isActive ? Colors.white : (isDark ? Colors.white : AppColors.primary),
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),

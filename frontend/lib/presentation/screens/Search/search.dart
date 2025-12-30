@@ -41,16 +41,31 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : AppColors.darkBlue;
+    final hintColor = isDark
+        ? Colors.white70
+        : const Color.fromARGB(255, 161, 161, 161);
+
+    // Helper for tab button background
+    Color getTabButtonColor(bool active) {
+      if (active) return AppColors.lightBlue;
+      return isDark ? Colors.black : Colors.white;
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.lightBlue.withOpacity(0.3), Colors.white],
-          ),
-        ),
+        decoration: isDark
+            ? null
+            : BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [AppColors.lightBlue.withOpacity(0.3), Colors.white],
+                ),
+              ),
+        color: isDark ? Colors.black : null,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
@@ -129,7 +144,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.darkBlue,
+                      color: textColor,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -138,7 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? Colors.black : Colors.white,
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(color: AppColors.lightBlue, width: 2),
                       boxShadow: [
@@ -162,7 +177,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 context,
                               )!.searchMedicinePrompt,
                               hintStyle: TextStyle(
-                                color: const Color.fromARGB(255, 161, 161, 161),
+                                color: hintColor,
                                 fontSize: 13,
                               ),
                               border: InputBorder.none,
@@ -195,7 +210,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                     context,
                                   )!.searchMedicinesDescription,
                                   style: TextStyle(
-                                    color: AppColors.darkBlue.withOpacity(0.6),
+                                    color: isDark
+                                        ? Colors.white70
+                                        : AppColors.darkBlue.withOpacity(0.6),
                                     fontSize: 16,
                                   ),
                                   textAlign: TextAlign.center,
@@ -230,9 +247,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                     state.message,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      color: AppColors.darkBlue.withOpacity(
-                                        0.6,
-                                      ),
+                                      color: isDark
+                                          ? Colors.white70
+                                          : AppColors.darkBlue.withOpacity(0.6),
                                       fontSize: 16,
                                     ),
                                   ),
@@ -360,15 +377,18 @@ class _SearchScreenState extends State<SearchScreen> {
   ) {
     final inStock = (result['stock'] as int) > 0;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Colors.black : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
+            color: isDark
+                ? Colors.black.withOpacity(0.5)
+                : Colors.grey.withOpacity(0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -383,7 +403,7 @@ class _SearchScreenState extends State<SearchScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.primary,
+              color: isDark ? Colors.white : AppColors.primary,
             ),
           ),
           const SizedBox(height: 8),
@@ -413,10 +433,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 Expanded(
                   child: Text(
                     result['pharmacy_name'] ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.darkBlue,
+                      color: isDark ? Colors.white : AppColors.darkBlue,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -437,7 +457,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   LocationService.formatDistance(distance),
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.darkBlue.withOpacity(0.6),
+                    color: isDark
+                        ? Colors.white70
+                        : AppColors.darkBlue.withOpacity(0.6),
                   ),
                 ),
               ],
@@ -480,7 +502,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       '${result['stock']} ${AppLocalizations.of(context)!.inStock.toLowerCase()}',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.darkBlue.withOpacity(0.6),
+                        color: isDark
+                            ? Colors.white70
+                            : AppColors.darkBlue.withOpacity(0.6),
                       ),
                     ),
                   ],

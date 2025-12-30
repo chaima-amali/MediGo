@@ -117,10 +117,7 @@ class _SearchScreenState extends State<SearchScreen> {
             Theme.of(context).colorScheme.surface,
             Theme.of(context).colorScheme.background,
           ]
-        : [
-            Theme.of(context).colorScheme.primary.withOpacity(0.3),
-            Theme.of(context).colorScheme.background,
-          ];
+        : [Colors.white, Colors.white];
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -550,7 +547,9 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Fixed Header and Search Bar
             Container(
-              color: Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).colorScheme.surface
+                  : Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -567,13 +566,21 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(width: 4),
                             Icon(
                               Icons.local_hospital,
-                              color: Theme.of(context).colorScheme.primary,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.primary,
                               size: 24,
                             ),
                           ],
@@ -600,7 +607,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Icon(
                                   Icons.notifications_outlined,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Theme.of(context).colorScheme.primary,
                                   size: 24,
                                 ),
                                 Positioned(
@@ -628,14 +639,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       text: TextSpan(
                         style: TextStyle(
                           fontSize: 24,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Theme.of(context).colorScheme.onSurface,
                         ),
                         children: [
                           TextSpan(text: loc.hi),
                           TextSpan(
                             text: widget.userName,
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -854,7 +871,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                color: AppColors.pink,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(

@@ -2433,6 +2433,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Share Reports'**
   String get shareReports;
+
+  /// No description provided for @delayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delayed'**
+  String get delayed;
 }
 
 class _AppLocalizationsDelegate
