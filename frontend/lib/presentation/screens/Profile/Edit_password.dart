@@ -18,7 +18,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
   final _oldPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _obscureOldPassword = true;
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
@@ -34,12 +34,12 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
   Future<void> _savePassword() async {
     if (_formKey.currentState!.validate()) {
       final userState = context.read<UserCubit>().state;
-      
+
       if (userState is UserAuthenticated || userState is UserLoaded) {
-        final user = userState is UserAuthenticated 
-            ? userState.user 
+        final user = userState is UserAuthenticated
+            ? userState.user
             : (userState as UserLoaded).user;
-        
+
         // Verify old password matches
         if (user.password != _oldPasswordController.text) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -54,14 +54,14 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           );
           return;
         }
-        
+
         // Update password
         final updatedUser = user.copyWith(
           password: _newPasswordController.text,
         );
-        
+
         await context.read<UserCubit>().updateUser(updatedUser);
-        
+
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -82,18 +82,19 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.lightBlue,
+      backgroundColor: isDark ? Colors.black : AppColors.lightBlue,
       appBar: AppBar(
-        backgroundColor: AppColors.lightBlue,
+        backgroundColor: isDark ? Colors.black : AppColors.lightBlue,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: const CustomBackArrow(),
         title: Text(
-          'Edit Password',
+          loc.changePassword,
           style: AppText.bold.copyWith(
             fontSize: 24,
-            color: AppColors.darkBlue,
+            color: isDark ? Colors.white : AppColors.darkBlue,
           ),
         ),
       ),
@@ -105,14 +106,10 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
-                
-                // Old Password
                 Text(
-                  'Old password',
+                  loc.oldPassword,
                   style: AppText.medium.copyWith(
-                    fontSize: 14,
-                    color: AppColors.darkBlue,
+                    color: isDark ? Colors.white : AppColors.darkBlue,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -120,21 +117,36 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                   controller: _oldPasswordController,
                   obscureText: _obscureOldPassword,
                   decoration: InputDecoration(
-                    hintText: 'Enter your old password',
+                    hintText: loc.enterOldPassword,
                     hintStyle: AppText.regular.copyWith(
-                      color: AppColors.darkBlue.withOpacity(0.4),
-                      fontSize: 14,
+                      color: isDark
+                          ? Colors.white70
+                          : AppColors.darkBlue.withOpacity(0.4),
                     ),
-                    prefixIcon: Icon(
-                      Icons.lock_outline,
-                      color: AppColors.darkBlue.withOpacity(0.5),
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.black
+                        : Colors.black.withOpacity(0.07),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isDark ? Colors.white : AppColors.darkBlue,
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.lightBlue : AppColors.primary,
+                        width: 2,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureOldPassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: AppColors.darkBlue.withOpacity(0.5),
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: isDark ? Colors.white : AppColors.darkBlue,
                       ),
                       onPressed: () {
                         setState(() {
@@ -142,43 +154,16 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                         });
                       },
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                        width: 2,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return loc.enterPassword;
-                    }
-                    return null;
-                  },
+                  style: AppText.regular.copyWith(
+                    color: isDark ? Colors.white : AppColors.darkBlue,
+                  ),
                 ),
-                const SizedBox(height: 20),
-                
-                // New Password
+                const SizedBox(height: 24),
                 Text(
-                  'New password',
+                  loc.newPassword,
                   style: AppText.medium.copyWith(
-                    fontSize: 14,
-                    color: AppColors.darkBlue,
+                    color: isDark ? Colors.white : AppColors.darkBlue,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -186,21 +171,36 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                   controller: _newPasswordController,
                   obscureText: _obscureNewPassword,
                   decoration: InputDecoration(
-                    hintText: 'Enter your new password',
+                    hintText: loc.enterNewPassword,
                     hintStyle: AppText.regular.copyWith(
-                      color: AppColors.darkBlue.withOpacity(0.4),
-                      fontSize: 14,
+                      color: isDark
+                          ? Colors.white70
+                          : AppColors.darkBlue.withOpacity(0.4),
                     ),
-                    prefixIcon: Icon(
-                      Icons.lock_outline,
-                      color: AppColors.darkBlue.withOpacity(0.5),
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.black
+                        : Colors.black.withOpacity(0.07),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isDark ? Colors.white : AppColors.darkBlue,
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.lightBlue : AppColors.primary,
+                        width: 2,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureNewPassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: AppColors.darkBlue.withOpacity(0.5),
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: isDark ? Colors.white : AppColors.darkBlue,
                       ),
                       onPressed: () {
                         setState(() {
@@ -208,49 +208,16 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                         });
                       },
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                        width: 2,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return loc.enterPassword;
-                    }
-                    if (value.length < 6) {
-                      return loc.passwordMinLength;
-                    }
-                    if (value == _oldPasswordController.text) {
-                      return 'New password must be different from old password';
-                    }
-                    return null;
-                  },
+                  style: AppText.regular.copyWith(
+                    color: isDark ? Colors.white : AppColors.darkBlue,
+                  ),
                 ),
-                const SizedBox(height: 20),
-                
-                // Confirm New Password
+                const SizedBox(height: 24),
                 Text(
-                  'Confirm new password',
+                  loc.confirmNewPassword,
                   style: AppText.medium.copyWith(
-                    fontSize: 14,
-                    color: AppColors.darkBlue,
+                    color: isDark ? Colors.white : AppColors.darkBlue,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -258,21 +225,36 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
                   decoration: InputDecoration(
-                    hintText: 'Confirm your new password',
+                    hintText: loc.enterNewPassword,
                     hintStyle: AppText.regular.copyWith(
-                      color: AppColors.darkBlue.withOpacity(0.4),
-                      fontSize: 14,
+                      color: isDark
+                          ? Colors.white70
+                          : AppColors.darkBlue.withOpacity(0.4),
                     ),
-                    prefixIcon: Icon(
-                      Icons.lock_outline,
-                      color: AppColors.darkBlue.withOpacity(0.5),
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.black
+                        : Colors.black.withOpacity(0.07),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isDark ? Colors.white : AppColors.darkBlue,
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.lightBlue : AppColors.primary,
+                        width: 2,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirmPassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: AppColors.darkBlue.withOpacity(0.5),
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: isDark ? Colors.white : AppColors.darkBlue,
                       ),
                       onPressed: () {
                         setState(() {
@@ -280,62 +262,27 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                         });
                       },
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                        width: 2,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return loc.confirmYourPassword;
-                    }
-                    if (value != _newPasswordController.text) {
-                      return loc.passwordsDoNotMatch;
-                    }
-                    return null;
-                  },
+                  style: AppText.regular.copyWith(
+                    color: isDark ? Colors.white : AppColors.darkBlue,
+                  ),
                 ),
-                const SizedBox(height: 40),
-                
-                // Action Buttons
+                const SizedBox(height: 32),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF9494),
+                          backgroundColor: AppColors.pink,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          elevation: 0,
                         ),
                         child: Text(
                           loc.cancel,
-                          style: AppText.medium.copyWith(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
+                          style: AppText.medium.copyWith(color: Colors.white),
                         ),
                       ),
                     ),
@@ -344,18 +291,18 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                       child: ElevatedButton(
                         onPressed: _savePassword,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5DD3D3),
+                          backgroundColor: isDark
+                              ? AppColors.lightBlue
+                              : AppColors.lightBlue,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          elevation: 0,
                         ),
                         child: Text(
-                          'Edit Password',
+                          loc.changePassword,
                           style: AppText.medium.copyWith(
-                            fontSize: 16,
-                            color: Colors.white,
+                            color: isDark ? Colors.black : AppColors.darkBlue,
                           ),
                         ),
                       ),

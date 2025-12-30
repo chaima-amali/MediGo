@@ -12,49 +12,40 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  
-
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final List<OnboardingData> _pages = [
-    
-    OnboardingData(
-      
-      icon: Icons.location_on,
-      iconColor: AppColors.primary,
-      title: loc.findNearbyPharmacies,
-      description:
-          loc.discoverPharmaciesDescription,
-    ),
-    OnboardingData(
-      icon: Icons.search,
-      iconColor: Color(0xFF9C27B0),
-      title: loc.searchMedicines,
-      description:
-          loc.searchMedicinesDescription,
-    ),
-    OnboardingData(
-      icon: Icons.notifications,
-      iconColor: Color(0xFFE91E63),
-      title: loc.medicineReminders,
-      description: 
-          loc.medicineRemindersDescription,
-    ),
-    OnboardingData(
-      icon: Icons.phone,
-      iconColor: Color(0xFF00BFA5),
-      title: loc.contactDirections,
-      description:
-          loc.contactDirectionsDescription,
-    ),
-  ];
+      OnboardingData(
+        icon: Icons.location_on,
+        iconColor: AppColors.primary,
+        title: loc.findNearbyPharmacies,
+        description: loc.discoverPharmaciesDescription,
+      ),
+      OnboardingData(
+        icon: Icons.search,
+        iconColor: Color(0xFF9C27B0),
+        title: loc.searchMedicines,
+        description: loc.searchMedicinesDescription,
+      ),
+      OnboardingData(
+        icon: Icons.notifications,
+        iconColor: Color(0xFFE91E63),
+        title: loc.medicineReminders,
+        description: loc.medicineRemindersDescription,
+      ),
+      OnboardingData(
+        icon: Icons.phone,
+        iconColor: Color(0xFF00BFA5),
+        title: loc.contactDirections,
+        description: loc.contactDirectionsDescription,
+      ),
+    ];
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -126,10 +117,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: Text(
-                    _currentPage < _pages.length - 1 ? loc.next : loc.getStarted,
+                    _currentPage < _pages.length - 1
+                        ? loc.next
+                        : loc.getStarted,
                     style: AppText.medium.copyWith(
                       fontSize: 16,
-                      color: AppColors.white,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),
@@ -206,7 +199,7 @@ class OnboardingPage extends StatelessWidget {
               color: data.iconColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(data.icon, size: 52, color: AppColors.white),
+            child: Icon(data.icon, size: 52, color: Colors.white),
           ),
           const SizedBox(height: 16),
           // Image / illustration (flexible to avoid overflow)

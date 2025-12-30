@@ -7,29 +7,6 @@ import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/data/models/user.dart';
 
-// static List<Map<String, dynamic>> _getPremiumFeatures() {
-// return [
-// {
-// "icon": "⚡",
-// "title": "Medicine pre-order & reservation",
-// "description":
-// "pre-order your medicine and reserve it then go for pick up when you are free",
-// },
-// {
-// "icon": "🔔",
-// "title": "Instant Restock Alerts",
-// "description":
-// "Get notified immediately when out-of-stock medicines are available",
-// },
-// {
-// "icon": "✨",
-// "title": "Ad-Free Experience",
-// "description":
-// "Enjoy a clean, distraction-free interface without any ads",
-// },
-// ];
-// }
-
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({Key? key}) : super(key: key);
 
@@ -38,6 +15,7 @@ class SubscriptionPage extends StatefulWidget {
 }
 
 class _SubscriptionPageState extends State<SubscriptionPage> {
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
   String selectedPlan = 'yearly'; // 'monthly' or 'yearly'
   late List<Map<String, dynamic>> subscriptionPlans;
   late List<Map<String, dynamic>> premiumFeatures;
@@ -101,16 +79,16 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: isDark ? Colors.black : Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: const Color(0xFFB2EBF2),
+        backgroundColor: isDark ? Theme.of(context).appBarTheme.backgroundColor : const Color(0xFFB2EBF2),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: CustomBackArrow(),
         title: Text(
           loc.subscription,
           style: TextStyle(
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -143,13 +121,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               // Title and Subtitle
               Text(
                 loc.upgradeToPremium,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
               ),
               const SizedBox(height: 8),
               Text(
                 loc.premiumDescription,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(fontSize: 14, color: isDark ? Colors.grey[400] : Colors.grey),
               ),
               const SizedBox(height: 32),
 
@@ -160,46 +138,24 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: _buildFeatureCard(
-                    icon: _getIconForFeature(feature['icon']),
+                    icon: _getIconForFeature(feature['icon'] ?? '⚡'),
                     iconColor: _getColorForFeature(index),
-                    title: feature['title'],
-                    description: feature['description'],
+                    title: feature['title'] ?? '',
+                    description: feature['description'] ?? '',
                   ),
                 );
               }).toList(),
 
               const SizedBox(height: 32),
-              // Choose Your Plan
-              Text(
-                loc.chooseYourPlan,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+
+              // Monthly Plan Card
+              if (monthlyPlan != null) _buildMonthlyPlanCard(monthlyPlan),
+
               const SizedBox(height: 16),
 
-              // Monthly Plan (if exists)
-              if (monthlyPlan != null) ...[
-                GestureDetector(
-                  onTap: () => setState(() => selectedPlan = 'monthly'),
-                  child: _buildMonthlyPlanCard(monthlyPlan),
-                ),
-                const SizedBox(height: 16),
-              ],
+              // Yearly Plan Card
+              if (yearlyPlan != null) _buildYearlyPlanCard(yearlyPlan),
 
-              // Yearly Plan (if exists)
-              if (yearlyPlan != null) ...[
-                GestureDetector(
-                  onTap: () => setState(() => selectedPlan = 'yearly'),
-                  child: _buildYearlyPlanCard(yearlyPlan),
-                ),
-              ],
-
-              const SizedBox(height: 24),
-              // Terms
-              Text(
-                loc.subscriptionAgreement,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
               const SizedBox(height: 24),
             ],
           ),
@@ -217,64 +173,62 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: selectedPlan == 'monthly'
-              ? const Color(0xFF4DD0E1)
-              : Colors.transparent,
+          color: selectedPlan == 'monthly' ? (isDark ? AppColors.premiumOrange : const Color(0xFF4DD0E1)) : Colors.transparent,
           width: 2,
         ),
+        boxShadow: isDark
+            ? [BoxShadow(color: Colors.black54, blurRadius: 8)]
+            : [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            plan['name'] ?? loc.monthly,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            loc.billedMonthly,
+            style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey),
+          ),
+          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    plan['name'] ?? loc.monthly,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    loc.billedMonthly,
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
+              Text(
+                '$price$currency',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$price$currency',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text(
-                      loc.perMonth,
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ),
-                ],
+              const SizedBox(width: 4),
+              Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  loc.perMonth,
+                  style: TextStyle(fontSize: 14, color: isDark ? Colors.grey[400] : Colors.grey),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          ...features
-              .map((feature) => _buildPlanFeature(feature.toString()))
-              .toList(),
+          ...features.map((feature) => _buildPlanFeature(feature.toString())).toList(),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -284,7 +238,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 _upgradeUserToPremium(plan['name']);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4DD0E1),
+                backgroundColor: isDark ? AppColors.premiumOrange : const Color(0xFF4DD0E1),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
@@ -294,7 +248,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 loc.subscribeMonthly,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white,
+                  color: isDark ? Colors.black : Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -316,16 +270,22 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.premiumGold, AppColors.premiumOrange],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: isDark
+            ? null
+            : const LinearGradient(
+                colors: [AppColors.premiumGold, AppColors.premiumOrange],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        color: isDark ? AppColors.surfaceDark : null,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: selectedPlan == 'yearly' ? Colors.white : Colors.transparent,
           width: 2,
         ),
+        boxShadow: isDark
+            ? [BoxShadow(color: Colors.black54, blurRadius: 8)]
+            : [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,16 +298,16 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 children: [
                   Text(
                     plan['name'] ?? loc.yearly,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     loc.billedAnnually,
-                    style: TextStyle(fontSize: 12, color: Colors.white),
+                    style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.white),
                   ),
                 ],
               ),
@@ -378,10 +338,10 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
             children: [
               Text(
                 '$price$currency',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.white,
                 ),
               ),
               const SizedBox(width: 4),
@@ -389,25 +349,22 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
                   loc.perMonth,
-                  style: TextStyle(fontSize: 14, color: Colors.white),
+                  style: TextStyle(fontSize: 14, color: isDark ? Colors.grey[400] : Colors.white),
                 ),
               ),
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  loc.perYear, //"perYear": "${price * 12} $currency per year",
-                  style: const TextStyle(fontSize: 12, color: Colors.white),
+                  loc.perYear,
+                  style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.white),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           ...features
-              .map(
-                (feature) =>
-                    _buildPlanFeature(feature.toString(), isWhite: true),
-              )
+              .map((feature) => _buildPlanFeature(feature.toString(), isWhite: true))
               .toList(),
           const SizedBox(height: 16),
           SizedBox(
@@ -448,8 +405,17 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: isDark
+            ? [BoxShadow(color: Colors.black54, blurRadius: 8)]
+            : [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,15 +435,16 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey),
                 ),
               ],
             ),
@@ -503,7 +470,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               text,
               style: TextStyle(
                 fontSize: 14,
-                color: isWhite ? Colors.white : Colors.black87,
+                color: isWhite ? Colors.white : (isDark ? Colors.white : Colors.black87),
               ),
             ),
           ),
@@ -525,9 +492,9 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     }
 
     if (currentUser == null || currentUser.userId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Error: User not found')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: User not found')),
+      );
       return;
     }
 

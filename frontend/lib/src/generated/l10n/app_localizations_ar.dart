@@ -1244,4 +1244,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get shareReports => 'مشاركة التقارير';
+
+  @override
+  String get delayed => 'متأخر';
 }

@@ -247,6 +247,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
     final initial = isStart
         ? (startDate ?? DateTime.now())
         : (endDate ?? DateTime.now());
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
@@ -254,10 +255,18 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
       lastDate: DateTime(2100),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: AppColors.primary,
-            onSurface: Colors.black,
-          ),
+          colorScheme: isDark
+              ? const ColorScheme.dark(
+                  primary: AppColors.primary,
+                  surface: Colors.black,
+                  background: Colors.black,
+                  onSurface: Colors.white,
+                )
+              : const ColorScheme.light(
+                  primary: AppColors.primary,
+                  onSurface: Colors.black,
+                ),
+          dialogBackgroundColor: isDark ? Colors.black : null,
         ),
         child: child!,
       ),
@@ -277,15 +286,24 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
     final initial = index < _medicineTimes.length
         ? _medicineTimes[index]
         : TimeOfDay.now();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showTimePicker(
       context: context,
       initialTime: initial,
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: AppColors.primary,
-            onSurface: Colors.black,
-          ),
+          colorScheme: isDark
+              ? const ColorScheme.dark(
+                  primary: AppColors.primary,
+                  surface: Colors.black,
+                  background: Colors.black,
+                  onSurface: Colors.white,
+                )
+              : const ColorScheme.light(
+                  primary: AppColors.primary,
+                  onSurface: Colors.black,
+                ),
+          dialogBackgroundColor: isDark ? Colors.black : null,
         ),
         child: child!,
       ),
@@ -423,7 +441,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text(
               loc.delete,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
         ],
@@ -443,10 +461,12 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.darkBlue,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : AppColors.darkBlue,
           ),
         ),
         const SizedBox(height: 8),
@@ -454,20 +474,44 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
           decoration: BoxDecoration(
             color: AppColors.darkBlue.withOpacity(0.08),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white24
+                  : AppColors.primary,
+              width: 1.2,
+            ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(
             children: [
-              Icon(icon, size: 22, color: Colors.black45),
+              Icon(
+                icon,
+                size: 22,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black45,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child:
                     child ??
                     TextField(
                       controller: controller,
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                       decoration: InputDecoration(
                         hintText: hint,
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white54
+                              : Colors.black54,
+                        ),
                         border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
                       ),
                     ),
               ),
@@ -565,8 +609,8 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                 Expanded(
                   child: Container(
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: AppColors.white,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(30),
                       ),
@@ -650,10 +694,14 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                             children: [
                               Text(
                                 l10n.medicine_times,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.darkBlue,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -663,6 +711,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                                 return GestureDetector(
                                   onTap: () => _selectTime(index),
                                   child: Container(
+                                    width: double.infinity,
                                     margin: const EdgeInsets.only(bottom: 8),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
@@ -670,10 +719,25 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                                         0.08,
                                       ),
                                       borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white24
+                                            : AppColors.primary,
+                                        width: 1.2,
+                                      ),
                                     ),
                                     child: Text(
                                       '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-                                      style: const TextStyle(fontSize: 14),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : AppColors.darkBlue,
+                                      ),
                                     ),
                                   ),
                                 );
@@ -688,22 +752,35 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                               onTap: () => _selectDate(true),
                               child: Text(
                                 startDate?.toString().split(' ')[0] ?? '',
-                                style: const TextStyle(fontSize: 14),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
+                                ),
                               ),
                             ),
                           ),
                           _field(
                             label: l10n.end_date,
-                            icon: Icons.calendar_today,
+                            icon: Icons.event,
                             child: GestureDetector(
                               onTap: () => _selectDate(false),
                               child: Text(
                                 endDate?.toString().split(' ')[0] ?? '',
-                                style: const TextStyle(fontSize: 14),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 24),
                           Row(
                             children: [
                               Expanded(
@@ -713,7 +790,9 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                                   label: Text(l10n.delete_medicine),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
+                                    foregroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -725,7 +804,9 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                                   label: Text(l10n.save),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
+                                    foregroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                   ),
                                 ),
                               ),

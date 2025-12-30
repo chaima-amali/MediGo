@@ -1268,4 +1268,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get shareReports => 'Partager les Rapports';
+
+  @override
+  String get delayed => 'Retardé';
 }
