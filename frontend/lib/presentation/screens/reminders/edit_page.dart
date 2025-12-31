@@ -60,23 +60,39 @@ class _EditContentState extends State<EditContent> {
   }
 
   Color _colorForOccurrence(Occurrence occ) {
+    final now = DateTime.now();
     try {
-      final c = occ.importanceColor;
-      if (c != null) return c;
+      final timeParts = occ.time.split(':');
+      final hour = int.tryParse(timeParts[0]) ?? 0;
+      final minute = int.tryParse(timeParts[1]) ?? 0;
+      final scheduledDateTime = DateTime(
+        occ.date.year,
+        occ.date.month,
+        occ.date.day,
+        hour,
+        minute,
+      );
+
+      if (occ.isTaken == 1) {
+        final takenDiff = now.difference(scheduledDateTime);
+        if (!now.isBefore(scheduledDateTime) && takenDiff.inHours >= 2) {
+          return Colors.orange; // delayed
+        }
+        return AppColors.success; // taken on time
+      }
+
+      if (now.isAfter(scheduledDateTime)) {
+        // Past time, not taken
+        final diff = now.difference(scheduledDateTime);
+        if (diff.inHours < 2) {
+          return Colors.orange; // delayed
+        } else {
+          return AppColors.error; // missed
+        }
+      }
     } catch (_) {}
 
-    final palette = [
-      AppColors.primary,
-      AppColors.pinkCard,
-      AppColors.yellowCard,
-      AppColors.blueCard,
-      AppColors.coralCard,
-      AppColors.lavenderCard,
-      AppColors.mint,
-    ];
-
-    final key = (occ.medicineName ?? '').hashCode & 0x7fffffff;
-    return palette[key % palette.length];
+    return AppColors.darkBlue.withOpacity(0.3); // pending/future
   }
 
   @override
@@ -85,34 +101,46 @@ class _EditContentState extends State<EditContent> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     Widget content = SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 12),
-
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text(
+              'Your current medicines',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
           BlocBuilder<TrackingCubit, TrackingState>(
             bloc: _cubit,
             builder: (context, state) {
               if (state.loading) {
                 return const Center(child: CircularProgressIndicator());
               }
-
               final occs = state.occurrences;
               if (occs.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Center(child: Text('No medicines for this day')),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: Text(
+                      'No medicines for this day',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 );
               }
-
               return Column(
                 children: occs.map((occ) {
                   final base = _colorForOccurrence(occ);
                   final pillBg = base.withOpacity(0.6);
-                  final textColor = base.computeLuminance() > 0.55
-                      ? AppColors.darkBlue
-                      : Colors.white;
-
+                  final textColor = Colors.white;
                   return Container(
                     margin: const EdgeInsets.only(bottom: 14),
                     child: Row(
@@ -136,9 +164,7 @@ class _EditContentState extends State<EditContent> {
                             ),
                           ],
                         ),
-
                         const SizedBox(width: 12),
-
                         Expanded(
                           child: Stack(
                             clipBehavior: Clip.none,
@@ -172,7 +198,7 @@ class _EditContentState extends State<EditContent> {
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,
-                                              color: textColor,
+                                              color: Colors.white,
                                             ),
                                           ),
                                           const SizedBox(height: 6),
@@ -180,35 +206,27 @@ class _EditContentState extends State<EditContent> {
                                             '${occ.dateString} • ${occ.time}',
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: textColor.withOpacity(
-                                                0.85,
-                                              ),
+                                              color: Colors.white70,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-
                                     const SizedBox(width: 8),
-
                                     GestureDetector(
                                       onTap: () async {
                                         if (occ.id == null) {
                                           return;
                                         }
-
                                         // toggle taken state: 1 -> 0 (unmark), 0 -> 1 (mark)
                                         final newValue = occ.isTaken == 1
                                             ? 0
                                             : 1;
-
                                         setState(() => _taking[occ.id!] = true);
-
                                         final success = await _cubit!.markTaken(
                                           occ.id!,
                                           newValue,
                                         );
-
                                         setState(() => _taking.remove(occ.id!));
                                       },
                                       child: Container(
@@ -252,14 +270,11 @@ class _EditContentState extends State<EditContent> {
                                   ],
                                 ),
                               ),
-
                               // Removed explicit 'Marked as done' badge — toggle shown via button
                             ],
                           ),
                         ),
-
                         const SizedBox(width: 8),
-
                         Column(
                           children: [
                             GestureDetector(
@@ -267,23 +282,18 @@ class _EditContentState extends State<EditContent> {
                                 if (occ.id == null) {
                                   return;
                                 }
-
                                 int? planId = occ.planId;
-
                                 if (planId == 0) {
                                   final repo = OccurrenceRepository();
                                   planId = await repo.getPlanIdForOccurrence(
                                     occ.id ?? 0,
                                   );
                                 }
-
                                 if (planId == null || planId == 0) {
                                   return;
                                 }
-
                                 final trackingCubit =
                                     BlocProvider.of<TrackingCubit>(context);
-
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -308,9 +318,7 @@ class _EditContentState extends State<EditContent> {
                                 color: AppColors.primary,
                               ),
                             ),
-
                             const SizedBox(height: 10),
-
                             GestureDetector(
                               onTap: () async {
                                 final localizations = AppLocalizations.of(
@@ -339,10 +347,8 @@ class _EditContentState extends State<EditContent> {
                                     ],
                                   ),
                                 );
-
                                 if (confirm != true) return;
                                 if (occ.id == null) return;
-
                                 await _cubit!.deleteOccurrence(occ.id!);
                               },
                               child: const Icon(

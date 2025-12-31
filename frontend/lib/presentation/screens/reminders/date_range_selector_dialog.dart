@@ -99,11 +99,11 @@ class _DateRangeSelectorDialogState extends State<DateRangeSelectorDialog> {
                       icon: Icon(
                         Icons.picture_as_pdf,
                         size: 18,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                       label: Text(
                         l10n.generateReport,
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         overflow: TextOverflow.ellipsis,
                       ),
                       style: ElevatedButton.styleFrom(
@@ -310,7 +310,7 @@ class _DateRangeSelectorDialogState extends State<DateRangeSelectorDialog> {
             backgroundColor: AppColors.success,
             action: SnackBarAction(
               label: 'Share',
-              textColor: Colors.white,
+              textColor: Theme.of(context).colorScheme.onSurface,
               onPressed: () async {
                 await pdfService.sharePdf(pdfFile);
               },
@@ -349,8 +349,8 @@ class _DateRangeSelectorDialogState extends State<DateRangeSelectorDialog> {
               Navigator.pop(context);
               await pdfService.sharePdf(pdfFile);
             },
-            icon: Icon(Icons.share, size: 18, color: Colors.white),
-            label: Text('Share', style: TextStyle(color: Colors.white)),
+            icon: Icon(Icons.share, size: 18, color: Theme.of(context).colorScheme.onSurface),
+            label: Text('Share', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
           ),
         ],

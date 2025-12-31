@@ -88,19 +88,16 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BlocBuilder<ReservationCubit, ReservationState>(
       builder: (context, state) {
         List<Reservation> allReservations = [];
-
         if (state is ReservationLoaded) {
           allReservations = state.reservations;
         }
-
         // Filter by selected tab
         List<Reservation> filteredReservations = [];
         if (_selectedTab == 'active') {
-          // Active tab shows both pending and confirmed reservations
           filteredReservations = allReservations
               .where((r) => r.status == 'pending' || r.status == 'confirmed')
               .toList();
@@ -113,11 +110,8 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
               .where((r) => r.status == 'cancelled')
               .toList();
         }
-
         final totalReservations = allReservations.length;
-
         return Scaffold(
-          // Full-bleed pale cyan header background to match design
           backgroundColor: AppColors.lightBlue,
           body: SafeArea(
             child: Column(
@@ -144,15 +138,15 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                               loc.myReservations,
                               style: AppText.bold.copyWith(
                                 fontSize: 22,
-                                color: AppColors.darkBlue,
+                                color: Colors.black,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '$totalReservations total',
                               style: AppText.regular.copyWith(
-                                fontSize: 13,
-                                color: AppColors.darkBlue.withOpacity(0.6),
+                                fontSize: 14,
+                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -166,7 +160,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                   child: Container(
                     margin: const EdgeInsets.only(top: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),
@@ -194,7 +188,9 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                                   '$totalReservations total reservations',
                                   style: AppText.regular.copyWith(
                                     fontSize: 14,
-                                    color: AppColors.darkBlue.withOpacity(0.6),
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppColors.darkBlue.withOpacity(0.6),
                                   ),
                                 ),
                               ),
@@ -289,7 +285,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                                 vertical: 12,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.white,
+                                color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: AppColors.primary.withOpacity(0.3),
@@ -330,6 +326,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
 
   Widget _buildTab(String key, String displayText) {
     final isSelected = _selectedTab == key;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -340,7 +337,9 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.white : Colors.transparent,
+          color: isSelected
+              ? (isDark ? Colors.white10 : AppColors.white)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           boxShadow: isSelected
               ? [
@@ -358,8 +357,10 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
             style: AppText.medium.copyWith(
               fontSize: 14,
               color: isSelected
-                  ? AppColors.darkBlue
-                  : AppColors.darkBlue.withOpacity(0.5),
+                  ? (isDark ? Colors.white : AppColors.darkBlue)
+                  : (isDark
+                        ? Colors.white70
+                        : AppColors.darkBlue.withOpacity(0.5)),
             ),
           ),
         ),
@@ -369,11 +370,12 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
 
   Widget _buildReservationCard(Reservation reservation) {
     final loc = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: isDark ? Colors.black : Theme.of(context).colorScheme.onSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.darkBlue.withOpacity(0.1)),
         boxShadow: [
@@ -399,7 +401,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                           'Reservation #${reservation.reservationId}',
                       style: AppText.bold.copyWith(
                         fontSize: 16,
-                        color: AppColors.darkBlue,
+                        color: isDark ? Colors.white : AppColors.darkBlue,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -407,7 +409,9 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                       '${loc.quantity}: ${reservation.quantity}',
                       style: AppText.regular.copyWith(
                         fontSize: 12,
-                        color: AppColors.darkBlue.withOpacity(0.6),
+                        color: isDark
+                            ? Colors.white70
+                            : AppColors.darkBlue.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -438,14 +442,18 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
               Icon(
                 Icons.calendar_today_outlined,
                 size: 16,
-                color: AppColors.darkBlue.withOpacity(0.6),
+                color: isDark
+                    ? Colors.white70
+                    : AppColors.darkBlue.withOpacity(0.6),
               ),
               const SizedBox(width: 4),
               Text(
                 '${loc.pickup}: ${reservation.day} ${loc.at} ${reservation.time}',
                 style: AppText.regular.copyWith(
                   fontSize: 12,
-                  color: AppColors.darkBlue.withOpacity(0.6),
+                  color: isDark
+                      ? Colors.white70
+                      : AppColors.darkBlue.withOpacity(0.6),
                 ),
               ),
             ],
@@ -466,6 +474,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
       emptyMessage = loc.noCancelledReservations;
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -473,14 +482,18 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
           Icon(
             Icons.receipt_long_outlined,
             size: 64,
-            color: AppColors.darkBlue.withOpacity(0.2),
+            color: isDark
+                ? Colors.white24
+                : AppColors.darkBlue.withOpacity(0.2),
           ),
           const SizedBox(height: 16),
           Text(
             emptyMessage,
             style: AppText.medium.copyWith(
               fontSize: 16,
-              color: AppColors.darkBlue.withOpacity(0.5),
+              color: isDark
+                  ? Colors.white70
+                  : AppColors.darkBlue.withOpacity(0.5),
             ),
           ),
           const SizedBox(height: 8),
@@ -488,7 +501,9 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
             loc.yourReservationsWillAppearHere,
             style: AppText.regular.copyWith(
               fontSize: 14,
-              color: AppColors.darkBlue.withOpacity(0.4),
+              color: isDark
+                  ? Colors.white38
+                  : AppColors.darkBlue.withOpacity(0.4),
             ),
           ),
         ],
@@ -498,9 +513,10 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
 
   Widget _buildStatusGuideSheet() {
     final loc = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: isDark ? Colors.black : Colors.white,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -538,7 +554,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                   loc.statusGuide,
                   style: AppText.bold.copyWith(
                     fontSize: 18,
-                    color: AppColors.darkBlue,
+                    color: isDark ? Colors.white : AppColors.darkBlue,
                   ),
                 ),
               ],
@@ -550,21 +566,25 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
             color: const Color(0xFFF59E0B),
             title: loc.pending,
             description: loc.pendingDescription,
+            isDark: isDark,
           ),
           _buildStatusGuideItem(
             color: AppColors.success,
             title: loc.confirmed,
             description: loc.confirmedDescription,
+            isDark: isDark,
           ),
           _buildStatusGuideItem(
             color: Colors.blue,
             title: loc.completed,
             description: loc.completedDescription,
+            isDark: isDark,
           ),
           _buildStatusGuideItem(
             color: AppColors.error,
             title: loc.cancelled,
             description: loc.cancelledDescription,
+            isDark: isDark,
           ),
           const SizedBox(height: 24),
         ],
@@ -576,6 +596,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
     required Color color,
     required String title,
     required String description,
+    required bool isDark,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -597,7 +618,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                   title,
                   style: AppText.bold.copyWith(
                     fontSize: 14,
-                    color: AppColors.darkBlue,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -605,7 +626,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
                   description,
                   style: AppText.regular.copyWith(
                     fontSize: 12,
-                    color: AppColors.darkBlue.withOpacity(0.6),
+                    color: isDark ? Colors.white : Colors.black,
                     height: 1.4,
                   ),
                 ),

@@ -85,8 +85,6 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
 
   /// Calculate the status of an occurrence based on time and is_taken flag
   String _getOccurrenceStatus(Occurrence occ) {
-    if (occ.isTaken == 1) return 'done';
-
     final now = DateTime.now();
     try {
       final timeParts = occ.time.split(':');
@@ -100,11 +98,20 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
         minute,
       );
 
+      if (occ.isTaken == 1) {
+        // If marked as done, check if it was delayed
+        final takenDiff = now.difference(scheduledDateTime);
+        if (!now.isBefore(scheduledDateTime) && takenDiff.inHours >= 2) {
+          return 'delayed';
+        }
+        return 'done';
+      }
+
       if (now.isBefore(scheduledDateTime)) {
         return 'pending'; // future time
       }
 
-      // Past time
+      // Past time, not taken
       final diff = now.difference(scheduledDateTime);
       if (diff.inHours < 2) {
         return 'delayed'; // within 2 hours past
@@ -173,8 +180,11 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
   Widget build(BuildContext context) {
     return BlocBuilder<TrackingCubit, TrackingState>(
       builder: (context, state) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return Scaffold(
-          backgroundColor: AppColors.white,
+          backgroundColor: isDark
+              ? Colors.black
+              : Theme.of(context).scaffoldBackgroundColor,
 
           floatingActionButton: _activeTab == "tracking"
               ? FloatingActionButton(
@@ -195,13 +205,18 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
               : null,
 
           body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.lightBlue, Colors.white],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            decoration: isDark
+                ? null
+                : BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.lightBlue,
+                        Theme.of(context).colorScheme.surface,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
             child: SafeArea(
               child: Column(
                 children: [
@@ -221,10 +236,13 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                           AppLocalizations.of(
                             context,
                           )!.haveYouTakentYourMedicineToday,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.darkBlue,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : AppColors.darkBlue,
                           ),
                         ),
 
@@ -235,9 +253,14 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                           children: [
                             Text(
                               DateFormat("MMMM").format(state.selectedDate),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : null,
                               ),
                             ),
                             const SizedBox(width: 4),
@@ -310,12 +333,14 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
       children: [
         Row(
           children: [
-            const Text(
+            Text(
               "MediGo",
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : AppColors.primary,
               ),
             ),
             const SizedBox(width: 6),
@@ -356,6 +381,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
       (i) => today.subtract(Duration(days: 3 - i)),
     );
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: dates.map((date) {
@@ -376,13 +402,23 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
             width: 38,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: selected ? AppColors.primary : AppColors.lightBlue,
+              color: selected
+                  ? (isDark ? AppColors.primary : AppColors.primary)
+                  : (isDark ? Colors.black : AppColors.lightBlue),
+              border: Border.all(
+                color: selected
+                    ? (isDark ? AppColors.primary : AppColors.primary)
+                    : (isDark ? Colors.white : AppColors.primary),
+                width: selected ? 2 : 1,
+              ),
             ),
             alignment: Alignment.center,
             child: Text(
               "${date.day}",
               style: TextStyle(
-                color: selected ? Colors.white : AppColors.darkBlue,
+                color: selected
+                    ? Colors.white
+                    : (isDark ? Colors.white : AppColors.darkBlue),
                 fontWeight: selected ? FontWeight.bold : FontWeight.w500,
               ),
             ),
@@ -407,6 +443,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
 
   Widget _buildTabContent(TrackingState state) {
     if (_activeTab == "tracking") {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
       return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,10 +454,10 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
             else ...[
               Text(
                 AppLocalizations.of(context)!.yourCurrentMedicines,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.darkBlue,
+                  color: isDark ? Colors.white : AppColors.darkBlue,
                 ),
               ),
               const SizedBox(height: 12),
@@ -454,19 +491,29 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
       }
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => setState(() => _activeTab = name),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
         decoration: BoxDecoration(
-          color: active ? AppColors.primary : Colors.white,
+          color: active
+              ? (isDark ? AppColors.primary : AppColors.primary)
+              : (isDark ? Colors.black : Colors.white),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.primary),
+          border: Border.all(
+            color: active
+                ? (isDark ? AppColors.primary : AppColors.primary)
+                : (isDark ? Colors.white : AppColors.primary),
+            width: active ? 2 : 1,
+          ),
         ),
         child: Text(
           getTabLabel(),
           style: TextStyle(
-            color: active ? Colors.white : AppColors.darkBlue,
+            color: active
+                ? Colors.white
+                : (isDark ? Colors.white : AppColors.darkBlue),
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -482,21 +529,38 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
       return Center(
         child: Text(
           AppLocalizations.of(context)!.no_medicines_for_day,
-          style: const TextStyle(fontSize: 15, color: Colors.black54),
+          style: TextStyle(
+            fontSize: 15,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black54,
+          ),
         ),
       );
     }
 
     // Render a vertical timeline-like list with colored pill cards.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       children: state.occurrences.map((occ) {
-        final Color base = _colorForOccurrence(occ);
-        // stronger pastel background so the pill is visibly colored
-        final Color pillBg = base.withOpacity(0.60);
-        // pick readable text color based on luminance; lower threshold for darker backgrounds
-        final Color textColor = base.computeLuminance() > 0.55
-            ? AppColors.darkBlue
-            : Colors.white;
+        final String status = _getOccurrenceStatus(occ);
+        Color base;
+        if (status == 'delayed') {
+          base = Colors.orange;
+        } else if (status == 'done') {
+          base = AppColors.success;
+        } else if (status == 'missed') {
+          base = AppColors.error;
+        } else {
+          base = AppColors.primary;
+        }
+        // In dark mode, use true black background and white text for the card
+        final Color pillBg = isDark ? Colors.black : base.withOpacity(0.60);
+        final Color textColor = isDark
+            ? Colors.white
+            : (base.computeLuminance() > 0.55
+                  ? AppColors.darkBlue
+                  : Colors.white);
 
         return Container(
           margin: const EdgeInsets.only(bottom: 14),
@@ -540,7 +604,9 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: base.withOpacity(0.18),
+                            color: isDark
+                                ? Colors.black.withOpacity(0.5)
+                                : base.withOpacity(0.18),
                             blurRadius: 12,
                             spreadRadius: 1,
                             offset: const Offset(0, 6),
@@ -598,14 +664,16 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                               ),
                               child: Center(
                                 child: _taking[occ.id] == true
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                               ),
                                         ),
                                       )
@@ -613,7 +681,9 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                                         occ.isTaken == 1
                                             ? Icons.check_circle
                                             : Icons.radio_button_unchecked,
-                                        color: Colors.white,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
                                         size: 22,
                                       ),
                               ),
@@ -634,7 +704,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
@@ -645,11 +715,17 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                             ],
                           ),
                           child: Text(
-                            AppLocalizations.of(context)!.marked_as_done,
-                            style: const TextStyle(
+                            _getOccurrenceStatus(occ) == 'delayed'
+                                ? 'Delayed'
+                                : AppLocalizations.of(context)!.marked_as_done,
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.darkBlue,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : AppColors.darkBlue,
                             ),
                           ),
                         ),
@@ -666,7 +742,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(

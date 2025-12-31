@@ -107,7 +107,7 @@ class MediGoAppState extends State<MediGoApp> {
             title: 'MediGo',
             theme: appTheme,
             darkTheme: darkTheme,
-            themeMode: themeState.themeMode,
+            themeMode: themeState.themeMode, // Controlled by ThemeCubit
             debugShowCheckedModeBanner: false,
             locale: _locale,
             localizationsDelegates: [

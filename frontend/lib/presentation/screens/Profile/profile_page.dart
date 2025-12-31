@@ -106,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.lightBlue,
         elevation: 0,
