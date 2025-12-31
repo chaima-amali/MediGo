@@ -75,12 +75,24 @@ class StatisticsPanel extends StatelessWidget {
                       children: [
                         Text(
                           "${(state.todayProgress * 100).round()}%",
-                          style: AppText.bold.copyWith(fontSize: 26),
+                          style: AppText.bold.copyWith(
+                            fontSize: 26,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : null,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           AppLocalizations.of(context)!.today_taken,
-                          style: AppText.medium.copyWith(fontSize: 14),
+                          style: AppText.medium.copyWith(
+                            fontSize: 14,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : null,
+                          ),
                         ),
                       ],
                     ),
@@ -91,7 +103,12 @@ class StatisticsPanel extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               AppLocalizations.of(context)!.medicines_progress,
-              style: AppText.bold.copyWith(fontSize: 16),
+              style: AppText.bold.copyWith(
+                fontSize: 16,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -102,7 +119,11 @@ class StatisticsPanel extends StatelessWidget {
                 ? Center(
                     child: Text(
                       AppLocalizations.of(context)!.no_medicines_for_this_day,
-                      style: AppText.regular,
+                      style: AppText.regular.copyWith(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : null,
+                      ),
                     ),
                   )
                 : ListView.separated(
@@ -223,6 +244,7 @@ class _StatisticsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: AppColors.lightBlue,
       body: SafeArea(
@@ -237,7 +259,10 @@ class _StatisticsContent extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     'Statistics',
-                    style: AppText.bold.copyWith(fontSize: 22),
+                    style: AppText.bold.copyWith(
+                      fontSize: 22,
+                      color: isDark ? Colors.white : null,
+                    ),
                   ),
                   const Spacer(),
                 ],
@@ -249,11 +274,20 @@ class _StatisticsContent extends StatelessWidget {
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF222222) : Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    if (!isDark)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                  ],
                 ),
-
                 // Detect if a provider already exists above
                 child: _buildStatisticsBloc(context),
               ),
@@ -297,9 +331,14 @@ class _StatisticsContent extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (state is MSError) {
       return Center(
-        child: Text("Error: ${state.message}", style: AppText.medium),
+        child: Text(
+          "Error: ${state.message}",
+          style: AppText.medium.copyWith(color: isDark ? Colors.white : null),
+        ),
       );
     }
 
@@ -331,12 +370,18 @@ class _StatisticsContent extends StatelessWidget {
                     children: [
                       Text(
                         "${(state.todayProgress * 100).round()}%",
-                        style: AppText.bold.copyWith(fontSize: 26),
+                        style: AppText.bold.copyWith(
+                          fontSize: 26,
+                          color: isDark ? Colors.white : null,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         AppLocalizations.of(context)!.today_taken,
-                        style: AppText.medium.copyWith(fontSize: 14),
+                        style: AppText.medium.copyWith(
+                          fontSize: 14,
+                          color: isDark ? Colors.white : null,
+                        ),
                       ),
                     ],
                   ),
@@ -348,7 +393,10 @@ class _StatisticsContent extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             AppLocalizations.of(context)!.medicines_progress,
-            style: AppText.bold.copyWith(fontSize: 16),
+            style: AppText.bold.copyWith(
+              fontSize: 16,
+              color: isDark ? Colors.white : null,
+            ),
           ),
           const SizedBox(height: 12),
 
@@ -358,7 +406,9 @@ class _StatisticsContent extends StatelessWidget {
                 ? Center(
                     child: Text(
                       AppLocalizations.of(context)!.no_medicines_for_this_day,
-                      style: AppText.regular,
+                      style: AppText.regular.copyWith(
+                        color: isDark ? Colors.white : null,
+                      ),
                     ),
                   )
                 : ListView.separated(
@@ -366,7 +416,7 @@ class _StatisticsContent extends StatelessWidget {
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, idx) {
                       final it = state.items[idx];
-                      return _medicineTile(context, it, idx);
+                      return _medicineTile(context, it, idx, isDark: isDark);
                     },
                   ),
           ),
@@ -380,7 +430,12 @@ class _StatisticsContent extends StatelessWidget {
   /// =============================================================
   /// ONE MEDICINE PROGRESS ROW
   /// =============================================================
-  Widget _medicineTile(BuildContext context, dynamic it, int idx) {
+  Widget _medicineTile(
+    BuildContext context,
+    dynamic it,
+    int idx, {
+    bool isDark = false,
+  }) {
     final medicineColors = [
       AppColors.primary,
       AppColors.pinkCard,
@@ -429,7 +484,9 @@ class _StatisticsContent extends StatelessWidget {
               children: [
                 Text(
                   it.name.isNotEmpty ? it.name : "Unnamed",
-                  style: AppText.medium,
+                  style: AppText.medium.copyWith(
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 LinearProgressIndicator(
@@ -442,7 +499,12 @@ class _StatisticsContent extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          Text("${(it.progress * 100).round()}%", style: AppText.regular),
+          Text(
+            "${(it.progress * 100).round()}%",
+            style: AppText.regular.copyWith(
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
         ],
       ),
     );

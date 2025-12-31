@@ -1256,4 +1256,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareReports => 'Share Reports';
+
+  @override
+  String get delayed => 'Delayed';
 }

@@ -32,8 +32,9 @@ class _NotificationsViewState extends State<_NotificationsView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Color(0xFFE0F7FA),
+      backgroundColor: isDark ? Colors.black : Color(0xFFE0F7FA),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,13 +45,19 @@ class _NotificationsViewState extends State<_NotificationsView> {
               child: Row(
                 children: [
                   CustomBackArrow(
-                    backgroundColor: Color(0xFF80DEEA),
-                    iconColor: Color(0xFF4DD0E1),
+                    backgroundColor: isDark
+                        ? Colors.grey[900]
+                        : Color(0xFF80DEEA),
+                    iconColor: isDark ? Colors.white : Color(0xFF4DD0E1),
                   ),
                   SizedBox(width: 12),
                   Text(
                     l10n.notifications,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                   ),
                 ],
               ),
@@ -71,6 +78,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
                           selectedFilter = 'All';
                         });
                       },
+                      isDark: isDark,
                     ),
                     SizedBox(width: 8),
                     FilterButton(
@@ -81,6 +89,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
                           selectedFilter = 'Reminders';
                         });
                       },
+                      isDark: isDark,
                     ),
                     SizedBox(width: 8),
                     FilterButton(
@@ -92,6 +101,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
                           selectedFilter = 'medicine stock/Reservation';
                         });
                       },
+                      isDark: isDark,
                     ),
                   ],
                 ),
@@ -141,14 +151,14 @@ class _NotificationsViewState extends State<_NotificationsView> {
                           Icon(
                             Icons.notifications_none,
                             size: 64,
-                            color: Colors.grey[400],
+                            color: isDark ? Colors.white54 : Colors.grey[400],
                           ),
                           SizedBox(height: 16),
                           Text(
                             l10n.no_notifications_yet,
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey[600],
+                              color: isDark ? Colors.white : Colors.grey[600],
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -159,7 +169,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
                                 : l10n.add_medicines_to_see_reminders,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[500],
+                              color: isDark ? Colors.white70 : Colors.grey[500],
                             ),
                           ),
                         ],
@@ -198,7 +208,7 @@ class _NotificationsViewState extends State<_NotificationsView> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black87,
+                                color: isDark ? Colors.white : Colors.black87,
                               ),
                             ),
                             SizedBox(height: 12),
@@ -261,12 +271,14 @@ class FilterButton extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool isDark;
 
   const FilterButton({
     Key? key,
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.isDark = false,
   }) : super(key: key);
 
   @override
@@ -276,10 +288,14 @@ class FilterButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Color(0xFFB2EBF2),
+          color: isDark
+              ? (isSelected ? Colors.black : Colors.grey[900])
+              : (isSelected ? Colors.white : Color(0xFFB2EBF2)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? Color(0xFF4DD0E1) : Colors.transparent,
+            color: isSelected
+                ? (isDark ? Colors.white : Color(0xFF4DD0E1))
+                : Colors.transparent,
             width: 1.5,
           ),
         ),
@@ -288,7 +304,9 @@ class FilterButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: Colors.black87,
+            color: isDark
+                ? (isSelected ? Colors.white : Colors.white70)
+                : Colors.black87,
           ),
         ),
       ),

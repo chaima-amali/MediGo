@@ -458,5 +458,6 @@
   "shareReportDescription": "Export your reports to share with your doctor or family members",
   "retry": "Retry",
   "comingSoon": "Coming Soon",
-  "shareReports": "Share Reports"
+  "shareReports": "Share Reports",
+  "delayed": "Delayed"
 }

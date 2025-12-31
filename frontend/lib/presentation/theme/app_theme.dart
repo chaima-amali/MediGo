@@ -42,8 +42,8 @@ ThemeData appTheme = ThemeData.from(colorScheme: lightColorScheme).copyWith(
 ThemeData darkTheme = ThemeData.from(colorScheme: darkColorScheme).copyWith(
   useMaterial3: false,
   textTheme: ThemeData.dark().textTheme.apply(
-    bodyColor: darkColorScheme.onBackground,
-    displayColor: darkColorScheme.onBackground,
+    bodyColor: AppColors.onSurfaceDark,
+    displayColor: AppColors.onSurfaceDark,
     fontFamily: 'Poppins',
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -60,12 +60,16 @@ ThemeData darkTheme = ThemeData.from(colorScheme: darkColorScheme).copyWith(
     ),
   ),
   appBarTheme: AppBarTheme(
-    backgroundColor: darkColorScheme.surface,
-    foregroundColor: darkColorScheme.onSurface,
+    backgroundColor: AppColors.surfaceDark,
+    foregroundColor: AppColors.onSurfaceDark,
     elevation: 0,
   ),
-  scaffoldBackgroundColor: AppColors.backgroundDark,
-  cardColor: AppColors.surfaceDark,
+  scaffoldBackgroundColor: Colors.black, // true black background
+ 
+  cardColor: AppColors.surfaceDark, // dark gray for cards
+  dialogBackgroundColor: AppColors.surfaceDark,
+  canvasColor: Colors.black,
+  // Keep red and green as is by not overriding error/success colors
 );
 /*use it like this :
 MaterialApp(

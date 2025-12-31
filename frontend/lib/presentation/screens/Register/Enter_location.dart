@@ -335,7 +335,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -364,7 +364,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
               // Search field
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: AppColors.darkBlue.withOpacity(0.1),

@@ -65,10 +65,6 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
   }
 
   Color _getStatusColor(Occurrence occurrence) {
-    if (occurrence.isTaken == 1) {
-      return AppColors.success; // taken
-    }
-
     final now = DateTime.now();
     final occDate = occurrence.date;
     final occTime = occurrence.time;
@@ -85,11 +81,19 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
         minute,
       );
 
+      if (occurrence.isTaken == 1) {
+        final takenDiff = now.difference(scheduledDateTime);
+        if (!now.isBefore(scheduledDateTime) && takenDiff.inHours >= 2) {
+          return Colors.orange; // delayed
+        }
+        return AppColors.success; // taken on time
+      }
+
       if (now.isAfter(scheduledDateTime)) {
         // Past time, not taken
         final diff = now.difference(scheduledDateTime);
         if (diff.inHours < 2) {
-          return AppColors.warning; // delayed
+          return Colors.orange; // delayed
         } else {
           return AppColors.error; // missed
         }
@@ -214,9 +218,11 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                 Expanded(
                   child: Container(
                     margin: const EdgeInsets.only(top: 16),
-                    decoration: const BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : AppColors.white,
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),
                       ),
@@ -225,7 +231,77 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 24),
+                          // Legend for status colors
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.success,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.marked_as_done,
+                                      style: AppText.regular.copyWith(
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 16),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.orange,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      AppLocalizations.of(context)!.delayed,
+                                      style: AppText.regular.copyWith(
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 16),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.error,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      AppLocalizations.of(context)!.missed,
+                                      style: AppText.regular.copyWith(
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
 
                           // Title and View Report button (responsive)
                           Padding(
@@ -243,7 +319,11 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                       )!.medicine_calendar,
                                       style: AppText.bold.copyWith(
                                         fontSize: 24,
-                                        color: AppColors.darkBlue,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : AppColors.darkBlue,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -299,7 +379,11 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: AppColors.white,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.black
+                                    : AppColors.white,
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
@@ -340,16 +424,28 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                     shape: BoxShape.circle,
                                   ),
                                   todayTextStyle: AppText.medium.copyWith(
-                                    color: AppColors.primary,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : AppColors.primary,
                                   ),
                                   selectedTextStyle: AppText.medium.copyWith(
                                     color: AppColors.white,
                                   ),
                                   defaultTextStyle: AppText.regular.copyWith(
-                                    color: AppColors.darkBlue,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : AppColors.darkBlue,
                                   ),
                                   weekendTextStyle: AppText.regular.copyWith(
-                                    color: AppColors.darkBlue,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : AppColors.darkBlue,
                                   ),
                                   markerDecoration: const BoxDecoration(
                                     color: AppColors.primary,
@@ -361,25 +457,45 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                   titleCentered: true,
                                   titleTextStyle: AppText.bold.copyWith(
                                     fontSize: 16,
-                                    color: AppColors.darkBlue,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : AppColors.darkBlue,
                                   ),
-                                  leftChevronIcon: const Icon(
+                                  leftChevronIcon: Icon(
                                     Icons.chevron_left,
-                                    color: AppColors.darkBlue,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : AppColors.darkBlue,
                                   ),
-                                  rightChevronIcon: const Icon(
+                                  rightChevronIcon: Icon(
                                     Icons.chevron_right,
-                                    color: AppColors.darkBlue,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : AppColors.darkBlue,
                                   ),
                                 ),
                                 daysOfWeekStyle: DaysOfWeekStyle(
                                   weekdayStyle: AppText.medium.copyWith(
                                     fontSize: 12,
-                                    color: AppColors.darkBlue.withOpacity(0.6),
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white70
+                                        : AppColors.darkBlue.withOpacity(0.6),
                                   ),
                                   weekendStyle: AppText.medium.copyWith(
                                     fontSize: 12,
-                                    color: AppColors.darkBlue.withOpacity(0.6),
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white70
+                                        : AppColors.darkBlue.withOpacity(0.6),
                                   ),
                                 ),
                                 calendarBuilders: CalendarBuilders(
@@ -409,23 +525,6 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
-
-                          // Legend
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildLegendItem('Taken', AppColors.success),
-                                const SizedBox(width: 24),
-                                _buildLegendItem('Delayed', AppColors.warning),
-                                const SizedBox(width: 24),
-                                _buildLegendItem('Missed', AppColors.error),
-                              ],
-                            ),
-                          ),
-
                           const SizedBox(height: 24),
 
                           // Selected date title
@@ -437,7 +536,11 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                                   : '',
                               style: AppText.bold.copyWith(
                                 fontSize: 18,
-                                color: AppColors.darkBlue,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : AppColors.darkBlue,
                               ),
                             ),
                           ),

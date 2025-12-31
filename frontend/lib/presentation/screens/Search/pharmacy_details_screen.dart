@@ -175,7 +175,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
     final address = _generateAddress(pharmacy['name'] ?? 'Pharmacy');
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -207,9 +207,9 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                                 color: AppColors.error,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
+                              child:  Icon(
                                 Icons.local_pharmacy,
-                                color: AppColors.white,
+                                color: Theme.of(context).colorScheme.surface,
                                 size: 24,
                               ),
                             ),
@@ -224,7 +224,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                   top: 16,
                   left: 16,
                   child: CustomBackArrow(
-                    backgroundColor: AppColors.white,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     iconColor: AppColors.darkBlue,
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -239,7 +239,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.white.withOpacity(0.9),
+                      color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
@@ -271,7 +271,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -306,7 +306,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                           onPressed: _openDirections,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            foregroundColor: AppColors.white,
+                            foregroundColor: Theme.of(context).colorScheme.onSurface,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
@@ -316,7 +316,7 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                             'Get directions',
                             style: AppText.medium.copyWith(
                               fontSize: 14,
-                              color: AppColors.white,
+                              color: Theme.of(context).colorScheme.surface,
                             ),
                           ),
                         ),
@@ -382,12 +382,12 @@ class _PharmacyDetailScreenState extends State<PharmacyDetailScreen> {
                           'Call Now',
                           style: AppText.medium.copyWith(
                             fontSize: 16,
-                            color: AppColors.white,
+                            color: Theme.of(context).colorScheme.surface,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.white,
+                          foregroundColor: Theme.of(context).colorScheme.onSurface,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
