@@ -4,12 +4,12 @@ class Environment {
   // Supabase Configuration
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'YOUR_SUPABASE_URL_HERE',
+    defaultValue: 'https://oubdfkmmmjrvyfroqcoy.supabase.co',
   );
 
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'YOUR_SUPABASE_ANON_KEY_HERE',
+    defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91YmRma21tbWpydnlmcm9xY295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcyOTQ0NjMsImV4cCI6MjA4Mjg3MDQ2M30.G7Gva5X0_ZiKajvJAEjzl_72zebeb1zernJfZrblfgo',
   );
 
   // Flask Backend Configuration
