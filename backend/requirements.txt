@@ -1,7 +1,13 @@
 Flask==3.1.0
 Flask-CORS==5.0.0
-Flask-SQLAlchemy==3.1.1
 python-dotenv==1.0.1
-SQLAlchemy==2.0.36
-firebase-admin==6.5.0
+pydantic==2.5.3
+pydantic[email]==2.5.3
+
+# Optional: Uncomment when ready to integrate
+# supabase==2.3.4
+# psycopg2-binary==2.9.9
+# firebase-admin==6.5.0
+
+# Production server
 gunicorn==23.0.0
