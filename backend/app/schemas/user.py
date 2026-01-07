@@ -7,11 +7,11 @@ from typing import Optional
 
 class UserCreate(BaseModel):
     """Schema for creating a new user"""
-    name: str = Field(..., min_length=1, max_length=100)
+    name: str = Field(..., min_length=2, max_length=100)
     email: EmailStr
-    phone: Optional[str] = Field(None, max_length=20)
-    password: Optional[str] = Field(None, min_length=6)
-    gender: Optional[str] = Field(None, pattern='^(male|female|other)$')
+    phone: Optional[str] = Field(None, pattern=r'^0[567]\d{8}$', max_length=20)
+    password: Optional[str] = Field(None, min_length=6, max_length=128)
+    gender: Optional[str] = Field(None, pattern='^(male|female|Male|Female)$')
     dob: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
@@ -34,9 +34,9 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     """Schema for updating user information"""
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    name: Optional[str] = Field(None, min_length=2, max_length=100)
     email: Optional[EmailStr] = None
-    phone: Optional[str] = Field(None, max_length=20)
+    phone: Optional[str] = Field(None, pattern=r'^0[567]\d{8}$', max_length=20)
     gender: Optional[str] = None
     dob: Optional[str] = None
     latitude: Optional[float] = None

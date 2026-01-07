@@ -5,6 +5,8 @@ import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';
 import '../../widgets/back_arrow.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 class EditPasswordPage extends StatefulWidget {
   const EditPasswordPage({super.key});
@@ -40,8 +42,13 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
             ? userState.user
             : (userState as UserLoaded).user;
 
+        // Hash the old password to compare with stored hashed password
+        final hashedOldPassword = sha256
+            .convert(utf8.encode(_oldPasswordController.text))
+            .toString();
+
         // Verify old password matches
-        if (user.password != _oldPasswordController.text) {
+        if (user.password != hashedOldPassword) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Old password is incorrect'),
@@ -55,7 +62,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           return;
         }
 
-        // Update password
+        // Update password (send plain text, backend will hash it)
         final updatedUser = user.copyWith(
           password: _newPasswordController.text,
         );

@@ -43,7 +43,7 @@ def get_db():
     Context manager for database operations
     Usage:
         with get_db() as db:
-            cursor = db.execute("SELECT * FROM user")
+            cursor = db.execute("SELECT * FROM users")
             results = cursor.fetchall()
     """
     db = get_db_connection()

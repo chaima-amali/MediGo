@@ -5,7 +5,7 @@
 -- =====================================================
 -- USERS TABLE
 -- =====================================================
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS users (
     user_id BIGSERIAL PRIMARY KEY,
     name TEXT,
     email TEXT UNIQUE,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS medicine_tracking (
     type TEXT,
     dosage TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    CONSTRAINT fk_medicine_tracking_user FOREIGN KEY (user_id) REFERENCES "user"(user_id) ON DELETE CASCADE
+    CONSTRAINT fk_medicine_tracking_user FOREIGN KEY (user_id) REFERENCES "users"(user_id) ON DELETE CASCADE
 );
 
 -- =====================================================
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS user_medicines (
     notes TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     added_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    CONSTRAINT fk_user_medicines_user FOREIGN KEY (user_id) REFERENCES "user"(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_medicines_user FOREIGN KEY (user_id) REFERENCES "users"(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_user_medicines_medicine FOREIGN KEY (medicine_id) REFERENCES medicine(medicine_id) ON DELETE CASCADE
 );
 
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS medicine_plan (
     custom_dates TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT fk_medicine_plan_tracking FOREIGN KEY (medicine_track_id) REFERENCES medicine_tracking(medicine_track_id) ON DELETE CASCADE,
-    CONSTRAINT fk_medicine_plan_user FOREIGN KEY (user_id) REFERENCES "user"(user_id) ON DELETE CASCADE
+    CONSTRAINT fk_medicine_plan_user FOREIGN KEY (user_id) REFERENCES "users"(user_id) ON DELETE CASCADE
 );
 
 -- =====================================================

@@ -1,21 +1,11 @@
 /// Environment configuration for MediGo app
 /// Contains API endpoints and service configuration
 class Environment {
-  // Supabase Configuration
-  static const String supabaseUrl = String.fromEnvironment(
-    'SUPABASE_URL',
-    defaultValue: 'https://oubdfkmmmjrvyfroqcoy.supabase.co',
-  );
-
-  static const String supabaseAnonKey = String.fromEnvironment(
-    'SUPABASE_ANON_KEY',
-    defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91YmRma21tbWpydnlmcm9xY295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcyOTQ0NjMsImV4cCI6MjA4Mjg3MDQ2M30.G7Gva5X0_ZiKajvJAEjzl_72zebeb1zernJfZrblfgo',
-  );
-
   // Flask Backend Configuration
   static const String flaskBaseUrl = String.fromEnvironment(
     'FLASK_BASE_URL',
-    defaultValue: 'http://localhost:5000/api',
+    defaultValue:
+        'http://10.66.113.125:5000/api', // Change to your PC IP when testing on device or use localhost for the emulator
   );
 
   // App Configuration
