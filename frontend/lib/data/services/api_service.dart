@@ -120,23 +120,8 @@ class ApiService {
   }
 
   // Pharmacies (use api.pharmacies instead)
-  Future<List<dynamic>> searchPharmacies({
-    double? latitude,
-    double? longitude,
-    double? radius,
-    String? medicineName,
-  }) async {
-    return pharmacies.searchPharmacies(
-      latitude: latitude,
-      longitude: longitude,
-      radius: radius,
-      medicineName: medicineName,
-    );
-  }
-
-  Future<Map<String, dynamic>> getPharmacy(int pharmacyId) async {
-    return pharmacies.getPharmacy(pharmacyId);
-  }
+  // Removed wrapper methods - use api.pharmacies.getAllPharmacies(),
+  // api.pharmacies.searchPharmaciesByName(), api.pharmacies.getNearbyPharmacies() directly
 
   // Reservations (use api.reservations instead)
   Future<Map<String, dynamic>> createReservation(
