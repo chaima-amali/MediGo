@@ -368,6 +368,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             if (value == null || value.isEmpty) {
                               return loc.pleaseEnterName;
                             }
+                            // Validate name: at least 2 characters, alphanumeric and spaces
+                            if (value.trim().length < 2) {
+                              return 'Name must be at least 2 characters';
+                            }
+                            if (value.trim().length > 100) {
+                              return 'Name must be less than 100 characters';
+                            }
                             return null;
                           },
                         ),
@@ -517,6 +524,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return loc.enterPhoneNumber;
+                            }
+                            // Validate Algerian phone format: 0[567]XXXXXXXX (10 digits starting with 05, 06, or 07)
+                            final phoneRegex = RegExp(r'^0[567]\d{8}$');
+                            if (!phoneRegex.hasMatch(value)) {
+                              return 'Phone must be 10 digits starting with 05, 06, or 07';
                             }
                             return null;
                           },

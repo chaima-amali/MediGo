@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/user_repo.dart';
+import '../../data/services/api_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 // States
 abstract class UserState extends Equatable {
@@ -66,42 +68,114 @@ class UserUnauthenticated extends UserState {}
 // Cubit
 class UserCubit extends Cubit<UserState> {
   final UserRepository userRepository;
+  final ApiService _apiService = ApiService();
+  final Connectivity _connectivity = Connectivity();
 
   UserCubit(this.userRepository) : super(UserInitial()) {
+    _apiService.initialize();
     restoreSession();
   }
 
-  // Register new user
+  /// Check if device has internet connection
+  Future<bool> _hasConnection() async {
+    try {
+      final connectivityResult = await _connectivity.checkConnectivity();
+      return !connectivityResult.contains(ConnectivityResult.none);
+    } catch (e) {
+      print('⚠️  Failed to check connectivity: $e');
+      return false;
+    }
+  }
+
+  // Register new user (Remote first, then local fallback)
   Future<void> registerUser(User user) async {
     try {
       emit(UserLoading());
 
       print('📝 Attempting to register user: ${user.email}');
 
-      // Check if email already exists
+      // Check internet connection
+      final hasInternet = await _hasConnection();
+      print('🌐 Internet connection: $hasInternet');
+
+      if (hasInternet) {
+        try {
+          print('☁️ Attempting remote registration...');
+          // Try remote registration first
+          final response = await _apiService.register(user.toMap());
+
+          if (response['success'] == true) {
+            print('✅ Remote registration successful');
+            final remoteUser = response['user'];
+
+            // Create User object from remote response
+            final registeredUser = User(
+              userId: remoteUser['user_id'],
+              name: remoteUser['name'],
+              email: remoteUser['email'],
+              phone: remoteUser['phone'],
+              password: user.password, // Keep original password for local sync
+              gender: remoteUser['gender'],
+              dob: remoteUser['dob'],
+              latitude: remoteUser['latitude'],
+              longitude: remoteUser['longitude'],
+              locationName: remoteUser['location_name'],
+              premium: remoteUser['premium'],
+            );
+
+            // Save to local database for offline access
+            try {
+              print('💾 Syncing user to local database...');
+              await userRepository.insertUser(registeredUser);
+              print('✅ User synced to local database');
+            } catch (localError) {
+              print('⚠️  Failed to sync to local database: $localError');
+              // Continue even if local sync fails
+            }
+
+            await _saveUserSession(registeredUser.userId!);
+            emit(UserAuthenticated(registeredUser));
+            return;
+          } else {
+            // Remote registration failed, try local
+            print('⚠️  Remote registration failed: ${response['error']}');
+            emit(UserError(response['error'] ?? 'Registration failed'));
+            return;
+          }
+        } catch (apiError) {
+          print('❌ Remote registration error: $apiError');
+          print('📍 Falling back to local registration...');
+        }
+      }
+
+      // Local registration (fallback or no internet)
+      print('💾 Attempting local registration...');
+
+      // Check if email already exists locally
       final emailExists = await userRepository.emailExists(user.email);
       print('📧 Email exists check for ${user.email}: $emailExists');
       if (emailExists) {
-        print('❌ Registration failed: Email already registered');
+        print('❌ Registration failed: Email already registered locally');
         emit(const UserError('Email already registered'));
         return;
       }
 
-      // Check if phone already exists
+      // Check if phone already exists locally
       final phoneExists = await userRepository.phoneExists(user.phone);
       print('📱 Phone exists check for ${user.phone}: $phoneExists');
       if (phoneExists) {
-        print('❌ Registration failed: Phone already registered');
-        emit(const UserError('Phone number already registered'));
-        return;
+        // Delete the old entry (likely from a failed registration attempt)
+        print('⚠️ Phone exists from previous attempt, deleting old entry...');
+        await userRepository.deleteUserByPhone(user.phone);
+        print('✅ Old entry deleted, proceeding with registration');
       }
 
-      // Insert user
-      print('💾 Inserting user into database...');
+      // Insert user locally
+      print('💾 Inserting user into local database...');
       final userId = await userRepository.insertUser(user);
-      print('✅ User inserted with ID: $userId');
+      print('✅ User inserted locally with ID: $userId');
 
-      // After successful registration, load the user to set authenticated state
+      // Load the registered user
       final registeredUser = await userRepository.getUserByEmail(user.email);
       if (registeredUser != null) {
         await _saveUserSession(registeredUser.userId!);
@@ -110,23 +184,104 @@ class UserCubit extends Cubit<UserState> {
         emit(const UserOperationSuccess('User registered successfully'));
       }
     } catch (e) {
+      print('❌ Registration error: $e');
       emit(UserError('Failed to register user: $e'));
     }
   }
 
-  // Login user
+  // Login user (Remote first, then local fallback)
   Future<void> loginUser(String email, String password) async {
     try {
       emit(UserLoading());
 
       print('🔐 Attempting login for: $email');
+
+      // Check internet connection
+      final hasInternet = await _hasConnection();
+      print('🌐 Internet connection: $hasInternet');
+
+      if (hasInternet) {
+        try {
+          print('☁️ Attempting remote login...');
+          // Try remote login first
+          final response = await _apiService.login(email, password);
+
+          if (response['success'] == true) {
+            print('✅ Remote login successful');
+            final remoteUser = response['user'];
+
+            // Create User object from remote response
+            final user = User(
+              userId: remoteUser['user_id'], // Changed from 'id' to 'user_id'
+              name: remoteUser['name'],
+              email: remoteUser['email'],
+              phone: remoteUser['phone'],
+              password: password, // Store password for local sync
+              gender: remoteUser['gender'],
+              dob: remoteUser['dob'],
+              latitude: remoteUser['latitude'],
+              longitude: remoteUser['longitude'],
+              locationName: remoteUser['location_name'],
+              premium: remoteUser['premium'] == 'false'
+                  ? false
+                  : (remoteUser['premium'] == 'true'
+                        ? true
+                        : remoteUser['premium']),
+            );
+
+            // Sync to local database
+            try {
+              print('💾 Syncing user to local database...');
+              final localUser = await userRepository.getUserByEmail(email);
+              if (localUser == null) {
+                // User doesn't exist locally, insert
+                await userRepository.insertUser(user);
+                print('✅ User synced to local database');
+              } else {
+                // User exists locally, update
+                await userRepository.updateUser(
+                  user.copyWith(userId: localUser.userId),
+                );
+                print('✅ User updated in local database');
+              }
+            } catch (localError) {
+              print('⚠️  Failed to sync to local database: $localError');
+            }
+
+            print(
+              '📍 User location: Lat=${user.latitude}, Lon=${user.longitude}',
+            );
+            await _saveUserSession(user.userId!);
+            emit(UserAuthenticated(user));
+            return;
+          } else {
+            // Remote login failed
+            print('⚠️  Remote login failed: ${response['error']}');
+            emit(UserError(response['error'] ?? 'Login failed'));
+            return;
+          }
+        } catch (apiError) {
+          print('❌ Remote login error: $apiError');
+          print('📍 Falling back to local login...');
+        }
+      }
+
+      // Local login (fallback or no internet)
+      print('💾 Attempting local login...');
       print('🔑 Password provided: ${password.length} characters');
+
       final user = await userRepository.authenticateUser(email, password);
       if (user != null) {
-        print('✅ Login successful: ${user.name} (ID: ${user.userId})');
+        print('✅ Local login successful: ${user.name} (ID: ${user.userId})');
         print('📍 User location: Lat=${user.latitude}, Lon=${user.longitude}');
         await _saveUserSession(user.userId!);
         emit(UserAuthenticated(user));
+
+        // Try to sync to remote if user doesn't have a proper remote ID and internet is available
+        if (hasInternet && (user.userId == null || user.userId! < 100)) {
+          print('🔄 User might be local-only, attempting remote sync...');
+          syncLocalUserToRemote(user);
+        }
       } else {
         print('❌ Login failed: Invalid credentials');
         print('🔍 Checking if email exists...');
@@ -146,22 +301,70 @@ class UserCubit extends Cubit<UserState> {
         emit(const UserError('Invalid email or password'));
       }
     } catch (e) {
+      print('❌ Login error: $e');
       emit(UserError('Login failed: $e'));
     }
   }
 
-  // Get user by ID
+  // Get user by ID (Try remote first, fallback to local)
   Future<void> getUserById(int userId) async {
     try {
       emit(UserLoading());
 
+      print('📂 Loading user $userId...');
+      final hasInternet = await _hasConnection();
+
+      if (hasInternet) {
+        try {
+          print('☁️ Fetching user from remote...');
+          final response = await _apiService.getUser(userId);
+
+          if (response['user_id'] != null) {
+            print('✅ User fetched from remote');
+            // Create User object from remote response
+            final user = User(
+              userId: response['user_id'],
+              name: response['name'],
+              email: response['email'],
+              phone: response['phone'],
+              password: response['password'] ?? '',
+              gender: response['gender'],
+              dob: response['dob'],
+              latitude: response['latitude'],
+              longitude: response['longitude'],
+              locationName: response['location_name'],
+              premium: response['premium'] ?? 'false',
+            );
+
+            // Sync to local database
+            try {
+              await userRepository.updateUser(user);
+              print('💾 User synced to local DB');
+            } catch (e) {
+              print('⚠️ Failed to sync to local: $e');
+            }
+
+            emit(UserLoaded(user));
+            return;
+          }
+        } catch (e) {
+          print('❌ Remote fetch failed: $e');
+          print('📍 Falling back to local database...');
+        }
+      }
+
+      // Fallback to local
+      print('💾 Loading from local database...');
       final user = await userRepository.getUserById(userId);
       if (user != null) {
+        print('✅ User loaded from local DB');
         emit(UserLoaded(user));
       } else {
+        print('❌ User not found');
         emit(const UserError('User not found'));
       }
     } catch (e) {
+      print('❌ Load user error: $e');
       emit(UserError('Failed to load user: $e'));
     }
   }
@@ -194,23 +397,103 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
-  // Update user
+  // Update user (Remote first, then local)
   Future<void> updateUser(User user) async {
     try {
       emit(UserLoading());
 
+      print('🔄 Updating user ${user.userId}...');
+      final hasInternet = await _hasConnection();
+
+      if (hasInternet) {
+        try {
+          print('☁️ Updating user on remote...');
+          // Create update payload excluding user_id, password, and created_at
+          final updateData = user.toMap();
+          updateData.remove('user_id');
+          updateData.remove('password');
+          updateData.remove('created_at');
+
+          final response = await _apiService.updateUser(
+            user.userId!,
+            updateData,
+          );
+
+          if (response['user_id'] != null) {
+            print('✅ User updated on remote');
+            // Update local database
+            await userRepository.updateUser(user);
+            print('💾 User updated in local DB');
+
+            // Reload user
+            final updatedUser = await userRepository.getUserById(user.userId!);
+            if (updatedUser != null) {
+              print('✅ User reloaded successfully');
+              emit(UserLoaded(updatedUser));
+            } else {
+              emit(const UserError('Failed to reload user'));
+            }
+            return;
+          }
+        } catch (e) {
+          print('❌ Remote update failed: $e');
+
+          // Check if error is 404 (user doesn't exist in Supabase)
+          if (e.toString().contains('404')) {
+            print('🆕 User not found in Supabase, creating new user...');
+            try {
+              // Register user in Supabase
+              final registerResponse = await _apiService.register(user.toMap());
+
+              if (registerResponse['success'] == true) {
+                final remoteUser = registerResponse['user'];
+                print(
+                  '✅ User created in Supabase with ID: ${remoteUser['user_id']}',
+                );
+
+                // Update local user with remote ID
+                final updatedUser = user.copyWith(
+                  userId: remoteUser['user_id'],
+                );
+                await userRepository.deleteUserById(
+                  user.userId!,
+                ); // Delete old local-only user
+                await userRepository.insertUser(
+                  updatedUser,
+                ); // Insert with Supabase ID
+
+                // Save new session with Supabase ID
+                await _saveUserSession(remoteUser['user_id']);
+
+                print('✅ User synced to Supabase and local DB updated');
+                emit(UserLoaded(updatedUser));
+                return;
+              }
+            } catch (createError) {
+              print('❌ Failed to create user in Supabase: $createError');
+            }
+          }
+
+          print('📍 Updating local database only...');
+        }
+      }
+
+      // Fallback to local update
+      print('💾 Updating local database...');
       final result = await userRepository.updateUser(user);
       if (result > 0) {
-        emit(const UserOperationSuccess('User updated successfully'));
+        print('✅ User updated locally');
         // Reload user
         final updatedUser = await userRepository.getUserById(user.userId!);
         if (updatedUser != null) {
           emit(UserLoaded(updatedUser));
         }
       } else {
+        print('❌ Failed to update user');
         emit(const UserError('Failed to update user'));
       }
     } catch (e) {
+      print('❌ Update error: $e');
       emit(UserError('Update failed: $e'));
     }
   }
@@ -260,8 +543,25 @@ class UserCubit extends Cubit<UserState> {
     try {
       emit(UserLoading());
 
+      print('💎 Updating premium status for user $userId to $premium');
+
+      // Update local first
       final result = await userRepository.updateUserPremium(userId, premium);
       if (result > 0) {
+        // Try to sync to remote if online
+        final hasInternet = await _hasConnection();
+        if (hasInternet) {
+          try {
+            final user = await userRepository.getUserById(userId);
+            if (user != null) {
+              await _apiService.updateUser(userId, user.toMap());
+              print('✅ Premium status synced to remote');
+            }
+          } catch (e) {
+            print('⚠️ Failed to sync premium to remote: $e');
+          }
+        }
+
         // Reload user
         final user = await userRepository.getUserById(userId);
         if (user != null) {
@@ -369,7 +669,7 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
-  // Restore user session on app start
+  // Restore user session on app start (Try remote first, fallback to local)
   Future<void> restoreSession() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -379,7 +679,51 @@ class UserCubit extends Cubit<UserState> {
       print('🔄 Restoring session: isLoggedIn=$isLoggedIn, userId=$userId');
 
       if (isLoggedIn && userId != null) {
-        print('📂 Loading user from database...');
+        // Try to fetch from remote first if online
+        final hasInternet = await _hasConnection();
+
+        if (hasInternet) {
+          try {
+            print('☁️ Fetching user from remote...');
+            final response = await _apiService.getUser(userId);
+
+            if (response['user_id'] != null) {
+              print('✅ User fetched from remote');
+              // Create User object from remote response
+              final user = User(
+                userId: response['user_id'],
+                name: response['name'],
+                email: response['email'],
+                phone: response['phone'],
+                password: response['password'] ?? '',
+                gender: response['gender'],
+                dob: response['dob'],
+                latitude: response['latitude'],
+                longitude: response['longitude'],
+                locationName: response['location_name'],
+                premium: response['premium'] ?? 'false',
+              );
+
+              // Sync to local database
+              try {
+                await userRepository.updateUser(user);
+                print('💾 User synced to local DB');
+              } catch (e) {
+                print('⚠️ Failed to sync to local: $e');
+              }
+
+              print('✅ Session restored for: ${user.name}');
+              emit(UserAuthenticated(user));
+              return;
+            }
+          } catch (e) {
+            print('❌ Remote fetch failed: $e');
+            print('📍 Falling back to local database...');
+          }
+        }
+
+        // Fallback to local database
+        print('📂 Loading user from local database...');
         final user = await userRepository.getUserById(userId);
         if (user != null) {
           print('✅ Session restored for: ${user.name}');
@@ -396,6 +740,43 @@ class UserCubit extends Cubit<UserState> {
     } catch (e) {
       print('❌ Failed to restore session: $e');
       emit(UserUnauthenticated());
+    }
+  }
+
+  /// Sync local user to remote server (Supabase)
+  Future<void> syncLocalUserToRemote(User user) async {
+    try {
+      print('🔄 Syncing local user to remote server...');
+
+      // Check internet connection
+      final hasInternet = await _hasConnection();
+      if (!hasInternet) {
+        print('⚠️ No internet connection, cannot sync');
+        return;
+      }
+
+      // Try to register user remotely
+      try {
+        final response = await _apiService.register(user.toMap());
+
+        if (response['success'] == true) {
+          print('✅ User synced to remote successfully');
+          final remoteUser = response['user'];
+
+          // Update local user with remote ID
+          final updatedUser = user.copyWith(userId: remoteUser['id']);
+
+          await userRepository.updateUser(updatedUser);
+          emit(UserAuthenticated(updatedUser));
+          print('✅ Local user updated with remote ID: ${remoteUser['id']}');
+        } else {
+          print('⚠️ Remote sync failed: ${response['error']}');
+        }
+      } catch (e) {
+        print('❌ Error syncing to remote: $e');
+      }
+    } catch (e) {
+      print('❌ Sync error: $e');
     }
   }
 }
