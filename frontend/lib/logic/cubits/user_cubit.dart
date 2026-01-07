@@ -212,7 +212,7 @@ class UserCubit extends Cubit<UserState> {
 
             // Create User object from remote response
             final user = User(
-              userId: remoteUser['id'],
+              userId: remoteUser['user_id'], // Changed from 'id' to 'user_id'
               name: remoteUser['name'],
               email: remoteUser['email'],
               phone: remoteUser['phone'],
@@ -222,7 +222,11 @@ class UserCubit extends Cubit<UserState> {
               latitude: remoteUser['latitude'],
               longitude: remoteUser['longitude'],
               locationName: remoteUser['location_name'],
-              premium: remoteUser['premium'],
+              premium: remoteUser['premium'] == 'false'
+                  ? false
+                  : (remoteUser['premium'] == 'true'
+                        ? true
+                        : remoteUser['premium']),
             );
 
             // Sync to local database
