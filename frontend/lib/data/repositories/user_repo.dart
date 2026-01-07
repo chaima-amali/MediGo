@@ -236,4 +236,17 @@ class UserRepository {
       whereArgs: [userId],
     );
   }
+
+  // DELETE - Delete user by phone
+  Future<int> deleteUserByPhone(String phone) async {
+    final db = await _db;
+    print('🗑️ Deleting user with phone: $phone');
+    final count = await db.delete(
+      DBUserTable.table,
+      where: 'phone = ?',
+      whereArgs: [phone],
+    );
+    print('✅ Deleted $count user(s) with phone: $phone');
+    return count;
+  }
 }

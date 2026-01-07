@@ -2,8 +2,29 @@
 
 Flask-based REST API for MediGo medication management application.
 
+## 🎉 NEW: Hybrid Authentication System
+
+**Remote-first authentication with local fallback** has been implemented!
+
+- ✅ **Supabase Integration**: Cloud database for remote authentication
+- ✅ **SQLite Fallback**: Local database when offline
+- ✅ **Automatic Sync**: Seamless data synchronization
+- ✅ **Password Security**: SHA256 hashing
+- ✅ **Session Management**: Persistent user sessions
+
+📖 **Quick Start**: See [`QUICK_START_AUTH.md`](../QUICK_START_AUTH.md)  
+📚 **Full Documentation**: See [`AUTHENTICATION_IMPLEMENTATION.md`](../AUTHENTICATION_IMPLEMENTATION.md)  
+🧪 **Testing**: Run `python test_auth.py`
+
+---
+
 ## Features
 
+- 🔐 **User Authentication** (NEW)
+  - User registration with validation
+  - Secure login with password hashing
+  - Remote (Supabase) + Local (SQLite) hybrid storage
+  - Automatic fallback and sync
 - 🔐 User management
 - 💊 Medicine CRUD operations
 - 🏥 Pharmacy search and inventory
@@ -15,8 +36,9 @@ Flask-based REST API for MediGo medication management application.
 ## Tech Stack
 
 - **Framework**: Flask 3.1.0
+- **Remote Database**: Supabase (PostgreSQL)
+- **Local Database**: SQLite
 - **ORM**: SQLAlchemy 2.0
-- **Database**: SQLite (development) / PostgreSQL (production)
 - **CORS**: Flask-CORS
 - **Authentication**: Firebase Admin (optional)
 

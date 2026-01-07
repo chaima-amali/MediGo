@@ -141,7 +141,7 @@ class BackgroundJobsService {
       'dataSync',
       frequency: const Duration(minutes: 30),
       constraints: Constraints(networkType: NetworkType.connected),
-      existingWorkPolicy: ExistingWorkPolicy.replace,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
     );
     debugPrint('📅 Registered periodic data sync');
 
@@ -150,7 +150,7 @@ class BackgroundJobsService {
       'medicationReminder',
       'medicationReminder',
       frequency: const Duration(minutes: 15),
-      existingWorkPolicy: ExistingWorkPolicy.replace,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
     );
     debugPrint('📅 Registered medication reminder check');
 
@@ -159,7 +159,7 @@ class BackgroundJobsService {
       'databaseBackup',
       'databaseBackup',
       frequency: const Duration(hours: 24),
-      existingWorkPolicy: ExistingWorkPolicy.replace,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
     );
     debugPrint('📅 Registered daily database backup');
 
@@ -168,7 +168,7 @@ class BackgroundJobsService {
       'cleanupOldData',
       'cleanupOldData',
       frequency: const Duration(days: 7),
-      existingWorkPolicy: ExistingWorkPolicy.replace,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
     );
     debugPrint('📅 Registered weekly data cleanup');
   }

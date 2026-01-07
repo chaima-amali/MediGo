@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:frontend/data/services/api_service.dart';
-import 'package:frontend/data/services/supabase_service.dart';
 import 'package:frontend/data/databases/db_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -12,7 +11,6 @@ class SyncService {
   SyncService._internal();
 
   final ApiService _apiService = ApiService();
-  final SupabaseService _supabaseService = SupabaseService();
   final Connectivity _connectivity = Connectivity();
 
   bool _isSyncing = false;

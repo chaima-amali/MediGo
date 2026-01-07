@@ -18,7 +18,13 @@ Example usage:
     response = supabase.table('user').delete().eq('id', 1).execute()
 """
 
-from supabase import create_client, Client
+try:
+    from supabase import create_client, Client
+    SUPABASE_AVAILABLE = True
+except ImportError:
+    SUPABASE_AVAILABLE = False
+    Client = None
+
 from app.core.config import settings
 
 # Initialize Supabase client
@@ -28,17 +34,43 @@ def init_supabase():
     """Initialize Supabase client"""
     global supabase
     
+    if not SUPABASE_AVAILABLE:
+        print("⚠️  Supabase library not installed - using local database only")
+        return None
+    
     if not settings.SUPABASE_URL or not settings.SUPABASE_KEY:
-        print("⚠️  Supabase credentials not configured")
+        print("⚠️  Supabase credentials not configured - using local database only")
         return None
     
     try:
-        supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-        print("✅ Supabase client initialized")
+        # Create Supabase client with only required parameters
+        supabase = create_client(
+            supabase_url=settings.SUPABASE_URL,
+            supabase_key=settings.SUPABASE_KEY
+        )
+        print("✅ Supabase client initialized successfully")
+        print(f"📡 Connected to: {settings.SUPABASE_URL}")
         return supabase
+    except TypeError as e:
+        # Handle API compatibility issues - try legacy initialization
+        print(f"⚠️  Trying legacy Supabase initialization...")
+        try:
+            supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+            print("✅ Supabase client initialized successfully")
+            print(f"📡 Connected to: {settings.SUPABASE_URL}")
+            return supabase
+        except Exception as fallback_error:
+            print(f"❌ Failed to initialize Supabase: {fallback_error}")
+            print("📍 Falling back to local database only")
+            return None
     except Exception as e:
         print(f"❌ Failed to initialize Supabase: {e}")
+        print("📍 Falling back to local database only")
         return None
 
-# Call this in app/__init__.py when ready to use Supabase
-# supabase = init_supabase()
+def get_supabase():
+    """Get Supabase client instance"""
+    return supabase
+
+# Auto-initialize on import
+supabase = init_supabase()
