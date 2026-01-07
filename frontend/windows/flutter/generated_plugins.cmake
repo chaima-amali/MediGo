@@ -3,8 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  firebase_auth
-  firebase_core
+  app_links
+  connectivity_plus
   geolocator_windows
   printing
   share_plus
