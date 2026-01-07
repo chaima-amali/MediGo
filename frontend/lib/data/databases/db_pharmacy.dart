@@ -9,7 +9,8 @@ class DBPharmacyTable {
     phone TEXT,
     opening_hours TEXT,
     rating REAL,
-    image_url TEXT
+    image_url TEXT,
+    address TEXT
   )
   ''';
 }
