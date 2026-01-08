@@ -5,34 +5,52 @@ import 'api_client.dart';
 class PharmacyApiService {
   final ApiClient _client = ApiClient();
 
-  /// Search for pharmacies near a location
-  ///
-  /// Optional parameters:
-  /// - [latitude] - User's latitude
-  /// - [longitude] - User's longitude
-  /// - [radius] - Search radius in kilometers
-  /// - [medicineName] - Filter by medicine availability
-  Future<List<dynamic>> searchPharmacies({
-    double? latitude,
-    double? longitude,
-    double? radius,
-    String? medicineName,
+  /// Get all pharmacies
+  Future<Map<String, dynamic>> getAllPharmacies({
+    double? userLat,
+    double? userLon,
   }) async {
     final response = await _client.get(
-      '/pharmacies/search',
+      '/pharmacies/all',
       queryParameters: {
-        if (latitude != null) 'lat': latitude,
-        if (longitude != null) 'lng': longitude,
-        if (radius != null) 'radius': radius,
-        if (medicineName != null) 'medicine': medicineName,
+        if (userLat != null) 'user_lat': userLat,
+        if (userLon != null) 'user_lon': userLon,
       },
     );
-    return response.data as List<dynamic>;
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Search pharmacies by name
+  Future<Map<String, dynamic>> searchPharmaciesByName(String query) async {
+    final response = await _client.get(
+      '/pharmacies/search',
+      queryParameters: {'q': query},
+    );
+    return response.data as Map<String, dynamic>;
   }
 
   /// Get pharmacy details by ID
   Future<Map<String, dynamic>> getPharmacy(int pharmacyId) async {
     final response = await _client.get('/pharmacies/$pharmacyId');
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Get nearby pharmacies
+  Future<Map<String, dynamic>> getNearbyPharmacies({
+    required double lat,
+    required double lon,
+    double radius = 10.0,
+    int limit = 10,
+  }) async {
+    final response = await _client.get(
+      '/pharmacies/nearby',
+      queryParameters: {
+        'lat': lat,
+        'lon': lon,
+        'radius': radius,
+        'limit': limit,
+      },
+    );
     return response.data as Map<String, dynamic>;
   }
 }

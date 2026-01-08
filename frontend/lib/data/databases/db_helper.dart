@@ -167,6 +167,15 @@ class DBHelper {
       }
     } catch (_) {}
 
+    // pharmacy: ensure 'address' column exists
+    try {
+      final pharmCols = await columns('pharmacy');
+      final pharmNames = pharmCols.map((r) => r['name'] as String).toSet();
+      if (!pharmNames.contains('address')) {
+        await db.execute('ALTER TABLE pharmacy ADD COLUMN address TEXT');
+      }
+    } catch (_) {}
+
     // reservation: ensure new columns exist
     try {
       final resCols = await columns('reservation');

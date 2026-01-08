@@ -37,15 +37,24 @@ def create_app():
 def register_routes(app):
     """Register all API route blueprints"""
     
-    from app.routes import users, medicines, auth
+    from app.routes import users, medicines, auth, pharmacies
+    
+    # Root endpoint
+    @app.route('/')
+    def home():
+        return jsonify({
+            'message': 'Welcome to MediGo Backend API',
+            'version': '1.0.0',
+            'docs': 'http://localhost:5000/docs'
+        })
     
     # API endpoints
     app.register_blueprint(auth.bp, url_prefix='/api')
     app.register_blueprint(users.bp, url_prefix='/api')
     app.register_blueprint(medicines.bp, url_prefix='/api')
+    app.register_blueprint(pharmacies.pharmacies_bp, url_prefix='/api/pharmacies')
     
     # TODO: Add more route blueprints here as you expand
-    # app.register_blueprint(pharmacies.bp, url_prefix='/api')
     # app.register_blueprint(reservations.bp, url_prefix='/api')
 
 def register_swagger(app):
@@ -172,6 +181,108 @@ def get_swagger_spec():
                     "summary": "Get all medicines",
                     "responses": {
                         "200": {"description": "List of medicines"}
+                    }
+                }
+            },
+            "/api/pharmacies/all": {
+                "get": {
+                    "tags": ["Pharmacies"],
+                    "summary": "Get all pharmacies",
+                    "parameters": [
+                        {
+                            "name": "user_lat",
+                            "in": "query",
+                            "required": False,
+                            "schema": {"type": "number"},
+                            "description": "User latitude for distance calculation"
+                        },
+                        {
+                            "name": "user_lon",
+                            "in": "query",
+                            "required": False,
+                            "schema": {"type": "number"},
+                            "description": "User longitude for distance calculation"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "List of all pharmacies"}
+                    }
+                }
+            },
+            "/api/pharmacies/search": {
+                "get": {
+                    "tags": ["Pharmacies"],
+                    "summary": "Search pharmacies by name",
+                    "parameters": [
+                        {
+                            "name": "q",
+                            "in": "query",
+                            "required": True,
+                            "schema": {"type": "string"},
+                            "description": "Search query"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "Search results"},
+                        "400": {"description": "Query parameter required"}
+                    }
+                }
+            },
+            "/api/pharmacies/{pharmacy_id}": {
+                "get": {
+                    "tags": ["Pharmacies"],
+                    "summary": "Get pharmacy by ID",
+                    "parameters": [
+                        {
+                            "name": "pharmacy_id",
+                            "in": "path",
+                            "required": True,
+                            "schema": {"type": "integer"}
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "Pharmacy details"},
+                        "404": {"description": "Pharmacy not found"}
+                    }
+                }
+            },
+            "/api/pharmacies/nearby": {
+                "get": {
+                    "tags": ["Pharmacies"],
+                    "summary": "Get nearby pharmacies",
+                    "parameters": [
+                        {
+                            "name": "lat",
+                            "in": "query",
+                            "required": True,
+                            "schema": {"type": "number"},
+                            "description": "User latitude"
+                        },
+                        {
+                            "name": "lon",
+                            "in": "query",
+                            "required": True,
+                            "schema": {"type": "number"},
+                            "description": "User longitude"
+                        },
+                        {
+                            "name": "radius",
+                            "in": "query",
+                            "required": False,
+                            "schema": {"type": "number", "default": 10},
+                            "description": "Search radius in km"
+                        },
+                        {
+                            "name": "limit",
+                            "in": "query",
+                            "required": False,
+                            "schema": {"type": "integer", "default": 10},
+                            "description": "Max results"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "Nearby pharmacies"},
+                        "400": {"description": "Invalid parameters"}
                     }
                 }
             }

@@ -3,8 +3,12 @@ import 'package:sqflite/sqflite.dart';
 import '../databases/db_helper.dart';
 import '../databases/db_pharmacy.dart';
 import '../models/pharmacy.dart';
+import '../services/api/pharmacy_api_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class PharmacyRepository {
+  final PharmacyApiService _apiService = PharmacyApiService();
+
   // Get database instance
   Future<Database> get _db async => await DBHelper.getDatabase();
 
@@ -23,8 +27,32 @@ class PharmacyRepository {
     return pharmacyId;
   }
 
-  // READ - Get pharmacy by ID
+  // READ - Get pharmacy by ID (Remote-first)
   Future<Pharmacy?> getPharmacyById(int pharmacyId) async {
+    try {
+      // Check internet connection
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult != ConnectivityResult.none) {
+        print('☁️ Fetching pharmacy $pharmacyId from remote...');
+
+        final response = await _apiService.getPharmacy(pharmacyId);
+
+        if (response['success'] == true && response['pharmacy'] != null) {
+          print('✅ Pharmacy fetched from remote');
+          final pharmacy = Pharmacy.fromMap(response['pharmacy']);
+
+          // Sync to local database
+          await insertPharmacy(pharmacy);
+
+          return pharmacy;
+        }
+      }
+    } catch (e) {
+      print('❌ Remote fetch failed: $e');
+    }
+
+    // Fallback to local database
+    print('💾 Fetching pharmacy from local database...');
     final db = await _db;
     final List<Map<String, dynamic>> maps = await db.query(
       DBPharmacyTable.table,
@@ -36,8 +64,36 @@ class PharmacyRepository {
     return Pharmacy.fromMap(maps.first);
   }
 
-  // READ - Get all pharmacies
+  // READ - Get all pharmacies (Remote-first)
   Future<List<Pharmacy>> getAllPharmacies() async {
+    try {
+      // Check internet connection
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult != ConnectivityResult.none) {
+        print('☁️ Fetching all pharmacies from remote...');
+
+        final response = await _apiService.getAllPharmacies();
+
+        if (response['success'] == true && response['pharmacies'] != null) {
+          print('✅ Pharmacies fetched from remote');
+          final pharmacies = (response['pharmacies'] as List)
+              .map((p) => Pharmacy.fromMap(p))
+              .toList();
+
+          // Sync to local database
+          for (var pharmacy in pharmacies) {
+            await insertPharmacy(pharmacy);
+          }
+
+          return pharmacies;
+        }
+      }
+    } catch (e) {
+      print('❌ Remote fetch failed: $e');
+    }
+
+    // Fallback to local database
+    print('💾 Fetching pharmacies from local database...');
     final db = await _db;
     final List<Map<String, dynamic>> maps = await db.query(
       DBPharmacyTable.table,
@@ -48,10 +104,33 @@ class PharmacyRepository {
     });
   }
 
-  // READ - Search pharmacies by name
+  // READ - Search pharmacies by name (Remote-first)
   Future<List<Pharmacy>> searchPharmaciesByName(String query) async {
     if (query.trim().isEmpty) return [];
 
+    try {
+      // Check internet connection
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult != ConnectivityResult.none) {
+        print('☁️ Searching pharmacies remotely for: $query');
+
+        final response = await _apiService.searchPharmaciesByName(query);
+
+        if (response['success'] == true && response['pharmacies'] != null) {
+          print('✅ Pharmacies search results from remote');
+          final pharmacies = (response['pharmacies'] as List)
+              .map((p) => Pharmacy.fromMap(p))
+              .toList();
+
+          return pharmacies;
+        }
+      }
+    } catch (e) {
+      print('❌ Remote search failed: $e');
+    }
+
+    // Fallback to local search
+    print('💾 Searching pharmacies locally for: $query');
     final db = await _db;
     final List<Map<String, dynamic>> maps = await db.query(
       DBPharmacyTable.table,
