@@ -539,35 +539,22 @@ class UserCubit extends Cubit<UserState> {
   }
 
   // Update premium status
-  Future<void> updateUserPremium(int userId, String premium) async {
+  Future<void> updateUserPremium(int userId, bool premium) async {
     try {
       emit(UserLoading());
 
       print('💎 Updating premium status for user $userId to $premium');
 
-      // Update local first
+      // Update with remote-first logic (repository handles it)
       final result = await userRepository.updateUserPremium(userId, premium);
       if (result > 0) {
-        // Try to sync to remote if online
-        final hasInternet = await _hasConnection();
-        if (hasInternet) {
-          try {
-            final user = await userRepository.getUserById(userId);
-            if (user != null) {
-              await _apiService.updateUser(userId, user.toMap());
-              print('✅ Premium status synced to remote');
-            }
-          } catch (e) {
-            print('⚠️ Failed to sync premium to remote: $e');
-          }
-        }
-
         // Reload user
         final user = await userRepository.getUserById(userId);
         if (user != null) {
           emit(
             UserAuthenticated(user),
           ); // Keep user authenticated after premium upgrade
+          print('✅ Premium status updated successfully');
         } else {
           emit(const UserError('Failed to reload user after premium update'));
         }

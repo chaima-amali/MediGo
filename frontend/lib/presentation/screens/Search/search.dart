@@ -572,7 +572,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     // Check premium status
-    if (currentUser.premium.toLowerCase() != 'premium') {
+    if (!currentUser.premium) {
       _showPremiumRequiredDialog(context);
       return;
     }
@@ -692,7 +692,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     // Check premium status
-    if (currentUser.premium.toLowerCase() != 'premium') {
+    if (!currentUser.premium) {
       _showPremiumRequiredForNotification(context);
       return;
     }
