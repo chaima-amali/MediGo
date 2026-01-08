@@ -193,6 +193,67 @@ def update_user(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/users/<int:user_id>/premium', methods=['PUT'])
+def update_user_premium(user_id):
+    """Update user premium status"""
+    try:
+        data = request.get_json()
+        premium_value = data.get('premium')
+        
+        if premium_value is None:
+            return jsonify({'error': 'Premium field is required'}), 400
+        
+        # Convert to boolean
+        premium = premium_value if isinstance(premium_value, bool) else premium_value in ['true', 'True', '1', 'premium', 'yes']
+        
+        # Try Supabase first
+        if supabase:
+            try:
+                # Check if user exists in Supabase
+                existing = supabase.table('users').select('*').eq('user_id', user_id).execute()
+                
+                if existing.data and len(existing.data) > 0:
+                    # Update in Supabase
+                    print(f"💎 Updating premium status for user {user_id} in Supabase to: {premium}")
+                    response = supabase.table('users').update({'premium': premium}).eq('user_id', user_id).execute()
+                    
+                    if response.data and len(response.data) > 0:
+                        print(f"✅ Premium status updated in Supabase")
+                        return jsonify({
+                            'success': True,
+                            'message': 'Premium status updated successfully',
+                            'user': response.data[0]
+                        }), 200
+                    else:
+                        return jsonify({'error': 'Failed to update premium status in Supabase'}), 500
+                        
+            except Exception as supabase_error:
+                print(f"⚠️  Supabase premium update failed: {supabase_error}")
+                print("📍 Falling back to local database...")
+        
+        # Fallback to local database
+        affected = execute_update(
+            "UPDATE users SET premium = ? WHERE user_id = ?",
+            (premium, user_id)
+        )
+        
+        if affected == 0:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Fetch and return updated user
+        rows = execute_query("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        user = User.from_db_row(rows[0])
+        
+        print(f"✅ Premium status updated in local database")
+        return jsonify({
+            'success': True,
+            'message': 'Premium status updated successfully',
+            'user': user.to_dict()
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @bp.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     """Delete user"""

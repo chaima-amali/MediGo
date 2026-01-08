@@ -15,7 +15,8 @@ class LocationService {
     final dLat = _toRadians(pharmacyLat - userLat);
     final dLon = _toRadians(pharmacyLon - userLon);
 
-    final a = sin(dLat / 2) * sin(dLat / 2) +
+    final a =
+        sin(dLat / 2) * sin(dLat / 2) +
         cos(_toRadians(userLat)) *
             cos(_toRadians(pharmacyLat)) *
             sin(dLon / 2) *
@@ -37,28 +38,37 @@ class LocationService {
     required double userLon,
     required List<Pharmacy> pharmacies,
     int? limit,
+    double? maxDistanceKm,
   }) {
     final pharmaciesWithDistance = pharmacies
-        .where((pharmacy) => 
-            pharmacy.latitude != null && pharmacy.longitude != null)
+        .where(
+          (pharmacy) => pharmacy.latitude != null && pharmacy.longitude != null,
+        )
         .map((pharmacy) {
-      final distance = calculateDistance(
-        userLat,
-        userLon,
-        pharmacy.latitude!,
-        pharmacy.longitude!,
-      );
-      return PharmacyWithDistance(pharmacy: pharmacy, distance: distance);
-    }).toList();
+          final distance = calculateDistance(
+            userLat,
+            userLon,
+            pharmacy.latitude!,
+            pharmacy.longitude!,
+          );
+          return PharmacyWithDistance(pharmacy: pharmacy, distance: distance);
+        })
+        .toList();
 
     // Sort by distance (nearest first)
     pharmaciesWithDistance.sort((a, b) => a.distance.compareTo(b.distance));
 
-    if (limit != null && limit > 0) {
-      return pharmaciesWithDistance.take(limit).toList();
+    // Filter by max distance if specified
+    var filtered = pharmaciesWithDistance;
+    if (maxDistanceKm != null && maxDistanceKm > 0) {
+      filtered = filtered.where((p) => p.distance <= maxDistanceKm).toList();
     }
 
-    return pharmaciesWithDistance;
+    if (limit != null && limit > 0) {
+      return filtered.take(limit).toList();
+    }
+
+    return filtered;
   }
 
   // Format distance for display
@@ -75,10 +85,7 @@ class PharmacyWithDistance {
   final Pharmacy pharmacy;
   final double distance;
 
-  PharmacyWithDistance({
-    required this.pharmacy,
-    required this.distance,
-  });
+  PharmacyWithDistance({required this.pharmacy, required this.distance});
 
   String get formattedDistance => LocationService.formatDistance(distance);
 }
