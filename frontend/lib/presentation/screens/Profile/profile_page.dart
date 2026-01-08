@@ -159,7 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
               }
 
               // Handle subscription type safely
-              final isPremium = user.premium.toLowerCase() == 'premium';
+              final isPremium = user.premium;
 
               return SingleChildScrollView(
                 child: Padding(
