@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediGo Mobile Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #10b981;
+            color: white;
+        }
+        .status.disconnected {
+            background: #ef4444;
+            color: white;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #1f2937;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .result {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 13px;
+            word-break: break-word;
+        }
+        .result.success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .result.error {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .config-info {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .config-info strong {
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 MediGo Mobile Test</h1>
+            <div id="connectionStatus" class="status disconnected">Disconnected</div>
+        </div>
+
+        <div class="config-info">
+            <strong>⚙️ Server URL:</strong> <span id="serverUrl">Not set</span><br>
+            <button onclick="updateServerUrl()" style="margin-top: 10px; padding: 8px;">Change Server URL</button>
+        </div>
+
+        <!-- Health Check -->
+        <div class="card">
+            <h2>✅ Health Check</h2>
+            <button onclick="testHealth()">Test Connection</button>
+            <div id="healthResult" class="result">Tap button to test...</div>
+        </div>
+
+        <!-- Premium Status -->
+        <div class="card">
+            <h2>👑 Premium Status</h2>
+            <label>User ID:</label>
+            <input type="number" id="premiumUserId" value="26" placeholder="Enter user ID">
+            <button onclick="checkPremiumStatus()">Check Status</button>
+            <div id="premiumResult" class="result">Results will appear here...</div>
+        </div>
+
+        <!-- Medicine Search -->
+        <div class="card">
+            <h2>🔍 Search Medicines</h2>
+            <label>Medicine Name:</label>
+            <input type="text" id="searchQuery" value="clarithromycin" placeholder="Enter medicine name">
+            <button onclick="searchMedicines()">Search</button>
+            <div id="searchResult" class="result">Results will appear here...</div>
+        </div>
+
+        <!-- Notify Me -->
+        <div class="card">
+            <h2>📬 Notify Me</h2>
+            <label>User ID:</label>
+            <input type="number" id="notifyUserId" value="26">
+            <label>Medicine Name:</label>
+            <input type="text" id="notifyMedicineName" value="Rare Medicine XYZ">
+            <button onclick="notifyMe()">Request Notification</button>
+            <div id="notifyResult" class="result">Results will appear here...</div>
+        </div>
+
+        <!-- Create Reservation -->
+        <div class="card">
+            <h2>🎫 Create Reservation</h2>
+            <label>User ID:</label>
+            <input type="number" id="resUserId" value="26">
+            <label>Medicine ID:</label>
+            <input type="number" id="resMedicineId" value="138">
+            <label>Pharmacy ID:</label>
+            <input type="number" id="resPharmacyId" value="1">
+            <label>Medicine Name:</label>
+            <input type="text" id="resMedicineName" value="Clarithromycin 500mg">
+            <label>Quantity:</label>
+            <input type="number" id="resQuantity" value="1">
+            <button onclick="createReservation()">Create Reservation</button>
+            <div id="reservationResult" class="result">Results will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        // Default server URL - will be updated
+        let serverUrl = 'http://localhost:5000/api';
+
+        // Try to get saved URL from localStorage
+        if (localStorage.getItem('serverUrl')) {
+            serverUrl = localStorage.getItem('serverUrl');
+        }
+
+        // Display current server URL
+        document.getElementById('serverUrl').textContent = serverUrl;
+
+        function updateServerUrl() {
+            const newUrl = prompt('Enter server URL (e.g., http://192.168.1.100:5000/api):', serverUrl);
+            if (newUrl) {
+                serverUrl = newUrl.replace(/\/+$/, ''); // Remove trailing slashes
+                localStorage.setItem('serverUrl', serverUrl);
+                document.getElementById('serverUrl').textContent = serverUrl;
+                alert('Server URL updated! Testing connection...');
+                testHealth();
+            }
+        }
+
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = isError ? 'result error' : 'result success';
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.className = 'status connected';
+                status.textContent = 'Connected ✓';
+            } else {
+                status.className = 'status disconnected';
+                status.textContent = 'Disconnected ✗';
+            }
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(serverUrl.replace('/api', '') + '/api/health');
+                const data = await response.json();
+                showResult('healthResult', data);
+                updateConnectionStatus(true);
+            } catch (error) {
+                showResult('healthResult', { error: error.message }, true);
+                updateConnectionStatus(false);
+            }
+        }
+
+        async function checkPremiumStatus() {
+            const userId = document.getElementById('premiumUserId').value;
+            try {
+                const response = await fetch(`${serverUrl}/user/${userId}/premium-status`);
+                const data = await response.json();
+                showResult('premiumResult', data);
+            } catch (error) {
+                showResult('premiumResult', { error: error.message }, true);
+            }
+        }
+
+        async function searchMedicines() {
+            const query = document.getElementById('searchQuery').value;
+            try {
+                const response = await fetch(`${serverUrl}/search/medicines`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ search_query: query })
+                });
+                const data = await response.json();
+                showResult('searchResult', data);
+            } catch (error) {
+                showResult('searchResult', { error: error.message }, true);
+            }
+        }
+
+        async function notifyMe() {
+            const userId = document.getElementById('notifyUserId').value;
+            const medicineName = document.getElementById('notifyMedicineName').value;
+            try {
+                const response = await fetch(`${serverUrl}/search/notify-me`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: parseInt(userId), 
+                        medicine_name: medicineName 
+                    })
+                });
+                const data = await response.json();
+                showResult('notifyResult', data);
+            } catch (error) {
+                showResult('notifyResult', { error: error.message }, true);
+            }
+        }
+
+        async function createReservation() {
+            const userId = document.getElementById('resUserId').value;
+            const medicineId = document.getElementById('resMedicineId').value;
+            const pharmacyId = document.getElementById('resPharmacyId').value;
+            const medicineName = document.getElementById('resMedicineName').value;
+            const quantity = document.getElementById('resQuantity').value;
+            
+            try {
+                const response = await fetch(`${serverUrl}/reservations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: parseInt(userId),
+                        medicine_id: parseInt(medicineId),
+                        pharmacy_id: parseInt(pharmacyId),
+                        medicine_name: medicineName,
+                        quantity: parseInt(quantity)
+                    })
+                });
+                const data = await response.json();
+                showResult('reservationResult', data);
+            } catch (error) {
+                showResult('reservationResult', { error: error.message }, true);
+            }
+        }
+
+        // Auto-test health on page load
+        window.onload = function() {
+            setTimeout(testHealth, 500);
+        };
+    </script>
+</body>
+</html>

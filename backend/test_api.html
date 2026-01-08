@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediGo API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; }
+        h2 { color: #3498db; margin-top: 0; }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background-color: #2980b9; }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏥 MediGo API Test Interface</h1>
+
+    <!-- Health Check -->
+    <div class="container">
+        <h2>✅ Health Check</h2>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <pre id="healthResult">Click button to test...</pre>
+    </div>
+
+    <!-- Medicine Search -->
+    <div class="container">
+        <h2>🔍 Search Medicines</h2>
+        <label>Search Query:</label>
+        <input type="text" id="searchQuery" value="aspirin" placeholder="Enter medicine name">
+        <br>
+        <button onclick="searchMedicines()">Search</button>
+        <pre id="searchResult">Results will appear here...</pre>
+    </div>
+
+    <!-- Premium Status -->
+    <div class="container">
+        <h2>👑 Check Premium Status</h2>
+        <label>User ID:</label>
+        <input type="number" id="premiumUserId" value="1" placeholder="User ID">
+        <br>
+        <button onclick="checkPremiumStatus()">Check Status</button>
+        <pre id="premiumResult">Results will appear here...</pre>
+    </div>
+
+    <!-- Notify Me -->
+    <div class="container">
+        <h2>📬 Notify Me</h2>
+        <label>User ID:</label>
+        <input type="number" id="notifyUserId" value="1">
+        <br>
+        <label>Medicine Name:</label>
+        <input type="text" id="notifyMedicineName" value="Rare Medicine X">
+        <br>
+        <button onclick="notifyMe()">Request Notification</button>
+        <pre id="notifyResult">Results will appear here...</pre>
+    </div>
+
+    <!-- Create Reservation -->
+    <div class="container">
+        <h2>🎫 Create Reservation</h2>
+        <label>User ID:</label>
+        <input type="number" id="resUserId" value="1">
+        <br>
+        <label>Medicine ID:</label>
+        <input type="number" id="resMedicineId" value="1">
+        <br>
+        <label>Pharmacy ID:</label>
+        <input type="number" id="resPharmacyId" value="1">
+        <br>
+        <label>Medicine Name:</label>
+        <input type="text" id="resMedicineName" value="Aspirin 500mg">
+        <br>
+        <label>Quantity:</label>
+        <input type="number" id="resQuantity" value="1">
+        <br>
+        <button onclick="createReservation()">Create Reservation</button>
+        <pre id="reservationResult">Results will appear here...</pre>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:5000/api';
+
+        async function testHealth() {
+            try {
+                const response = await fetch('http://localhost:5000/api/health');
+                const data = await response.json();
+                document.getElementById('healthResult').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('healthResult').className = 'success';
+            } catch (error) {
+                document.getElementById('healthResult').innerHTML = 'Error: ' + error.message;
+                document.getElementById('healthResult').className = 'error';
+            }
+        }
+
+        async function searchMedicines() {
+            const query = document.getElementById('searchQuery').value;
+            try {
+                const response = await fetch(`${baseUrl}/search/medicines`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ search_query: query })
+                });
+                const data = await response.json();
+                document.getElementById('searchResult').innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('searchResult').innerHTML = 'Error: ' + error.message;
+            }
+        }
+
+        async function checkPremiumStatus() {
+            const userId = document.getElementById('premiumUserId').value;
+            try {
+                const response = await fetch(`${baseUrl}/user/${userId}/premium-status`);
+                const data = await response.json();
+                document.getElementById('premiumResult').innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('premiumResult').innerHTML = 'Error: ' + error.message;
+            }
+        }
+
+        async function notifyMe() {
+            const userId = document.getElementById('notifyUserId').value;
+            const medicineName = document.getElementById('notifyMedicineName').value;
+            try {
+                const response = await fetch(`${baseUrl}/search/notify-me`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        user_id: parseInt(userId), 
+                        medicine_name: medicineName 
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('notifyResult').innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('notifyResult').innerHTML = 'Error: ' + error.message;
+            }
+        }
+
+        async function createReservation() {
+            const userId = document.getElementById('resUserId').value;
+            const medicineId = document.getElementById('resMedicineId').value;
+            const pharmacyId = document.getElementById('resPharmacyId').value;
+            const medicineName = document.getElementById('resMedicineName').value;
+            const quantity = document.getElementById('resQuantity').value;
+            
+            try {
+                const response = await fetch(`${baseUrl}/reservations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        user_id: parseInt(userId),
+                        medicine_id: parseInt(medicineId),
+                        pharmacy_id: parseInt(pharmacyId),
+                        medicine_name: medicineName,
+                        quantity: parseInt(quantity)
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('reservationResult').innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('reservationResult').innerHTML = 'Error: ' + error.message;
+            }
+        }
+
+        // Auto-test health on page load
+        window.onload = function() {
+            testHealth();
+        };
+    </script>
+</body>
+</html>

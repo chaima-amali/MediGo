@@ -672,6 +672,60 @@ class UserCubit extends Cubit<UserState> {
   // Restore user session on app start (Try remote first, fallback to local)
   Future<void> restoreSession() async {
     try {
+      // ⚠️ AUTO-LOGIN FOR TESTING - REMOVE IN PRODUCTION ⚠️
+      print('🧪 TEST MODE: Auto-logging in as user ID 26...');
+      final testUserId = 26;
+      
+      // Try to fetch user 26 from backend
+      final hasInternet = await _hasConnection();
+      if (hasInternet) {
+        try {
+          print('☁️ Fetching test user from remote...');
+          final response = await _apiService.getUser(testUserId);
+
+          if (response['user_id'] != null) {
+            print('✅ Test user fetched from remote');
+            final user = User(
+              userId: response['user_id'],
+              name: response['name'],
+              email: response['email'],
+              phone: response['phone'],
+              password: response['password'] ?? '',
+              gender: response['gender'],
+              dob: response['dob'],
+              latitude: response['latitude'],
+              longitude: response['longitude'],
+              locationName: response['location_name'],
+              premium: response['premium'] ?? 'false',
+            );
+
+            // Save session
+            await _saveUserSession(user.userId!);
+            print('✅ Auto-login successful: ${user.name} (Premium: ${user.premium})');
+            emit(UserAuthenticated(user));
+            return;
+          }
+        } catch (e) {
+          print('❌ Remote fetch failed: $e');
+        }
+      }
+      
+      // If remote fails, try local
+      print('📂 Loading test user from local database...');
+      final localUser = await userRepository.getUserById(testUserId);
+      if (localUser != null) {
+        await _saveUserSession(localUser.userId!);
+        print('✅ Auto-login from local: ${localUser.name}');
+        emit(UserAuthenticated(localUser));
+        return;
+      }
+      
+      print('⚠️ Test user not found, showing login screen');
+      emit(UserUnauthenticated());
+      return;
+      
+      // ⚠️ ORIGINAL CODE BELOW - COMMENTED FOR TESTING ⚠️
+      /*
       final prefs = await SharedPreferences.getInstance();
       final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
       final userId = prefs.getInt('user_id');
@@ -737,6 +791,7 @@ class UserCubit extends Cubit<UserState> {
         print('ℹ️ No active session found');
         emit(UserUnauthenticated());
       }
+      */
     } catch (e) {
       print('❌ Failed to restore session: $e');
       emit(UserUnauthenticated());

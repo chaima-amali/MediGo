@@ -160,11 +160,8 @@ class MediGoAppState extends State<MediGoApp> {
         ),
         BlocProvider(
           create: (context) {
-            debugPrint('💊 Creating MedicineSearchCubit...');
-            return MedicineSearchCubit(
-              pharmacyMedicineRepository: PharmacyMedicineRepository(),
-              medicineFindRepository: MedicineFindRepository(),
-            );
+            debugPrint('💊 Creating MedicineSearchCubit with API service...');
+            return MedicineSearchCubit();
           },
         ),
         BlocProvider(

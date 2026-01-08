@@ -7,6 +7,7 @@ import 'api/reservation_api_service.dart';
 import 'api/medication_log_api_service.dart';
 import 'api/statistics_api_service.dart';
 import 'api/sync_api_service.dart';
+import 'api/medicine_search_api_service.dart';
 
 /// Main API Service - Unified access to all API endpoints
 ///
@@ -44,6 +45,7 @@ class ApiService {
   late final MedicationLogApiService medicationLogs = MedicationLogApiService();
   late final StatisticsApiService statistics = StatisticsApiService();
   late final SyncApiService sync = SyncApiService();
+  late final MedicineSearchApiService medicineSearch = MedicineSearchApiService();
 
   /// Initialize API service and all sub-services
   void initialize() {

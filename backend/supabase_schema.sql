@@ -163,6 +163,7 @@ CREATE TABLE IF NOT EXISTS pharmacy_medicine (
     CONSTRAINT fk_pharmacy_medicine_medicine FOREIGN KEY (medicine_id) REFERENCES medicine(medicine_id) ON DELETE CASCADE
 );
 
+
 -- =====================================================
 -- MEDICINE SEARCH HISTORY (Restock Notifications)
 -- =====================================================

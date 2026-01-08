@@ -37,12 +37,46 @@ def create_app():
 def register_routes(app):
     """Register all API route blueprints"""
     
-    from app.routes import users, medicines, auth
+    from flask import send_from_directory
+    import os
+    from app.routes import users, medicines, auth, medicine_search
+    
+    # Root endpoint
+    @app.route('/')
+    def index():
+        return jsonify({
+            'name': 'MediGo Backend API',
+            'version': '1.0.0',
+            'status': 'running',
+            'endpoints': {
+                'health': '/api/health',
+                'swagger': '/docs',
+                'mobile_test': '/mobile',
+                'search': '/api/search/medicines',
+                'reservations': '/api/reservations',
+                'auth': '/api/auth/login'
+            }
+        })
+    
+    # Health check endpoint
+    @app.route('/api/health')
+    def health_check():
+        return jsonify({
+            'status': 'healthy',
+            'database': 'connected',
+            'supabase': 'connected'
+        })
+    
+    # Mobile test page
+    @app.route('/mobile')
+    def mobile_test():
+        return send_from_directory(os.path.dirname(os.path.dirname(__file__)), 'mobile_test.html')
     
     # API endpoints
     app.register_blueprint(auth.bp, url_prefix='/api')
     app.register_blueprint(users.bp, url_prefix='/api')
     app.register_blueprint(medicines.bp, url_prefix='/api')
+    app.register_blueprint(medicine_search.bp, url_prefix='/api')
     
     # TODO: Add more route blueprints here as you expand
     # app.register_blueprint(pharmacies.bp, url_prefix='/api')

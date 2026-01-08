@@ -1,5 +1,6 @@
 Flask==3.1.0
 Flask-CORS==5.0.0
+flask-swagger-ui==5.21.0
 python-dotenv==1.0.1
 pydantic==2.5.3
 pydantic[email]==2.5.3

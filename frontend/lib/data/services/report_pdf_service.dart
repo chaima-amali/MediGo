@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -36,7 +37,7 @@ class ReportPdfService {
     // Save to Downloads folder
     Directory? directory;
 
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       directory = Directory('/storage/emulated/0/Download');
       // Fallback to external storage if Download doesn't exist
       if (!await directory.exists()) {

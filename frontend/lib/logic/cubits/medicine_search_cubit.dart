@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../data/repositories/medicine_find_repo.dart';
-import '../../data/repositories/pharmacy_medicine_repo.dart';
+import '../../data/services/api/medicine_search_api_service.dart';
+import 'package:dio/dio.dart';
 
 // States
 abstract class MedicineSearchState extends Equatable {
@@ -46,28 +46,14 @@ class MedicineSearchError extends MedicineSearchState {
 
 // Cubit
 class MedicineSearchCubit extends Cubit<MedicineSearchState> {
-  final PharmacyMedicineRepository pharmacyMedicineRepository;
-  final MedicineFindRepository medicineFindRepository;
+  final MedicineSearchApiService _apiService;
 
   MedicineSearchCubit({
-    required this.pharmacyMedicineRepository,
-    required this.medicineFindRepository,
-  }) : super(MedicineSearchInitial()) {
-    _init();
-  }
+    MedicineSearchApiService? apiService,
+  })  : _apiService = apiService ?? MedicineSearchApiService(),
+        super(MedicineSearchInitial());
 
-  Future<void> _init() async {
-    // Debug: Check if data exists
-    try {
-      final allInventory = await pharmacyMedicineRepository
-          .getAllPharmacyMedicines();
-      print('📊 Total pharmacy medicines in database: ${allInventory.length}');
-    } catch (e) {
-      print('❌ Error checking inventory: $e');
-    }
-  }
-
-  // Search medicines and get pharmacies that have them
+  // Search medicines using remote API (Supabase data via Flask backend)
   Future<void> searchMedicine(String query) async {
     try {
       if (query.trim().isEmpty) {
@@ -76,13 +62,16 @@ class MedicineSearchCubit extends Cubit<MedicineSearchState> {
       }
 
       emit(MedicineSearchLoading());
-      print('🔍 Searching for medicine: $query');
+      print('🔍 [API] Searching for medicine: $query');
 
-      // Search pharmacies that have this medicine
-      final results = await pharmacyMedicineRepository
-          .searchPharmaciesByMedicineName(query);
+      // Call Flask backend API
+      final response = await _apiService.searchMedicines(query);
+      
+      final results = (response['data'] as List<dynamic>?)
+          ?.map((item) => item as Map<String, dynamic>)
+          .toList() ?? [];
 
-      print('✅ Found ${results.length} pharmacies with medicine: $query');
+      print('✅ [API] Found ${results.length} results for: $query');
 
       if (results.isEmpty) {
         emit(
@@ -94,9 +83,27 @@ class MedicineSearchCubit extends Cubit<MedicineSearchState> {
       } else {
         emit(MedicineSearchLoaded(results, query));
       }
+    } on DioException catch (e) {
+      print('❌ [API] Network error: ${e.message}');
+      emit(MedicineSearchError('Connection failed. Check if backend is running.'));
     } catch (e) {
-      print('❌ Error searching medicine: $e');
+      print('❌ [API] Error searching medicine: $e');
       emit(MedicineSearchError('Failed to search medicine: $e'));
+    }
+  }
+
+  // Request "Notify Me" when medicine not found
+  Future<void> notifyMeWhenAvailable(int userId, String medicineName) async {
+    try {
+      print('🔔 [API] Recording notify-me request for: $medicineName');
+      await _apiService.notifyMe(
+        userId: userId,
+        medicineName: medicineName,
+      );
+      print('✅ [API] Notify-me request recorded');
+    } catch (e) {
+      print('❌ [API] Failed to record notify-me: $e');
+      rethrow;
     }
   }
 
@@ -105,17 +112,29 @@ class MedicineSearchCubit extends Cubit<MedicineSearchState> {
     emit(MedicineSearchInitial());
   }
 
-  // Get all medicines (for autocomplete suggestions)
+  // Get medicine suggestions (for autocomplete) - using API
   Future<List<String>> getMedicineSuggestions(String query) async {
     try {
       if (query.trim().isEmpty) return [];
 
-      final medicines = await medicineFindRepository.searchMedicinesByName(
-        query,
-      );
-      return medicines.map((m) => m.name).toList();
+      // Use the search API to get suggestions
+      final response = await _apiService.searchMedicines(query);
+      final results = (response['data'] as List<dynamic>?)
+          ?.map((item) => item as Map<String, dynamic>)
+          .toList() ?? [];
+      
+      // Extract unique medicine names
+      final Set<String> uniqueNames = {};
+      for (var result in results) {
+        final name = result['medicine_name'] as String?;
+        if (name != null) {
+          uniqueNames.add(name);
+        }
+      }
+      
+      return uniqueNames.toList();
     } catch (e) {
-      print('❌ Error getting medicine suggestions: $e');
+      print('❌ [API] Error getting medicine suggestions: $e');
       return [];
     }
   }
