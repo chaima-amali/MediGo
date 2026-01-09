@@ -125,7 +125,68 @@ def create_user():
 
 @bp.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
-    """Update user information"""
+    """
+    Update user information (Edit Profile)
+    ---
+    tags:
+      - Users
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: User ID
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              description: User's full name
+            email:
+              type: string
+              description: User's email address
+            phone:
+              type: string
+              description: Phone number
+            password:
+              type: string
+              description: Password (hashed)
+            gender:
+              type: string
+              description: Gender
+            dob:
+              type: string
+              description: Date of birth (YYYY-MM-DD)
+            latitude:
+              type: number
+              format: float
+              description: Location latitude
+            longitude:
+              type: number
+              format: float
+              description: Location longitude
+            location_name:
+              type: string
+              description: Location name
+            premium:
+              type: boolean
+              description: Premium status
+    responses:
+      200:
+        description: User updated successfully
+        schema:
+          type: object
+          description: Updated user object
+      400:
+        description: Validation error
+      404:
+        description: User not found
+      500:
+        description: Server error
+    """
     try:
         # Validate request data
         update_data = UserUpdate(**request.json)
@@ -195,7 +256,57 @@ def update_user(user_id):
 
 @bp.route('/users/<int:user_id>/premium', methods=['PUT'])
 def update_user_premium(user_id):
-    """Update user premium status"""
+    """
+    Update user premium status
+    ---
+    tags:
+      - Users
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: User ID
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - premium
+          properties:
+            premium:
+              type: boolean
+              description: Premium status (true or false)
+              example: true
+    responses:
+      200:
+        description: Premium status updated successfully
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            message:
+              type: string
+              example: Premium status updated successfully
+            user:
+              type: object
+              description: Updated user object
+      400:
+        description: Invalid request
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Premium field is required
+      404:
+        description: User not found
+      500:
+        description: Server error
+    """
     try:
         data = request.get_json()
         premium_value = data.get('premium')
@@ -256,7 +367,31 @@ def update_user_premium(user_id):
 
 @bp.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
-    """Delete user"""
+    """
+    Delete a user
+    ---
+    tags:
+      - Users
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: User ID to delete
+    responses:
+      200:
+        description: User deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: User deleted successfully
+      404:
+        description: User not found
+      500:
+        description: Server error
+    """
     try:
         affected = execute_update(
             "DELETE FROM users WHERE user_id = ?",
@@ -267,6 +402,127 @@ def delete_user(user_id):
             return jsonify({'error': 'User not found'}), 404
         
         return jsonify({'message': 'User deleted successfully'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/users/<int:user_id>/password', methods=['PUT'])
+def change_password(user_id):
+    """
+    Change user password
+    ---
+    tags:
+      - Users
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: User ID
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - old_password
+            - new_password
+          properties:
+            old_password:
+              type: string
+              description: Current password (hashed with SHA-256)
+              example: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+            new_password:
+              type: string
+              description: New password (hashed with SHA-256)
+              example: 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
+    responses:
+      200:
+        description: Password changed successfully
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            message:
+              type: string
+              example: Password changed successfully
+      400:
+        description: Invalid request or wrong old password
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      404:
+        description: User not found
+      500:
+        description: Server error
+    """
+    try:
+        data = request.get_json()
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+        
+        if not old_password or not new_password:
+            return jsonify({'error': 'Both old_password and new_password are required'}), 400
+        
+        # Try Supabase first
+        if supabase:
+            try:
+                # Get user from Supabase
+                existing = supabase.table('users').select('*').eq('user_id', user_id).execute()
+                
+                if existing.data and len(existing.data) > 0:
+                    user = existing.data[0]
+                    
+                    # Verify old password
+                    if user['password'] != old_password:
+                        return jsonify({'error': 'Current password is incorrect'}), 400
+                    
+                    # Update password in Supabase
+                    print(f"🔑 Changing password for user {user_id} in Supabase")
+                    response = supabase.table('users').update({'password': new_password}).eq('user_id', user_id).execute()
+                    
+                    if response.data and len(response.data) > 0:
+                        print(f"✅ Password changed in Supabase")
+                        return jsonify({
+                            'success': True,
+                            'message': 'Password changed successfully'
+                        }), 200
+                    else:
+                        return jsonify({'error': 'Failed to change password in Supabase'}), 500
+                        
+            except Exception as supabase_error:
+                print(f"⚠️  Supabase password change failed: {supabase_error}")
+                print("📍 Falling back to local database...")
+        
+        # Fallback to local database
+        # Verify old password
+        rows = execute_query("SELECT password FROM users WHERE user_id = ?", (user_id,))
+        
+        if not rows:
+            return jsonify({'error': 'User not found'}), 404
+        
+        if rows[0][0] != old_password:
+            return jsonify({'error': 'Current password is incorrect'}), 400
+        
+        # Update password
+        affected = execute_update(
+            "UPDATE users SET password = ? WHERE user_id = ?",
+            (new_password, user_id)
+        )
+        
+        if affected == 0:
+            return jsonify({'error': 'Failed to update password'}), 500
+        
+        print(f"✅ Password changed in local database")
+        return jsonify({
+            'success': True,
+            'message': 'Password changed successfully'
+        }), 200
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
