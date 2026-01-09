@@ -159,8 +159,13 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
 
               if (tracking != null) {
                 medicineNameController.text = tracking.name;
-                selectedMedicineType = tracking.type;
-                selectedUnit = tracking.unit;
+                // Validate dropdown values exist in the lists before setting
+                selectedMedicineType = medicineTypes.contains(tracking.type)
+                    ? tracking.type
+                    : 'Tablet';
+                selectedUnit = units.contains(tracking.unit)
+                    ? tracking.unit
+                    : 'mg';
                 dosage = tracking.dosage.toInt();
                 dosageController.text = dosage.toString();
               }
@@ -376,6 +381,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
 
     final updatedTracking = MedicineTracking(
       id: _tracking!.id,
+      userId: _tracking!.userId,
       name: medicineNameController.text,
       type: selectedMedicineType ?? 'Tablet',
       unit: selectedUnit ?? 'mg',
@@ -418,36 +424,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
     }
   }
 
-  void _handleDelete() {
-    final loc = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(loc.delete_medicine),
-        content: Text(loc.confirm_delete_medicine),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc.no),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              if (_plan?.id != null) {
-                _cubit.deletePlan(_plan!.id!);
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(
-              loc.delete,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Delete action removed: edit page only supports Save/Cancel now.
 
   Widget _field({
     required String label,
@@ -784,15 +761,16 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                           Row(
                             children: [
                               Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: _handleDelete,
-                                  icon: const Icon(Icons.delete),
-                                  label: Text(l10n.delete_medicine),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
+                                child: OutlinedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(l10n.cancel),
+                                  style: OutlinedButton.styleFrom(
                                     foregroundColor: Theme.of(
                                       context,
                                     ).colorScheme.onSurface,
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
                                   ),
                                 ),
                               ),

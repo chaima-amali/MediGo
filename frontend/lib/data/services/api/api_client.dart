@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend/config/environment.dart';
-// import 'package:frontend/data/services/crashlytics_service.dart';
+import 'package:frontend/data/services/crashlytics_service.dart';
 
 /// Base API client for making HTTP requests
 /// Provides generic HTTP methods (GET, POST, PUT, DELETE) and error handling
@@ -11,7 +11,7 @@ class ApiClient {
   ApiClient._internal();
 
   late Dio _dio;
-  // final CrashlyticsService _crashlytics = CrashlyticsService();
+  final CrashlyticsService _crashlytics = CrashlyticsService();
 
   /// Get Dio instance for advanced use
   Dio get dio => _dio;
@@ -43,11 +43,11 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onError: (error, handler) {
-          // _crashlytics.logError(
-          //   error,
-          //   error.stackTrace,
-          //   reason: 'API Error: ${error.requestOptions.path}',
-          // );
+          _crashlytics.logError(
+            error,
+            error.stackTrace,
+            reason: 'API Error: ${error.requestOptions.path}',
+          );
           return handler.next(error);
         },
       ),
@@ -157,7 +157,7 @@ class ApiClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        errorMessage = 'Connection timeout';
+        errorMessage = 'Connection timeout - backend server may be unreachable';
         break;
       case DioExceptionType.badResponse:
         errorMessage = 'Server error: ${error.response?.statusCode}';
@@ -166,13 +166,17 @@ class ApiClient {
         errorMessage = 'Request cancelled';
         break;
       case DioExceptionType.connectionError:
-        errorMessage = 'No internet connection';
+        errorMessage = 'No internet connection or backend server unreachable';
         break;
       default:
         errorMessage = 'Unknown error occurred';
     }
 
     debugPrint('❌ API Error: $errorMessage');
+    debugPrint('❌ Request URL: ${error.requestOptions.uri}');
+    debugPrint('❌ Method: ${error.requestOptions.method}');
+    debugPrint('❌ Status Code: ${error.response?.statusCode}');
+    debugPrint('❌ Response: ${error.response?.data}');
     debugPrint('❌ Details: ${error.message}');
   }
 }

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/logic/cubits/theme_cubit.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
+import 'package:frontend/data/services/api_service.dart';
 import 'subscription_page.dart';
 import 'edit_profile_page.dart';
 import 'Language_page.dart';
 import 'Edit_password.dart';
 import '../Home/splash_screen.dart';
 import '../Home/home_page.dart';
+import '../Register/login_screen.dart';
 import '../Reservations/my_reservations_screen.dart';
 import 'package:frontend/data/repositories/reservation_repo.dart';
 
@@ -35,12 +38,29 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadCurrentLanguage();
+    _loadNotificationPermissionStatus();
     // Load reservations after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _loadActiveReservations();
       }
     });
+  }
+
+  Future<void> _loadNotificationPermissionStatus() async {
+    try {
+      final messaging = FirebaseMessaging.instance;
+      final settings = await messaging.getNotificationSettings();
+
+      if (mounted) {
+        setState(() {
+          _notificationsEnabled =
+              settings.authorizationStatus == AuthorizationStatus.authorized;
+        });
+      }
+    } catch (e) {
+      print('⚠️ Error loading notification permission status: $e');
+    }
   }
 
   Future<void> _loadActiveReservations() async {
@@ -127,11 +147,11 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: BlocListener<UserCubit, UserState>(
         listener: (context, state) {
-          // When user logs out, navigate to splash screen immediately
+          // When user logs out, navigate to login screen immediately
           if (state is UserUnauthenticated) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const SplashScreen()),
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
               (route) => false,
             );
           }
@@ -390,10 +410,45 @@ class _ProfilePageState extends State<ProfilePage> {
                         subtitle: loc.receiveMedicineReminders,
                         showSwitch: true,
                         switchValue: _notificationsEnabled,
-                        onSwitchChanged: (value) {
+                        onSwitchChanged: (value) async {
                           setState(() {
                             _notificationsEnabled = value;
                           });
+
+                          // Update notification preference on backend
+                          try {
+                            final prefs = await SharedPreferences.getInstance();
+                            final userId = prefs.getInt('user_id');
+
+                            if (userId != null) {
+                              await ApiService().updateNotificationPreference(
+                                userId,
+                                value,
+                              );
+                              print(
+                                '✅ Notification preference updated: $value',
+                              );
+                            }
+                          } catch (e) {
+                            print(
+                              '⚠️ Failed to update notification preference: $e',
+                            );
+                            // Revert the switch if update failed
+                            setState(() {
+                              _notificationsEnabled = !value;
+                            });
+
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to update notification settings',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                         onTap: () {},
                       ),

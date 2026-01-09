@@ -7,6 +7,7 @@ import 'api/reservation_api_service.dart';
 import 'api/medication_log_api_service.dart';
 import 'api/statistics_api_service.dart';
 import 'api/sync_api_service.dart';
+import 'api/tracking_api_service.dart';
 
 /// Main API Service - Unified access to all API endpoints
 ///
@@ -23,6 +24,9 @@ import 'api/sync_api_service.dart';
 ///
 /// // Medicines
 /// final medicines = await api.medicines.getMedicines(userId);
+///
+/// // Medicine Tracking
+/// await api.tracking.addMedicine(userId: 1, name: 'Aspirin', type: 'Tablet');
 ///
 /// // Pharmacies
 /// final pharmacies = await api.pharmacies.searchPharmacies(lat: 40.7, lng: -74.0);
@@ -44,6 +48,7 @@ class ApiService {
   late final MedicationLogApiService medicationLogs = MedicationLogApiService();
   late final StatisticsApiService statistics = StatisticsApiService();
   late final SyncApiService sync = SyncApiService();
+  late final TrackingApiService tracking = TrackingApiService();
 
   /// Initialize API service and all sub-services
   void initialize() {
@@ -95,6 +100,10 @@ class ApiService {
 
   Future<void> updateFCMToken(int userId, String token) async {
     return users.updateFCMToken(userId, token);
+  }
+
+  Future<void> updateNotificationPreference(int userId, bool enabled) async {
+    return users.updateNotificationPreference(userId, enabled);
   }
 
   // Medicines (use api.medicines instead)

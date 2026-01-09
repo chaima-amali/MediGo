@@ -193,6 +193,110 @@ def update_user(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/users/<int:user_id>/fcm-token', methods=['PUT'])
+def update_fcm_token(user_id):
+    """
+    Update user's FCM token for push notifications
+    Request body: {"fcm_token": "token_string"}
+    """
+    try:
+        data = request.json
+        fcm_token = data.get('fcm_token')
+        
+        if not fcm_token:
+            return jsonify({'error': 'fcm_token is required'}), 400
+        
+        # Try Supabase first
+        if supabase:
+            try:
+                response = supabase.table('users')\
+                    .update({'fcm_token': fcm_token})\
+                    .eq('user_id', user_id)\
+                    .execute()
+                
+                if response.data and len(response.data) > 0:
+                    print(f'✅ FCM token updated in Supabase for user {user_id}')
+                    return jsonify({
+                        'success': True,
+                        'message': 'FCM token updated successfully',
+                        'source': 'remote'
+                    }), 200
+                    
+            except Exception as supabase_error:
+                print(f'⚠️  Supabase FCM token update failed: {supabase_error}')
+        
+        # Fallback to local database
+        affected = execute_update(
+            "UPDATE users SET fcm_token = ? WHERE user_id = ?",
+            (fcm_token, user_id)
+        )
+        
+        if affected == 0:
+            return jsonify({'error': 'User not found'}), 404
+        
+        print(f'✅ FCM token updated in local database for user {user_id}')
+        return jsonify({
+            'success': True,
+            'message': 'FCM token updated successfully',
+            'source': 'local'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/users/<int:user_id>/notification-preference', methods=['PUT'])
+def update_notification_preference(user_id):
+    """
+    Update user's notification preference
+    Request body: {"notifications_enabled": true/false}
+    """
+    try:
+        data = request.json
+        notifications_enabled = data.get('notifications_enabled')
+        
+        if notifications_enabled is None:
+            return jsonify({'error': 'notifications_enabled is required'}), 400
+        
+        # Try Supabase first
+        if supabase:
+            try:
+                response = supabase.table('users')\
+                    .update({'notifications_enabled': notifications_enabled})\
+                    .eq('user_id', user_id)\
+                    .execute()
+                
+                if response.data and len(response.data) > 0:
+                    print(f'✅ Notification preference updated in Supabase for user {user_id}')
+                    return jsonify({
+                        'success': True,
+                        'message': 'Notification preference updated successfully',
+                        'notifications_enabled': notifications_enabled,
+                        'source': 'remote'
+                    }), 200
+                    
+            except Exception as supabase_error:
+                print(f'⚠️  Supabase notification preference update failed: {supabase_error}')
+        
+        # Fallback to local database
+        affected = execute_update(
+            "UPDATE users SET notifications_enabled = ? WHERE user_id = ?",
+            (1 if notifications_enabled else 0, user_id)
+        )
+        
+        if affected == 0:
+            return jsonify({'error': 'User not found'}), 404
+        
+        print(f'✅ Notification preference updated in local database for user {user_id}')
+        return jsonify({
+            'success': True,
+            'message': 'Notification preference updated successfully',
+            'notifications_enabled': notifications_enabled,
+            'source': 'local'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @bp.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     """Delete user"""

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/data/services/fcm_service.dart';
+import 'package:frontend/data/services/api_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../../src/generated/l10n/app_localizations.dart';
@@ -231,12 +233,51 @@ class LocalizationPage extends StatelessWidget {
                                 final state = userCubit.state;
                                 if (state is UserAuthenticated) {
                                   print('✅ User registered successfully');
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MainScreen(),
-                                    ),
-                                  );
+
+                                  // Request notification permission after successful registration
+                                  try {
+                                    final fcmService = FCMService();
+                                    await fcmService.initialize();
+                                    debugPrint(
+                                      '✅ Notification permission requested',
+                                    );
+
+                                    // Send FCM token to backend
+                                    final fcmToken = fcmService.fcmToken;
+                                    if (fcmToken != null &&
+                                        state.user.userId != null) {
+                                      try {
+                                        await ApiService().updateFCMToken(
+                                          state.user.userId!,
+                                          fcmToken,
+                                        );
+                                        debugPrint(
+                                          '✅ FCM token sent to backend: $fcmToken',
+                                        );
+                                      } catch (e) {
+                                        debugPrint(
+                                          '⚠️ Failed to send FCM token: $e',
+                                        );
+                                      }
+                                    } else {
+                                      debugPrint(
+                                        '⚠️ FCM token or user ID is null',
+                                      );
+                                    }
+                                  } catch (e) {
+                                    debugPrint(
+                                      '⚠️ Notification permission error: $e',
+                                    );
+                                  }
+
+                                  if (context.mounted) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MainScreen(),
+                                      ),
+                                    );
+                                  }
                                 } else if (state is UserError) {
                                   print('❌ Registration error: ${state.error}');
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -263,23 +304,50 @@ class LocalizationPage extends StatelessWidget {
                                 );
 
                                 if (context.mounted) {
-                                  // After updating location, emit authenticated state for navigation
-                                  final updatedUser = await userCubit
-                                      .userRepository
-                                      .getUserById(user.userId!);
-                                  if (updatedUser != null) {
-                                    // Manually emit UserAuthenticated state so login flow works properly
-                                    userCubit.emit(
-                                      UserAuthenticated(updatedUser),
+                                  // Location updated successfully, request notification permission
+                                  try {
+                                    final fcmService = FCMService();
+                                    await fcmService.initialize();
+                                    debugPrint(
+                                      '✅ Notification permission requested',
+                                    );
+
+                                    // Send FCM token to backend
+                                    final fcmToken = fcmService.fcmToken;
+                                    if (fcmToken != null &&
+                                        user.userId != null) {
+                                      try {
+                                        await ApiService().updateFCMToken(
+                                          user.userId!,
+                                          fcmToken,
+                                        );
+                                        debugPrint(
+                                          '✅ FCM token sent to backend: $fcmToken',
+                                        );
+                                      } catch (e) {
+                                        debugPrint(
+                                          '⚠️ Failed to send FCM token: $e',
+                                        );
+                                      }
+                                    } else {
+                                      debugPrint(
+                                        '⚠️ FCM token or user ID is null',
+                                      );
+                                    }
+                                  } catch (e) {
+                                    debugPrint(
+                                      '⚠️ Notification permission error: $e',
                                     );
                                   }
 
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MainScreen(),
-                                    ),
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MainScreen(),
+                                      ),
+                                    );
+                                  }
                                 }
                               }
                             }

@@ -501,4 +501,58 @@ class DBHelper {
 
     print('✅ Mock data reset successfully');
   }
+
+  /// Clear all user-specific medicine data (called on logout)
+  static Future<void> clearUserMedicineData(int userId) async {
+    try {
+      final db = await getDatabase();
+
+      // Get all medicine plans for this user to also delete their occurrences
+      final plans = await db.query(
+        'medicine_plan',
+        where: 'user_id = ?',
+        whereArgs: [userId],
+        columns: ['plan_id'],
+      );
+
+      final planIds = plans.map((p) => p['plan_id']).toList();
+
+      // Delete occurrences for these plans
+      for (final planId in planIds) {
+        await db.delete(
+          'occurrence_plan',
+          where: 'plan_id = ?',
+          whereArgs: [planId],
+        );
+      }
+
+      // Delete medicine plans for this user
+      await db.delete(
+        'medicine_plan',
+        where: 'user_id = ?',
+        whereArgs: [userId],
+      );
+
+      // Delete medicine tracking for this user
+      await db.delete(
+        'medicine_tracking',
+        where: 'user_id = ?',
+        whereArgs: [userId],
+      );
+
+      // Delete daily dosage checking for this user (if user_id exists in that table)
+      try {
+        await db.delete(
+          'daily_dosage_checking',
+          where: 'user_id = ?',
+          whereArgs: [userId],
+        );
+      } catch (_) {} // Table might not have user_id column
+
+      print('🗑️ User medicine data cleared for user_id=$userId');
+    } catch (e) {
+      print('❌ Failed to clear user medicine data: $e');
+    }
+  }
 }
+
