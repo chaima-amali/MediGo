@@ -5,7 +5,10 @@ class Environment {
   static const String flaskBaseUrl = String.fromEnvironment(
     'FLASK_BASE_URL',
     defaultValue:
-        'http://10.66.113.125:5000/api', // Change to your PC IP when testing on device or use localhost for the emulator
+       // 'http://localhost:5000/api', // Works with ADB reverse or emulator or desktop
+    // 'http://10.0.2.2:5000/api', // For Android emulator (maps to localhost)
+    // 'http://10.66.113.1:5000/api', // For physical device on same WiFi
+     'http://10.66.113.125:5000/api',
   );
 
   // App Configuration

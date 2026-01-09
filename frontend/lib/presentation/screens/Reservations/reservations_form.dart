@@ -472,13 +472,24 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                         return;
                       }
 
-                      // Get current user ID
+                      // Get current user ID and premium status
                       final userState = context.read<UserCubit>().state;
                       int userId = 0;
+                      bool isPremium = false;
                       if (userState is UserAuthenticated) {
                         userId = userState.user.userId!;
+                        isPremium = userState.user.premium ?? false;
+                        print(
+                          '👤 UserAuthenticated - userId: $userId, isPremium: $isPremium',
+                        );
                       } else if (userState is UserLoaded) {
                         userId = userState.user.userId!;
+                        isPremium = userState.user.premium ?? false;
+                        print(
+                          '👤 UserLoaded - userId: $userId, isPremium: $isPremium',
+                        );
+                      } else {
+                        print('⚠️ User state: ${userState.runtimeType}');
                       }
 
                       if (userId == 0) {
@@ -500,6 +511,8 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                       ).format(pickupDate!);
                       final formattedTime = pickupTime!.format(context);
 
+                      print('📝 Creating reservation - isPremium: $isPremium');
+
                       context.read<ReservationCubit>().createReservation(
                         medicineFindId:
                             0, // TODO: Link to medicine search if needed
@@ -509,6 +522,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                         day: formattedDate,
                         time: formattedTime,
                         quantity: quantity,
+                        isPremium: isPremium,
                       );
                     },
                     style: ElevatedButton.styleFrom(

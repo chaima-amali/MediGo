@@ -37,7 +37,7 @@ def create_app():
 def register_routes(app):
     """Register all API route blueprints"""
     
-    from app.routes import users, medicines, auth, pharmacies
+    from app.routes import users, medicines, auth, pharmacies, reservations, medicine_search_history
     
     # Root endpoint
     @app.route('/')
@@ -53,9 +53,8 @@ def register_routes(app):
     app.register_blueprint(users.bp, url_prefix='/api')
     app.register_blueprint(medicines.bp, url_prefix='/api')
     app.register_blueprint(pharmacies.pharmacies_bp, url_prefix='/api/pharmacies')
-    
-    # TODO: Add more route blueprints here as you expand
-    # app.register_blueprint(reservations.bp, url_prefix='/api')
+    app.register_blueprint(reservations.bp, url_prefix='/api')
+    app.register_blueprint(medicine_search_history.bp, url_prefix='/api')
 
 def register_swagger(app):
     """Register Swagger UI for API documentation"""
@@ -176,7 +175,7 @@ def get_swagger_spec():
                 },
                 "put": {
                     "tags": ["Users"],
-                    "summary": "Update user information (Edit Profile)",
+                    "summary": "Update user profile",
                     "parameters": [{
                         "name": "user_id",
                         "in": "path",
@@ -195,8 +194,6 @@ def get_swagger_spec():
                                         "phone": {"type": "string", "example": "1234567890"},
                                         "gender": {"type": "string", "example": "male"},
                                         "dob": {"type": "string", "example": "1990-01-01"},
-                                        "latitude": {"type": "number", "example": 36.686},
-                                        "longitude": {"type": "number", "example": 2.864},
                                         "location_name": {"type": "string", "example": "Mahelma"}
                                     }
                                 }
@@ -205,13 +202,12 @@ def get_swagger_spec():
                     },
                     "responses": {
                         "200": {"description": "User updated successfully"},
-                        "400": {"description": "Validation error"},
                         "404": {"description": "User not found"}
                     }
                 },
                 "delete": {
                     "tags": ["Users"],
-                    "summary": "Delete a user",
+                    "summary": "Delete user",
                     "parameters": [{
                         "name": "user_id",
                         "in": "path",
@@ -250,39 +246,6 @@ def get_swagger_spec():
                     },
                     "responses": {
                         "200": {"description": "Premium status updated successfully"},
-                        "400": {"description": "Premium field is required"},
-                        "404": {"description": "User not found"}
-                    }
-                }
-            },
-            "/api/users/{user_id}/password": {
-                "put": {
-                    "tags": ["Users"],
-                    "summary": "Change user password",
-                    "parameters": [{
-                        "name": "user_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "requestBody": {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "required": ["old_password", "new_password"],
-                                    "properties": {
-                                        "old_password": {"type": "string", "example": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"},
-                                        "new_password": {"type": "string", "example": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"}
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "responses": {
-                        "200": {"description": "Password changed successfully"},
-                        "400": {"description": "Invalid request or wrong old password"},
                         "404": {"description": "User not found"}
                     }
                 }
@@ -293,6 +256,222 @@ def get_swagger_spec():
                     "summary": "Get all medicines",
                     "responses": {
                         "200": {"description": "List of medicines"}
+                    }
+                },
+                "post": {
+                    "tags": ["Medicines"],
+                    "summary": "Add new medicine",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["name", "category", "dosage_form"],
+                                    "properties": {
+                                        "name": {"type": "string", "example": "Paracetamol"},
+                                        "category": {"type": "string", "example": "Pain Relief"},
+                                        "dosage_form": {"type": "string", "example": "Tablet"},
+                                        "active_ingredient": {"type": "string", "example": "Paracetamol 500mg"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "201": {"description": "Medicine created successfully"},
+                        "400": {"description": "Invalid data"}
+                    }
+                }
+            },
+            "/api/medicines/search": {
+                "get": {
+                    "tags": ["Medicines"],
+                    "summary": "Search medicines by name",
+                    "parameters": [{
+                        "name": "query",
+                        "in": "query",
+                        "required": True,
+                        "schema": {"type": "string"},
+                        "description": "Search query for medicine name"
+                    }],
+                    "responses": {
+                        "200": {"description": "Search results"},
+                        "400": {"description": "Query parameter required"}
+                    }
+                }
+            },
+            "/api/medicines/{medicine_id}": {
+                "get": {
+                    "tags": ["Medicines"],
+                    "summary": "Get medicine by ID",
+                    "parameters": [{
+                        "name": "medicine_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "Medicine details"},
+                        "404": {"description": "Medicine not found"}
+                    }
+                },
+                "put": {
+                    "tags": ["Medicines"],
+                    "summary": "Update medicine",
+                    "parameters": [{
+                        "name": "medicine_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "category": {"type": "string"},
+                                        "dosage_form": {"type": "string"},
+                                        "active_ingredient": {"type": "string"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {"description": "Medicine updated successfully"},
+                        "404": {"description": "Medicine not found"}
+                    }
+                },
+                "delete": {
+                    "tags": ["Medicines"],
+                    "summary": "Delete medicine",
+                    "parameters": [{
+                        "name": "medicine_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "Medicine deleted successfully"},
+                        "404": {"description": "Medicine not found"}
+                    }
+                }
+            },
+            "/api/reservations": {
+                "post": {
+                    "tags": ["Reservations"],
+                    "summary": "Create a new reservation",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["user_id", "pharmacy_id", "medicine_id", "quantity"],
+                                    "properties": {
+                                        "user_id": {"type": "integer", "example": 1},
+                                        "pharmacy_id": {"type": "integer", "example": 1},
+                                        "medicine_id": {"type": "integer", "example": 1},
+                                        "quantity": {"type": "integer", "example": 2}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "201": {"description": "Reservation created successfully"},
+                        "400": {"description": "Invalid data"}
+                    }
+                }
+            },
+            "/api/reservations/{user_id}": {
+                "get": {
+                    "tags": ["Reservations"],
+                    "summary": "Get user reservations",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "List of reservations"},
+                        "404": {"description": "User not found"}
+                    }
+                }
+            },
+            "/api/reservations/{reservation_id}": {
+                "patch": {
+                    "tags": ["Reservations"],
+                    "summary": "Update reservation status",
+                    "parameters": [{
+                        "name": "reservation_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["status"],
+                                    "properties": {
+                                        "status": {"type": "string", "example": "confirmed", "enum": ["pending", "confirmed", "cancelled"]}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {"description": "Reservation status updated"},
+                        "404": {"description": "Reservation not found"}
+                    }
+                }
+            },
+            "/api/medicine-search-history": {
+                "post": {
+                    "tags": ["Medicine Search History"],
+                    "summary": "Save medicine search history",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["user_id", "medicine_id"],
+                                    "properties": {
+                                        "user_id": {"type": "integer", "example": 1},
+                                        "medicine_id": {"type": "integer", "example": 1}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "201": {"description": "Search history saved"},
+                        "400": {"description": "Invalid data"}
+                    }
+                }
+            },
+            "/api/medicine-search-history/{user_id}": {
+                "get": {
+                    "tags": ["Medicine Search History"],
+                    "summary": "Get user search history",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "List of search history"},
+                        "404": {"description": "User not found"}
                     }
                 }
             },
