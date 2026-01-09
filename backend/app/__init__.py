@@ -173,6 +173,118 @@ def get_swagger_spec():
                         "200": {"description": "User details"},
                         "404": {"description": "User not found"}
                     }
+                },
+                "put": {
+                    "tags": ["Users"],
+                    "summary": "Update user information (Edit Profile)",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string", "example": "John Doe"},
+                                        "email": {"type": "string", "example": "john@example.com"},
+                                        "phone": {"type": "string", "example": "1234567890"},
+                                        "gender": {"type": "string", "example": "male"},
+                                        "dob": {"type": "string", "example": "1990-01-01"},
+                                        "latitude": {"type": "number", "example": 36.686},
+                                        "longitude": {"type": "number", "example": 2.864},
+                                        "location_name": {"type": "string", "example": "Mahelma"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {"description": "User updated successfully"},
+                        "400": {"description": "Validation error"},
+                        "404": {"description": "User not found"}
+                    }
+                },
+                "delete": {
+                    "tags": ["Users"],
+                    "summary": "Delete a user",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "User deleted successfully"},
+                        "404": {"description": "User not found"}
+                    }
+                }
+            },
+            "/api/users/{user_id}/premium": {
+                "put": {
+                    "tags": ["Users"],
+                    "summary": "Update user premium status",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["premium"],
+                                    "properties": {
+                                        "premium": {"type": "boolean", "example": True}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {"description": "Premium status updated successfully"},
+                        "400": {"description": "Premium field is required"},
+                        "404": {"description": "User not found"}
+                    }
+                }
+            },
+            "/api/users/{user_id}/password": {
+                "put": {
+                    "tags": ["Users"],
+                    "summary": "Change user password",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["old_password", "new_password"],
+                                    "properties": {
+                                        "old_password": {"type": "string", "example": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"},
+                                        "new_password": {"type": "string", "example": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {"description": "Password changed successfully"},
+                        "400": {"description": "Invalid request or wrong old password"},
+                        "404": {"description": "User not found"}
+                    }
                 }
             },
             "/api/medicines": {
