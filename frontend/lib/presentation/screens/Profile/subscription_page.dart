@@ -81,9 +81,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: isDark
-            ? Theme.of(context).appBarTheme.backgroundColor
-            : const Color(0xFFB2EBF2),
+        backgroundColor: isDark ? Theme.of(context).appBarTheme.backgroundColor : const Color(0xFFB2EBF2),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: CustomBackArrow(),
@@ -123,20 +121,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               // Title and Subtitle
               Text(
                 loc.upgradeToPremium,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
               ),
               const SizedBox(height: 8),
               Text(
                 loc.premiumDescription,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.grey[400] : Colors.grey,
-                ),
+                style: TextStyle(fontSize: 14, color: isDark ? Colors.grey[400] : Colors.grey),
               ),
               const SizedBox(height: 32),
 
@@ -185,9 +176,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: selectedPlan == 'monthly'
-              ? (isDark ? AppColors.premiumOrange : const Color(0xFF4DD0E1))
-              : Colors.transparent,
+          color: selectedPlan == 'monthly' ? (isDark ? AppColors.premiumOrange : const Color(0xFF4DD0E1)) : Colors.transparent,
           width: 2,
         ),
         boxShadow: isDark
@@ -214,10 +203,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
           const SizedBox(height: 4),
           Text(
             loc.billedMonthly,
-            style: TextStyle(
-              fontSize: 12,
-              color: isDark ? Colors.grey[400] : Colors.grey,
-            ),
+            style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey),
           ),
           const SizedBox(height: 16),
           Row(
@@ -236,18 +222,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
                   loc.perMonth,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.grey[400] : Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: isDark ? Colors.grey[400] : Colors.grey),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          ...features
-              .map((feature) => _buildPlanFeature(feature.toString()))
-              .toList(),
+          ...features.map((feature) => _buildPlanFeature(feature.toString())).toList(),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -257,9 +238,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 _upgradeUserToPremium(plan['name']);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark
-                    ? AppColors.premiumOrange
-                    : const Color(0xFF4DD0E1),
+                backgroundColor: isDark ? AppColors.premiumOrange : const Color(0xFF4DD0E1),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
@@ -328,10 +307,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                   const SizedBox(height: 4),
                   Text(
                     loc.billedAnnually,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? Colors.grey[400] : Colors.white,
-                    ),
+                    style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.white),
                   ),
                 ],
               ),
@@ -373,10 +349,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
                   loc.perMonth,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.grey[400] : Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 14, color: isDark ? Colors.grey[400] : Colors.white),
                 ),
               ),
               const Spacer(),
@@ -384,20 +357,14 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   loc.perYear,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.grey[400] : Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.white),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           ...features
-              .map(
-                (feature) =>
-                    _buildPlanFeature(feature.toString(), isWhite: true),
-              )
+              .map((feature) => _buildPlanFeature(feature.toString(), isWhite: true))
               .toList(),
           const SizedBox(height: 16),
           SizedBox(
@@ -477,10 +444,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.grey[400] : Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey),
                 ),
               ],
             ),
@@ -506,9 +470,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               text,
               style: TextStyle(
                 fontSize: 14,
-                color: isWhite
-                    ? Colors.white
-                    : (isDark ? Colors.white : Colors.black87),
+                color: isWhite ? Colors.white : (isDark ? Colors.white : Colors.black87),
               ),
             ),
           ),
@@ -530,14 +492,14 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     }
 
     if (currentUser == null || currentUser.userId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Error: User not found')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: User not found')),
+      );
       return;
     }
 
     // Update premium status in database
-    await userCubit.updateUserPremium(currentUser.userId!, true);
+    await userCubit.updateUserPremium(currentUser.userId!, 'premium');
 
     // Show success dialog
     _showSubscriptionSuccess(planName);

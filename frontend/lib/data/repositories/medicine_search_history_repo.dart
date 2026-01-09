@@ -1,14 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import '../databases/db_helper.dart';
 import '../databases/db_medicine_find.dart';
-import '../services/medicine_search_history_api_service.dart';
 
 class MedicineSearchHistoryRepository {
-  final MedicineSearchHistoryApiService _apiService;
-
-  MedicineSearchHistoryRepository({MedicineSearchHistoryApiService? apiService})
-    : _apiService = apiService ?? MedicineSearchHistoryApiService();
-
   Future<Database> get _db async => await DBHelper.getDatabase();
 
   // Save search with restock notification request
@@ -17,20 +11,6 @@ class MedicineSearchHistoryRepository {
     required String medicineName,
     required bool notifyRestock,
   }) async {
-    // Try to save to Supabase first (for premium users)
-    try {
-      print('🌐 Saving search history to Supabase...');
-      await _apiService.saveSearchHistory(
-        userId: userId,
-        medicineName: medicineName,
-        notifyRestock: notifyRestock,
-      );
-      print('✅ Search history saved to Supabase');
-    } catch (e) {
-      print('⚠️ Failed to save to Supabase: $e');
-    }
-
-    // Also save locally
     final db = await _db;
 
     // Check if already exists

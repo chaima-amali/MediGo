@@ -32,29 +32,32 @@ def create_app():
     # Register error handlers
     register_error_handlers(app)
     
+    # Start reminder scheduler for medicine notifications
+    try:
+        from app.services.reminder_scheduler import scheduler
+        scheduler.app = app  # Set Flask app context for scheduler
+        scheduler.start()
+        print('✅ Medicine reminder scheduler started')
+    except Exception as e:
+        print(f'⚠️  Failed to start reminder scheduler: {e}')
+    
     return app
 
 def register_routes(app):
     """Register all API route blueprints"""
     
-    from app.routes import users, medicines, auth, pharmacies, reservations, medicine_search_history
-    
-    # Root endpoint
-    @app.route('/')
-    def home():
-        return jsonify({
-            'message': 'Welcome to MediGo Backend API',
-            'version': '1.0.0',
-            'docs': 'http://localhost:5000/docs'
-        })
+    from app.routes import users, medicines, auth, tracking, statistics
     
     # API endpoints
     app.register_blueprint(auth.bp, url_prefix='/api')
     app.register_blueprint(users.bp, url_prefix='/api')
     app.register_blueprint(medicines.bp, url_prefix='/api')
-    app.register_blueprint(pharmacies.pharmacies_bp, url_prefix='/api/pharmacies')
-    app.register_blueprint(reservations.bp, url_prefix='/api')
-    app.register_blueprint(medicine_search_history.bp, url_prefix='/api')
+    app.register_blueprint(tracking.bp, url_prefix='/api')
+    app.register_blueprint(statistics.bp, url_prefix='/api')
+    
+    # TODO: Add more route blueprints here as you expand
+    # app.register_blueprint(pharmacies.bp, url_prefix='/api')
+    # app.register_blueprint(reservations.bp, url_prefix='/api')
 
 def register_swagger(app):
     """Register Swagger UI for API documentation"""
@@ -172,82 +175,6 @@ def get_swagger_spec():
                         "200": {"description": "User details"},
                         "404": {"description": "User not found"}
                     }
-                },
-                "put": {
-                    "tags": ["Users"],
-                    "summary": "Update user profile",
-                    "parameters": [{
-                        "name": "user_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "requestBody": {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "name": {"type": "string", "example": "John Doe"},
-                                        "email": {"type": "string", "example": "john@example.com"},
-                                        "phone": {"type": "string", "example": "1234567890"},
-                                        "gender": {"type": "string", "example": "male"},
-                                        "dob": {"type": "string", "example": "1990-01-01"},
-                                        "location_name": {"type": "string", "example": "Mahelma"}
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "responses": {
-                        "200": {"description": "User updated successfully"},
-                        "404": {"description": "User not found"}
-                    }
-                },
-                "delete": {
-                    "tags": ["Users"],
-                    "summary": "Delete user",
-                    "parameters": [{
-                        "name": "user_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "responses": {
-                        "200": {"description": "User deleted successfully"},
-                        "404": {"description": "User not found"}
-                    }
-                }
-            },
-            "/api/users/{user_id}/premium": {
-                "put": {
-                    "tags": ["Users"],
-                    "summary": "Update user premium status",
-                    "parameters": [{
-                        "name": "user_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "requestBody": {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "required": ["premium"],
-                                    "properties": {
-                                        "premium": {"type": "boolean", "example": True}
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "responses": {
-                        "200": {"description": "Premium status updated successfully"},
-                        "404": {"description": "User not found"}
-                    }
                 }
             },
             "/api/medicines": {
@@ -257,22 +184,24 @@ def get_swagger_spec():
                     "responses": {
                         "200": {"description": "List of medicines"}
                     }
-                },
+                }
+            },
+            "/api/tracking/medicines": {
                 "post": {
-                    "tags": ["Medicines"],
-                    "summary": "Add new medicine",
+                    "tags": ["Medicine Tracking"],
+                    "summary": "Add a new medicine to tracking",
                     "requestBody": {
                         "required": True,
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": ["name", "category", "dosage_form"],
+                                    "required": ["user_id", "name"],
                                     "properties": {
-                                        "name": {"type": "string", "example": "Paracetamol"},
-                                        "category": {"type": "string", "example": "Pain Relief"},
-                                        "dosage_form": {"type": "string", "example": "Tablet"},
-                                        "active_ingredient": {"type": "string", "example": "Paracetamol 500mg"}
+                                        "user_id": {"type": "integer", "example": 1},
+                                        "name": {"type": "string", "example": "Aspirin"},
+                                        "type": {"type": "string", "example": "Tablet"},
+                                        "dosage": {"type": "string", "example": "100mg"}
                                     }
                                 }
                             }
@@ -280,118 +209,14 @@ def get_swagger_spec():
                     },
                     "responses": {
                         "201": {"description": "Medicine created successfully"},
-                        "400": {"description": "Invalid data"}
+                        "400": {"description": "Validation error"}
                     }
                 }
             },
-            "/api/medicines/search": {
+            "/api/tracking/medicines/{user_id}": {
                 "get": {
-                    "tags": ["Medicines"],
-                    "summary": "Search medicines by name",
-                    "parameters": [{
-                        "name": "query",
-                        "in": "query",
-                        "required": True,
-                        "schema": {"type": "string"},
-                        "description": "Search query for medicine name"
-                    }],
-                    "responses": {
-                        "200": {"description": "Search results"},
-                        "400": {"description": "Query parameter required"}
-                    }
-                }
-            },
-            "/api/medicines/{medicine_id}": {
-                "get": {
-                    "tags": ["Medicines"],
-                    "summary": "Get medicine by ID",
-                    "parameters": [{
-                        "name": "medicine_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "responses": {
-                        "200": {"description": "Medicine details"},
-                        "404": {"description": "Medicine not found"}
-                    }
-                },
-                "put": {
-                    "tags": ["Medicines"],
-                    "summary": "Update medicine",
-                    "parameters": [{
-                        "name": "medicine_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "requestBody": {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "name": {"type": "string"},
-                                        "category": {"type": "string"},
-                                        "dosage_form": {"type": "string"},
-                                        "active_ingredient": {"type": "string"}
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "responses": {
-                        "200": {"description": "Medicine updated successfully"},
-                        "404": {"description": "Medicine not found"}
-                    }
-                },
-                "delete": {
-                    "tags": ["Medicines"],
-                    "summary": "Delete medicine",
-                    "parameters": [{
-                        "name": "medicine_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "responses": {
-                        "200": {"description": "Medicine deleted successfully"},
-                        "404": {"description": "Medicine not found"}
-                    }
-                }
-            },
-            "/api/reservations": {
-                "post": {
-                    "tags": ["Reservations"],
-                    "summary": "Create a new reservation",
-                    "requestBody": {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "required": ["user_id", "pharmacy_id", "medicine_id", "quantity"],
-                                    "properties": {
-                                        "user_id": {"type": "integer", "example": 1},
-                                        "pharmacy_id": {"type": "integer", "example": 1},
-                                        "medicine_id": {"type": "integer", "example": 1},
-                                        "quantity": {"type": "integer", "example": 2}
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "responses": {
-                        "201": {"description": "Reservation created successfully"},
-                        "400": {"description": "Invalid data"}
-                    }
-                }
-            },
-            "/api/reservations/{user_id}": {
-                "get": {
-                    "tags": ["Reservations"],
-                    "summary": "Get user reservations",
+                    "tags": ["Medicine Tracking"],
+                    "summary": "Get all medicines for a user",
                     "parameters": [{
                         "name": "user_id",
                         "in": "path",
@@ -399,70 +224,42 @@ def get_swagger_spec():
                         "schema": {"type": "integer"}
                     }],
                     "responses": {
-                        "200": {"description": "List of reservations"},
-                        "404": {"description": "User not found"}
+                        "200": {"description": "List of user medicines"}
                     }
                 }
             },
-            "/api/reservations/{reservation_id}": {
-                "patch": {
-                    "tags": ["Reservations"],
-                    "summary": "Update reservation status",
-                    "parameters": [{
-                        "name": "reservation_id",
-                        "in": "path",
-                        "required": True,
-                        "schema": {"type": "integer"}
-                    }],
-                    "requestBody": {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "required": ["status"],
-                                    "properties": {
-                                        "status": {"type": "string", "example": "confirmed", "enum": ["pending", "confirmed", "cancelled"]}
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "responses": {
-                        "200": {"description": "Reservation status updated"},
-                        "404": {"description": "Reservation not found"}
-                    }
-                }
-            },
-            "/api/medicine-search-history": {
+            "/api/tracking/plans": {
                 "post": {
-                    "tags": ["Medicine Search History"],
-                    "summary": "Save medicine search history",
+                    "tags": ["Medicine Plans"],
+                    "summary": "Create a medicine plan (schedule)",
                     "requestBody": {
                         "required": True,
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": ["user_id", "medicine_id"],
+                                    "required": ["medicine_track_id", "user_id", "start_date", "frequency_type"],
                                     "properties": {
-                                        "user_id": {"type": "integer", "example": 1},
-                                        "medicine_id": {"type": "integer", "example": 1}
+                                        "medicine_track_id": {"type": "integer"},
+                                        "user_id": {"type": "integer"},
+                                        "importance": {"type": "string"},
+                                        "start_date": {"type": "string", "format": "date"},
+                                        "end_date": {"type": "string", "format": "date"},
+                                        "frequency_type": {"type": "string", "enum": ["daily", "weekly", "monthly", "interval", "custom"]}
                                     }
                                 }
                             }
                         }
                     },
                     "responses": {
-                        "201": {"description": "Search history saved"},
-                        "400": {"description": "Invalid data"}
+                        "201": {"description": "Plan created successfully"}
                     }
                 }
             },
-            "/api/medicine-search-history/{user_id}": {
+            "/api/tracking/plans/user/{user_id}": {
                 "get": {
-                    "tags": ["Medicine Search History"],
-                    "summary": "Get user search history",
+                    "tags": ["Medicine Plans"],
+                    "summary": "Get all plans for a user",
                     "parameters": [{
                         "name": "user_id",
                         "in": "path",
@@ -470,110 +267,160 @@ def get_swagger_spec():
                         "schema": {"type": "integer"}
                     }],
                     "responses": {
-                        "200": {"description": "List of search history"},
-                        "404": {"description": "User not found"}
+                        "200": {"description": "List of user plans"}
                     }
                 }
             },
-            "/api/pharmacies/all": {
+            "/api/tracking/occurrences/date/{date}": {
                 "get": {
-                    "tags": ["Pharmacies"],
-                    "summary": "Get all pharmacies",
+                    "tags": ["Occurrences"],
+                    "summary": "Get all occurrences for a specific date",
                     "parameters": [
                         {
-                            "name": "user_lat",
-                            "in": "query",
-                            "required": False,
-                            "schema": {"type": "number"},
-                            "description": "User latitude for distance calculation"
+                            "name": "date",
+                            "in": "path",
+                            "required": True,
+                            "schema": {"type": "string", "format": "date"},
+                            "example": "2024-01-09"
                         },
                         {
-                            "name": "user_lon",
+                            "name": "user_id",
                             "in": "query",
-                            "required": False,
-                            "schema": {"type": "number"},
-                            "description": "User longitude for distance calculation"
-                        }
-                    ],
-                    "responses": {
-                        "200": {"description": "List of all pharmacies"}
-                    }
-                }
-            },
-            "/api/pharmacies/search": {
-                "get": {
-                    "tags": ["Pharmacies"],
-                    "summary": "Search pharmacies by name",
-                    "parameters": [
-                        {
-                            "name": "q",
-                            "in": "query",
-                            "required": True,
-                            "schema": {"type": "string"},
-                            "description": "Search query"
-                        }
-                    ],
-                    "responses": {
-                        "200": {"description": "Search results"},
-                        "400": {"description": "Query parameter required"}
-                    }
-                }
-            },
-            "/api/pharmacies/{pharmacy_id}": {
-                "get": {
-                    "tags": ["Pharmacies"],
-                    "summary": "Get pharmacy by ID",
-                    "parameters": [
-                        {
-                            "name": "pharmacy_id",
-                            "in": "path",
                             "required": True,
                             "schema": {"type": "integer"}
                         }
                     ],
                     "responses": {
-                        "200": {"description": "Pharmacy details"},
-                        "404": {"description": "Pharmacy not found"}
+                        "200": {"description": "List of occurrences for the date"}
                     }
                 }
             },
-            "/api/pharmacies/nearby": {
+            "/api/tracking/occurrences/{occurrence_id}": {
+                "put": {
+                    "tags": ["Occurrences"],
+                    "summary": "Update occurrence (mark as taken)",
+                    "parameters": [{
+                        "name": "occurrence_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "is_taken": {"type": "integer", "example": 1}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {"description": "Occurrence updated"}
+                    }
+                }
+            },
+            "/api/tracking/occurrences/batch": {
+                "post": {
+                    "tags": ["Occurrences"],
+                    "summary": "Create multiple occurrences at once",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "occurrences": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "plan_id": {"type": "integer"},
+                                                    "date": {"type": "string", "format": "date"},
+                                                    "time": {"type": "string"},
+                                                    "is_taken": {"type": "integer"}
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "201": {"description": "Occurrences created"}
+                    }
+                }
+            },
+            "/api/statistics/overview/{user_id}": {
                 "get": {
-                    "tags": ["Pharmacies"],
-                    "summary": "Get nearby pharmacies",
+                    "tags": ["Statistics"],
+                    "summary": "Get overall statistics for a user",
                     "parameters": [
                         {
-                            "name": "lat",
-                            "in": "query",
+                            "name": "user_id",
+                            "in": "path",
                             "required": True,
-                            "schema": {"type": "number"},
-                            "description": "User latitude"
+                            "schema": {"type": "integer"}
                         },
                         {
-                            "name": "lon",
-                            "in": "query",
-                            "required": True,
-                            "schema": {"type": "number"},
-                            "description": "User longitude"
-                        },
-                        {
-                            "name": "radius",
+                            "name": "period",
                             "in": "query",
                             "required": False,
-                            "schema": {"type": "number", "default": 10},
-                            "description": "Search radius in km"
-                        },
-                        {
-                            "name": "limit",
-                            "in": "query",
-                            "required": False,
-                            "schema": {"type": "integer", "default": 10},
-                            "description": "Max results"
+                            "schema": {"type": "string", "enum": ["week", "month", "year", "all"]}
                         }
                     ],
                     "responses": {
-                        "200": {"description": "Nearby pharmacies"},
-                        "400": {"description": "Invalid parameters"}
+                        "200": {"description": "Statistics overview"}
+                    }
+                }
+            },
+            "/api/statistics/daily/{user_id}": {
+                "get": {
+                    "tags": ["Statistics"],
+                    "summary": "Get daily statistics",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "Daily statistics"}
+                    }
+                }
+            },
+            "/api/statistics/weekly/{user_id}": {
+                "get": {
+                    "tags": ["Statistics"],
+                    "summary": "Get weekly statistics",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "Weekly statistics"}
+                    }
+                }
+            },
+            "/api/statistics/adherence-trend/{user_id}": {
+                "get": {
+                    "tags": ["Statistics"],
+                    "summary": "Get 30-day adherence trend",
+                    "parameters": [{
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "integer"}
+                    }],
+                    "responses": {
+                        "200": {"description": "Adherence trend data"}
                     }
                 }
             }
