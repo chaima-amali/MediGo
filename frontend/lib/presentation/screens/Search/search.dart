@@ -360,8 +360,8 @@ class _SearchScreenState extends State<SearchScreen> {
           distance = LocationService.calculateDistance(
             currentUser.latitude!,
             currentUser.longitude!,
-            result['latitude'],
-            result['longitude'],
+            result['latitude'] as double,
+            result['longitude'] as double,
           );
         }
 
