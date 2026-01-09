@@ -8,8 +8,165 @@ from pydantic import ValidationError
 from app.core.database import execute_query, execute_insert, execute_update
 from app.models.medicine import MedicineTracking
 from app.schemas.medicine import MedicineTrackingCreate, MedicineTrackingUpdate
+from app.supabase_client import supabase
 
 bp = Blueprint('medicines', __name__)
+
+@bp.route('/medicines/search', methods=['GET'])
+def search_medicines():
+    """
+    Search medicines and return pharmacies that have them in stock
+    
+    Query params:
+        - q: Search query (searches medicine name, generic_name)
+        - limit: Max results (default: 20, max: 100)
+    
+    Returns:
+        {
+            "success": true,
+            "count": 10,
+            "medicines": [
+                {
+                    "pharmacy_id": 1,
+                    "pharmacy_name": "Care Pharmacy",
+                    "medicine_name": "Paracetamol 500mg",
+                    "price": 5.50,
+                    "stock": 100,
+                    "latitude": 40.7128,
+                    "longitude": -74.0060,
+                    "phone": "123-456-7890",
+                    "rating": 4.5
+                }
+            ],
+            "source": "remote|local"
+        }
+    """
+    try:
+        query = request.args.get('q', '').strip()
+        limit = min(int(request.args.get('limit', 20)), 100)
+        
+        if not query:
+            return jsonify({
+                'success': False,
+                'error': 'Search query is required'
+            }), 400
+        
+        # Try Supabase first
+        if supabase:
+            try:
+                print(f"🔍 Searching Supabase for: {query}")
+                search_pattern = f"%{query}%"
+                
+                # Query pharmacy_medicine with joins to get all needed data
+                response = supabase.table('pharmacy_medicine') \
+                    .select('id, price, stock, pharmacy:pharmacy_id(pharmacy_id, name, latitude, longitude, phone, rating, opening_hours), medicine:medicine_id(medicine_id, name, dosage, generic_name)') \
+                    .gt('stock', 0) \
+                    .limit(200) \
+                    .execute()
+                
+                print(f"✅ Got {len(response.data) if response.data else 0} inventory items from Supabase")
+                
+                if not response.data:
+                    return jsonify({
+                        'success': True,
+                        'count': 0,
+                        'medicines': [],
+                        'source': 'remote'
+                    }), 200
+                
+                # Filter by medicine name/generic_name (case-insensitive)
+                results = []
+                query_lower = query.lower()
+                
+                for item in response.data:
+                    medicine = item.get('medicine')
+                    pharmacy = item.get('pharmacy')
+                    
+                    if medicine and pharmacy:
+                        medicine_name = medicine.get('name', '').lower()
+                        generic_name = medicine.get('generic_name', '').lower() if medicine.get('generic_name') else ''
+                        
+                        # Check if query matches medicine name or generic name
+                        if query_lower in medicine_name or query_lower in generic_name:
+                            medicine_display_name = medicine.get('name', '')
+                            # Don't append dosage since it's likely already in the name
+                            
+                            results.append({
+                                'pharmacy_id': pharmacy.get('pharmacy_id'),
+                                'pharmacy_name': pharmacy.get('name'),
+                                'medicine_name': medicine_display_name.strip(),
+                                'price': float(item.get('price', 0)),
+                                'stock': int(item.get('stock', 0)),
+                                'latitude': pharmacy.get('latitude'),
+                                'longitude': pharmacy.get('longitude'),
+                                'phone': pharmacy.get('phone'),
+                                'rating': pharmacy.get('rating'),
+                                'opening_hours': pharmacy.get('opening_hours'),
+                            })
+                            
+                            if len(results) >= limit:
+                                break
+                
+                print(f"✅ Filtered to {len(results)} matching pharmacies")
+                
+                return jsonify({
+                    'success': True,
+                    'count': len(results),
+                    'medicines': results,
+                    'source': 'remote'
+                }), 200
+                
+            except Exception as supabase_error:
+                print(f"⚠️  Supabase search failed: {supabase_error}")
+                import traceback
+                traceback.print_exc()
+                print("📍 Falling back to local database")
+        
+        # Fallback to local SQLite
+        local_query = """
+            SELECT 
+                pm.id,
+                pm.pharmacy_id,
+                p.name as pharmacy_name,
+                m.name || ' ' || COALESCE(m.dosage, '') as medicine_name,
+                pm.price,
+                pm.stock,
+                p.latitude,
+                p.longitude,
+                p.phone,
+                p.rating,
+                p.opening_hours
+            FROM pharmacy_medicine pm
+            JOIN pharmacy p ON pm.pharmacy_id = p.pharmacy_id
+            JOIN medicine m ON pm.medicine_id = m.medicine_id
+            WHERE (m.name LIKE ? OR m.generic_name LIKE ?)
+            AND pm.stock > 0
+            LIMIT ?
+        """
+        search_param = f"%{query}%"
+        rows = execute_query(local_query, (search_param, search_param, limit))
+        
+        medicines = []
+        for row in rows:
+            med_dict = dict(row)
+            medicines.append(med_dict)
+        
+        return jsonify({
+            'success': True,
+            'count': len(medicines),
+            'medicines': medicines,
+            'source': 'local'
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Search error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 
 @bp.route('/medicines', methods=['GET'])
 def get_medicines():
