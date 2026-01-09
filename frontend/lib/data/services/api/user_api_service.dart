@@ -26,20 +26,16 @@ class UserApiService {
     return response.data as Map<String, dynamic>;
   }
 
-  /// Update user premium status
-  Future<Map<String, dynamic>> updateUserPremium(
-    int userId,
-    bool premium,
-  ) async {
-    final response = await _client.put(
-      '/users/$userId/premium',
-      data: {'premium': premium},
-    );
-    return response.data as Map<String, dynamic>;
-  }
-
   /// Update FCM token for push notifications
   Future<void> updateFCMToken(int userId, String token) async {
-    await _client.post('/users/$userId/fcm-token', data: {'token': token});
+    await _client.put('/users/$userId/fcm-token', data: {'fcm_token': token});
+  }
+
+  /// Update notification preference
+  Future<void> updateNotificationPreference(int userId, bool enabled) async {
+    await _client.put(
+      '/users/$userId/notification-preference',
+      data: {'notifications_enabled': enabled},
+    );
   }
 }

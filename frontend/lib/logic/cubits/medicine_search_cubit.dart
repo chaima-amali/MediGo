@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../data/repositories/medicine_find_repo.dart';
 import '../../data/repositories/pharmacy_medicine_repo.dart';
-import '../../data/services/medicine_api_service.dart';
 
 // States
 abstract class MedicineSearchState extends Equatable {
@@ -49,14 +48,11 @@ class MedicineSearchError extends MedicineSearchState {
 class MedicineSearchCubit extends Cubit<MedicineSearchState> {
   final PharmacyMedicineRepository pharmacyMedicineRepository;
   final MedicineFindRepository medicineFindRepository;
-  final MedicineApiService medicineApiService;
 
   MedicineSearchCubit({
     required this.pharmacyMedicineRepository,
     required this.medicineFindRepository,
-    MedicineApiService? medicineApiService,
-  }) : medicineApiService = medicineApiService ?? MedicineApiService(),
-       super(MedicineSearchInitial()) {
+  }) : super(MedicineSearchInitial()) {
     _init();
   }
 
@@ -82,30 +78,19 @@ class MedicineSearchCubit extends Cubit<MedicineSearchState> {
       emit(MedicineSearchLoading());
       print('🔍 Searching for medicine: $query');
 
-      // First, try to search from remote API
-      try {
-        final remoteMedicines = await medicineApiService.searchMedicines(
-          query,
-          limit: 50,
-        );
-
-        if (remoteMedicines.isNotEmpty) {
-          print('✅ Found ${remoteMedicines.length} medicines from remote API');
-          emit(MedicineSearchLoaded(remoteMedicines, query));
-          return;
-        }
-      } catch (apiError) {
-        print('⚠️ Remote search failed, falling back to local: $apiError');
-      }
-
-      // Fallback: Search pharmacies that have this medicine locally
+      // Search pharmacies that have this medicine
       final results = await pharmacyMedicineRepository
           .searchPharmaciesByMedicineName(query);
 
       print('✅ Found ${results.length} pharmacies with medicine: $query');
 
       if (results.isEmpty) {
-        emit(MedicineSearchEmpty('No medicines found', query));
+        emit(
+          MedicineSearchEmpty(
+            'No pharmacies found with this medicine in stock',
+            query,
+          ),
+        );
       } else {
         emit(MedicineSearchLoaded(results, query));
       }

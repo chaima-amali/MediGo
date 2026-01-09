@@ -1,58 +1,12 @@
 import 'package:frontend/data/databases/db_helper.dart';
 import 'package:frontend/data/databases/db_reservation.dart';
 import 'package:frontend/data/models/reservation.dart';
-import 'package:frontend/data/services/reservation_api_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ReservationRepository {
-  final ReservationApiService _apiService;
-
-  ReservationRepository({ReservationApiService? apiService})
-    : _apiService = apiService ?? ReservationApiService();
-
   Future<Database> get _database async => await DBHelper.getDatabase();
 
-  Future<int> createReservation(
-    Reservation reservation, {
-    bool isPremium = false,
-  }) async {
-    print('🔍 createReservation called - isPremium: $isPremium');
-    print(
-      '📋 Reservation data: userId=${reservation.userId}, pharmacyId=${reservation.pharmacyId}, medicine=${reservation.medicineName}',
-    );
-
-    // Try remote API first if premium
-    if (isPremium) {
-      try {
-        print('🌐 Calling remote API for premium user...');
-        final remoteReservation = await _apiService.createReservation(
-          userId: reservation.userId,
-          pharmacyId: reservation.pharmacyId!,
-          medicineName: reservation.medicineName!,
-          day: reservation.day,
-          time: reservation.time,
-          quantity: reservation.quantity,
-          isPremium: isPremium,
-          medicineFindId: reservation.medicineFindId,
-        );
-
-        print('✅ Remote reservation response: $remoteReservation');
-
-        // Also save locally
-        final db = await _database;
-        return await db.insert(
-          DBReservationTable.table,
-          reservation.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      } catch (e) {
-        print('❌ Remote reservation failed, saving locally: $e');
-      }
-    } else {
-      print('📱 User is not premium, saving locally only');
-    }
-
-    // Fallback to local only
+  Future<int> createReservation(Reservation reservation) async {
     final db = await _database;
     return await db.insert(
       DBReservationTable.table,
@@ -98,31 +52,7 @@ class ReservationRepository {
     );
   }
 
-  Future<int> updateReservationStatus(
-    int reservationId,
-    String status, {
-    bool isPremium = false,
-    int? userId,
-  }) async {
-    print('🔄 updateReservationStatus called - isPremium: $isPremium');
-    print('📋 Updating reservation $reservationId to status: $status');
-
-    // Try remote API first if premium and userId is provided
-    if (isPremium && userId != null) {
-      try {
-        print('🌐 Calling remote API to update status...');
-        await _apiService.updateReservationStatus(
-          reservationId: reservationId,
-          status: status,
-          userId: userId,
-        );
-        print('✅ Remote status update successful');
-      } catch (e) {
-        print('❌ Remote status update failed: $e');
-      }
-    }
-
-    // Also update locally
+  Future<int> updateReservationStatus(int reservationId, String status) async {
     final db = await _database;
     return await db.update(
       DBReservationTable.table,

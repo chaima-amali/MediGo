@@ -304,3 +304,4 @@ def delete_medicine(medicine_id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+

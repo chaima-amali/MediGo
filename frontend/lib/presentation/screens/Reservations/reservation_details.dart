@@ -9,7 +9,6 @@ import 'package:frontend/data/repositories/pharmacy_repo.dart';
 import 'package:frontend/data/models/reservation.dart';
 import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/logic/cubits/reservation_cubit.dart';
-import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:intl/intl.dart';
 import 'reservation_confirm.dart' show ReservationDetailsPage;
 import 'reservation_complete.dart' show ReservationCompletePage;
@@ -158,24 +157,10 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                       // Close dialog
                       Navigator.pop(context);
 
-                      // Get user premium status
-                      final userState = context.read<UserCubit>().state;
-                      bool isPremium = false;
-                      int? userId;
-                      if (userState is UserAuthenticated) {
-                        isPremium = userState.user.premium ?? false;
-                        userId = userState.user.userId;
-                      } else if (userState is UserLoaded) {
-                        isPremium = userState.user.premium ?? false;
-                        userId = userState.user.userId;
-                      }
-
                       // Update status in database
                       await _reservationRepo.updateReservationStatus(
                         reservationData!.reservationId!,
                         'cancelled',
-                        isPremium: isPremium,
-                        userId: userId,
                       );
 
                       setState(() {

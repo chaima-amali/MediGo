@@ -9,7 +9,7 @@ class User {
   final double? latitude;
   final double? longitude;
   final String? locationName;
-  final bool premium;
+  final String premium;
 
   User({
     this.userId,
@@ -36,7 +36,7 @@ class User {
     double? latitude,
     double? longitude,
     String? locationName,
-    bool? premium,
+    String? premium,
   }) {
     return User(
       userId: userId ?? this.userId,
@@ -65,10 +65,7 @@ class User {
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),
       locationName: map['location_name'] as String?,
-      premium:
-          map['premium'] == 1 ||
-          map['premium'] == true ||
-          map['premium'] == 'true',
+      premium: map['premium'] as String,
     );
   }
 
@@ -84,7 +81,7 @@ class User {
       'latitude': latitude,
       'longitude': longitude,
       'location_name': locationName,
-      'premium': premium ? 1 : 0,
+      'premium': premium,
     };
   }
 }

@@ -33,12 +33,14 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
   String? _selectedGender;
   final _dateController = TextEditingController();
 
+  
+
   void _signUp() async {
     final loc = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       if (_selectedGender == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+           SnackBar(
             content: Text(loc.selectGenderPrompt),
             backgroundColor: AppColors.error,
           ),
@@ -48,7 +50,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
 
       if (_dateController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+           SnackBar(
             content: Text(loc.selectDOBPrompt),
             backgroundColor: AppColors.error,
           ),
@@ -66,7 +68,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
         dob: _dateController.text,
         latitude: null,
         longitude: null,
-        premium: false,
+        premium: 'false',
       );
 
       print('📝 User data collected: ${newUser.name}');
@@ -78,8 +80,10 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                LocalizationPage(email: widget.email, userData: newUser),
+            builder: (context) => LocalizationPage(
+              email: widget.email,
+              userData: newUser,
+            ),
           ),
         );
       }
@@ -104,14 +108,14 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
     if (picked != null) {
       setState(() {
         // Store in YYYY-MM-DD format for database
-        _dateController.text =
-            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+        _dateController.text = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -249,18 +253,14 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
                                     value: 'Male',
                                     child: Text(
                                       loc.male,
-                                      style: AppText.regular.copyWith(
-                                        fontSize: 14,
-                                      ),
+                                      style: AppText.regular.copyWith(fontSize: 14),
                                     ),
                                   ),
                                   DropdownMenuItem(
                                     value: 'Female',
                                     child: Text(
                                       loc.female,
-                                      style: AppText.regular.copyWith(
-                                        fontSize: 14,
-                                      ),
+                                      style: AppText.regular.copyWith(fontSize: 14),
                                     ),
                                   ),
                                 ],

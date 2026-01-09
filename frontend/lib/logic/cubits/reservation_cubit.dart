@@ -42,10 +42,8 @@ class ReservationCubit extends Cubit<ReservationState> {
     required String day,
     required String time,
     required int quantity,
-    bool isPremium = false,
   }) async {
     try {
-      print('🎯 ReservationCubit.createReservation - isPremium: $isPremium');
       emit(ReservationLoading());
 
       final reservation = Reservation(
@@ -60,14 +58,9 @@ class ReservationCubit extends Cubit<ReservationState> {
         createdAt: DateTime.now().toIso8601String(),
       );
 
-      final reservationId = await _repository.createReservation(
-        reservation,
-        isPremium: isPremium,
-      );
-      print('✅ Reservation created with ID: $reservationId');
+      final reservationId = await _repository.createReservation(reservation);
       emit(ReservationCreated(reservationId));
     } catch (e) {
-      print('❌ Reservation cubit error: $e');
       emit(ReservationError('Failed to create reservation: ${e.toString()}'));
     }
   }
@@ -96,39 +89,20 @@ class ReservationCubit extends Cubit<ReservationState> {
     }
   }
 
-  Future<void> updateReservationStatus(
-    int reservationId,
-    String status, {
-    bool isPremium = false,
-    int? userId,
-  }) async {
+  Future<void> updateReservationStatus(int reservationId, String status) async {
     try {
       emit(ReservationLoading());
-      await _repository.updateReservationStatus(
-        reservationId,
-        status,
-        isPremium: isPremium,
-        userId: userId,
-      );
+      await _repository.updateReservationStatus(reservationId, status);
       emit(ReservationUpdated());
     } catch (e) {
       emit(ReservationError('Failed to update reservation: ${e.toString()}'));
     }
   }
 
-  Future<void> cancelReservation(
-    int reservationId, {
-    bool isPremium = false,
-    int? userId,
-  }) async {
+  Future<void> cancelReservation(int reservationId) async {
     try {
       emit(ReservationLoading());
-      await _repository.updateReservationStatus(
-        reservationId,
-        'cancelled',
-        isPremium: isPremium,
-        userId: userId,
-      );
+      await _repository.updateReservationStatus(reservationId, 'cancelled');
       emit(ReservationDeleted());
     } catch (e) {
       emit(ReservationError('Failed to cancel reservation: ${e.toString()}'));

@@ -2,13 +2,15 @@
 /// Contains API endpoints and service configuration
 class Environment {
   // Flask Backend Configuration
+  // IMPORTANT: Update this IP to match your backend server's IP address
+  // - For emulator/web: use 'http://localhost:5000/api' or '10.0.2.2:5000/api' (emulator default gateway)
+  // - For physical device: use your PC's local IP (e.g., 192.168.x.x or 10.x.x.x)
+  // - Run `ipconfig` (Windows) or `ifconfig` (Mac/Linux) to find your PC's IP
+  
+  // UPDATE THIS IP ADDRESS TO YOUR BACKEND SERVER'S IP
   static const String flaskBaseUrl = String.fromEnvironment(
     'FLASK_BASE_URL',
-    defaultValue:
-       // 'http://localhost:5000/api', // Works with ADB reverse or emulator or desktop
-    // 'http://10.0.2.2:5000/api', // For Android emulator (maps to localhost)
-    // 'http://10.66.113.1:5000/api', // For physical device on same WiFi
-     'http://10.66.113.125:5000/api',
+    defaultValue: 'http://192.168.1.3:5000/api', // CHANGE THIS TO YOUR PC'S IP
   );
 
   // App Configuration

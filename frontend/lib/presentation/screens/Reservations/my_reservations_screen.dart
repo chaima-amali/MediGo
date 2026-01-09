@@ -375,7 +375,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? Colors.black : const Color(0xFFFFF0F5),
+        color: isDark ? Colors.black : Theme.of(context).colorScheme.onSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.darkBlue.withOpacity(0.1)),
         boxShadow: [
