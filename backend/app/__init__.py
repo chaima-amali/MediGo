@@ -37,7 +37,7 @@ def create_app():
 def register_routes(app):
     """Register all API route blueprints"""
     
-    from app.routes import users, medicines, auth, pharmacies, reservations, medicine_search_history
+    from app.routes import users, medicines, auth, pharmacies, reservations, medicine_search_history, tracking
     
     # Root endpoint
     @app.route('/')
@@ -55,6 +55,7 @@ def register_routes(app):
     app.register_blueprint(pharmacies.pharmacies_bp, url_prefix='/api/pharmacies')
     app.register_blueprint(reservations.bp, url_prefix='/api')
     app.register_blueprint(medicine_search_history.bp, url_prefix='/api')
+    app.register_blueprint(tracking.bp, url_prefix='/api')
 
 def register_swagger(app):
     """Register Swagger UI for API documentation"""

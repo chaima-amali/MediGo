@@ -1,10 +1,26 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../databases/db_helper.dart';
 import '../databases/db_medication_intake_log.dart';
 import '../models/medication_intake_log.dart';
 import '../models/adherence_report.dart';
+import '../services/api/statistics_api_service.dart';
 
 class AdherenceReportRepository {
+  final StatisticsApiService _apiService = StatisticsApiService();
+  final Connectivity _connectivity = Connectivity();
+
+  /// Check if device has internet connection
+  Future<bool> _hasConnection() async {
+    try {
+      final connectivityResult = await _connectivity.checkConnectivity();
+      return !connectivityResult.contains(ConnectivityResult.none);
+    } catch (e) {
+      print('⚠️  Failed to check connectivity: $e');
+      return false;
+    }
+  }
+
   // Log a medication intake
   Future<int> logIntake(MedicationIntakeLog log) async {
     final db = await DBHelper.getDatabase();
@@ -292,8 +308,107 @@ class AdherenceReportRepository {
     }).toList();
   }
 
-  // Get full adherence report
+  // Get full adherence report with remote-first approach
   Future<AdherenceReport?> getAdherenceReport(
+    DateTime startDate,
+    DateTime endDate, {
+    int? userId,
+  }) async {
+    try {
+      // Try to fetch from remote API first if connected
+      if (await _hasConnection()) {
+        try {
+          print('🌐 Fetching adherence report from remote...');
+
+          // Calculate period parameter
+          final duration = endDate.difference(startDate).inDays;
+          String period;
+          if (duration <= 7) {
+            period = 'week';
+          } else if (duration <= 30) {
+            period = 'month';
+          } else if (duration <= 365) {
+            period = 'year';
+          } else {
+            period = 'all';
+          }
+
+          // Get user ID from database if not provided
+          int effectiveUserId = userId ?? 0;
+          if (effectiveUserId == 0) {
+            final db = await DBHelper.getDatabase();
+            final userMaps = await db.query('user', limit: 1);
+            if (userMaps.isNotEmpty) {
+              effectiveUserId = userMaps.first['user_id'] as int? ?? 0;
+            }
+          }
+
+          if (effectiveUserId > 0) {
+            final remoteReport = await _apiService.getAdherenceStats(
+              effectiveUserId,
+              period: period,
+            );
+
+            print('✅ Remote report fetched successfully');
+
+            // Parse remote response to AdherenceReport model
+            // You may need to adjust this based on the actual API response structure
+            return _parseRemoteReport(remoteReport, startDate, endDate);
+          }
+        } catch (e) {
+          print('⚠️  Remote fetch failed, falling back to local: $e');
+        }
+      }
+
+      // Fallback to local database
+      print('📦 Fetching adherence report from local database...');
+      return await _getLocalAdherenceReport(startDate, endDate);
+    } catch (e) {
+      print('❌ Error generating adherence report: $e');
+      return null;
+    }
+  }
+
+  // Parse remote API response to AdherenceReport model
+  AdherenceReport? _parseRemoteReport(
+    Map<String, dynamic> remoteData,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    try {
+      // Parse based on actual API response structure
+      // This is a placeholder - adjust based on your actual API response
+      final userData = remoteData['user'] as Map<String, dynamic>? ?? {};
+      final stats = remoteData['statistics'] as Map<String, dynamic>? ?? {};
+
+      final missed = stats['missed'] ?? 0;
+      final notTaken = missed + (stats['skipped'] ?? 0);
+      final adherenceRate = (stats['adherence_rate'] ?? 0.0).toDouble();
+
+      return AdherenceReport(
+        fullName: userData['name'] ?? 'Unknown',
+        age: userData['age'] ?? 0,
+        phone: userData['phone'] ?? '',
+        reportGeneratedDate: DateTime.now(),
+        reportPeriod: remoteData['period'] ?? '',
+        adherenceSummary: AdherenceSummary(
+          notTaken: notTaken,
+          averageTaken: adherenceRate,
+          fullyAdherent: (stats['fully_adherent'] ?? 0.0).toDouble(),
+          medicineMissed: missed,
+        ),
+        weeklyAdherence: [], // Parse weekly data if available
+        medicationSummary: [], // Parse medication summary if available
+        detailedIntakeLog: [], // Parse detailed logs if available
+      );
+    } catch (e) {
+      print('Error parsing remote report: $e');
+      return null;
+    }
+  }
+
+  // Get adherence report from local database
+  Future<AdherenceReport?> _getLocalAdherenceReport(
     DateTime startDate,
     DateTime endDate,
   ) async {
@@ -391,7 +506,36 @@ class AdherenceReportRepository {
     );
     print('Total occurrences in database: ${totalOccurrences.first['count']}');
 
-    // Get all occurrences that don't have a corresponding intake log
+    // Step 1: Update existing intake logs with latest status from occurrence_plan
+    final existingLogs = await db.rawQuery('''
+      SELECT l.log_id, o.is_taken
+      FROM medication_intake_log l
+      INNER JOIN occurrence_plan o ON l.occurrence_id = o.id
+      WHERE o.is_taken != CASE 
+        WHEN l.status = 'taken' THEN 1
+        WHEN l.status = 'missed' THEN 0
+        WHEN l.status = 'scheduled' THEN 0
+        ELSE 0
+      END
+    ''');
+
+    print('Updating ${existingLogs.length} intake logs with new status');
+    for (var log in existingLogs) {
+      final newStatus = log['is_taken'] == 1 ? 'taken' : 'missed';
+      await db.update(
+        'medication_intake_log',
+        {
+          'status': newStatus,
+          'actual_time': log['is_taken'] == 1
+              ? DateTime.now().toIso8601String()
+              : null,
+        },
+        where: 'log_id = ?',
+        whereArgs: [log['log_id']],
+      );
+    }
+
+    // Step 2: Get all occurrences that don't have a corresponding intake log
     final List<Map<String, dynamic>> occurrences = await db.rawQuery('''
       SELECT o.id, o.plan_id, o.date, o.time, o.is_taken,
              p.medicine_track_id, m.dosage, m.name
@@ -402,7 +546,7 @@ class AdherenceReportRepository {
       WHERE l.log_id IS NULL AND o.date IS NOT NULL
     ''');
 
-    print('Syncing ${occurrences.length} occurrences to intake logs');
+    print('Syncing ${occurrences.length} new occurrences to intake logs');
 
     if (occurrences.isEmpty) {
       print('No occurrences to sync. Checking if data already exists...');

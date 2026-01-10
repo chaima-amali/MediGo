@@ -1,4 +1,4 @@
-class MedicinePlan {
+﻿class MedicinePlan {
   final int? id;
   final int trackingId;
   final int? userId;
@@ -59,7 +59,7 @@ class MedicinePlan {
   factory MedicinePlan.fromMap(Map<String, dynamic> map) {
     return MedicinePlan(
       id: map['plan_id'],
-      trackingId: map['medicine_track_id'],   // ✅ FIXED
+      trackingId: map['medicine_track_id'],   // Ô£à FIXED
       userId: map['user_id'],
 
       importance: map['importance'],
@@ -89,7 +89,7 @@ class MedicinePlan {
   Map<String, dynamic> toMap() {
     return {
       'plan_id': id,
-      'medicine_track_id': trackingId,   // ✅ FIXED
+      'medicine_track_id': trackingId,   // Ô£à FIXED
       'user_id': userId,
       'importance': importance,
       'start_date': startDate.toIso8601String(),

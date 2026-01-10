@@ -1,4 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+﻿import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/repositories/occurrence_repository.dart';
 import 'package:frontend/data/repositories/medicine_repository.dart';
 import 'package:frontend/data/models/medicine_progress.dart';

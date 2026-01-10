@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'edit_medicine_page.dart';
@@ -112,9 +112,11 @@ class _EditContentState extends State<EditContent> {
             child: Text(
               'Your current medicines',
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : AppColors.darkBlue,
               ),
             ),
           ),
@@ -131,16 +133,24 @@ class _EditContentState extends State<EditContent> {
                   child: Center(
                     child: Text(
                       'No medicines for this day',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                     ),
                   ),
                 );
               }
               return Column(
                 children: occs.map((occ) {
-                  final base = _colorForOccurrence(occ);
-                  final pillBg = base.withOpacity(0.6);
-                  final textColor = Colors.white;
+                  final statusColor = _colorForOccurrence(occ);
+                  final cardBackgroundColor = occ.importanceColor ?? AppColors.primary;
+                  final pillBg = cardBackgroundColor.withOpacity(0.6);
+                  final textColor =
+                      Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black;
                   return Container(
                     margin: const EdgeInsets.only(bottom: 14),
                     child: Row(
@@ -152,7 +162,7 @@ class _EditContentState extends State<EditContent> {
                               width: 12,
                               height: 12,
                               decoration: BoxDecoration(
-                                color: base,
+                                color: statusColor,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -179,7 +189,7 @@ class _EditContentState extends State<EditContent> {
                                   borderRadius: BorderRadius.circular(14),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: base.withOpacity(0.18),
+                                      color: cardBackgroundColor.withOpacity(0.18),
                                       blurRadius: 12,
                                       spreadRadius: 1,
                                       offset: const Offset(0, 6),
@@ -198,15 +208,21 @@ class _EditContentState extends State<EditContent> {
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,
-                                              color: Colors.white,
+                                              color: textColor,
                                             ),
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            '${occ.dateString} • ${occ.time}',
+                                            '${occ.dateString} ÔÇó ${occ.time}',
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Colors.white70,
+                                              color:
+                                                  Theme.of(
+                                                        context,
+                                                      ).brightness ==
+                                                      Brightness.dark
+                                                  ? Colors.white70
+                                                  : Colors.black54,
                                             ),
                                           ),
                                         ],
@@ -270,7 +286,7 @@ class _EditContentState extends State<EditContent> {
                                   ],
                                 ),
                               ),
-                              // Removed explicit 'Marked as done' badge — toggle shown via button
+                              // Removed explicit 'Marked as done' badge ÔÇö toggle shown via button
                             ],
                           ),
                         ),
@@ -324,15 +340,51 @@ class _EditContentState extends State<EditContent> {
                                 final localizations = AppLocalizations.of(
                                   context,
                                 )!;
-                                final confirm = await showDialog<bool>(
+                                // First dialog: Choose delete option
+                                final deleteOption = await showDialog<String>(
                                   context: context,
                                   builder: (_) => AlertDialog(
                                     title: Text(
                                       localizations.delete_occurrence_title,
                                     ),
                                     content: Text(
-                                      localizations.delete_occurrence_text,
+                                      'Do you want to delete this occurrence or all occurrences of this medicine at ${occ.time}?',
                                     ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, null),
+                                        child: Text(localizations.cancel),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, 'occurrence'),
+                                        child: const Text('Delete Occurrence'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, 'all_time'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.error,
+                                        ),
+                                        child: const Text('Delete All at This Time'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                
+                                if (deleteOption == null) return;
+                                
+                                // Second dialog: Confirm deletion
+                                final confirmMessage = deleteOption == 'all_time'
+                                    ? 'This will delete all occurrences of ${occ.medicineName ?? "this medicine"} at ${occ.time} for all days. This action cannot be undone.'
+                                    : localizations.delete_occurrence_text;
+                                
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: const Text('Confirm Deletion'),
+                                    content: Text(confirmMessage),
                                     actions: [
                                       TextButton(
                                         onPressed: () =>
@@ -342,14 +394,26 @@ class _EditContentState extends State<EditContent> {
                                       ElevatedButton(
                                         onPressed: () =>
                                             Navigator.pop(context, true),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.error,
+                                        ),
                                         child: Text(localizations.delete),
                                       ),
                                     ],
                                   ),
                                 );
+                                
                                 if (confirm != true) return;
-                                if (occ.id == null) return;
-                                await _cubit!.deleteOccurrence(occ.id!);
+                                
+                                if (deleteOption == 'all_time') {
+                                  await _cubit!.deleteOccurrencesByTime(
+                                    occ.planId,
+                                    occ.time,
+                                  );
+                                } else {
+                                  if (occ.id == null) return;
+                                  await _cubit!.deleteOccurrence(occ.id!);
+                                }
                               },
                               child: const Icon(
                                 Icons.delete_outline,

@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/data/repositories/occurrence_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/data/models/occurrence_plan.dart';
 import 'reports_hub_page.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
@@ -33,13 +34,21 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
   Future<void> _loadMonthOccurrences() async {
     final Map<DateTime, List<Occurrence>> occurrenceMap = {};
 
+    // Get current user ID
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
+    print('­ƒôà MedicineCalendar: Loading occurrences for userId=$userId');
+
     // Load occurrences for the entire month
     final firstDay = DateTime(_focusedDay.year, _focusedDay.month, 1);
     final lastDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
 
     for (int day = firstDay.day; day <= lastDay.day; day++) {
       final date = DateTime(_focusedDay.year, _focusedDay.month, day);
-      final occurrences = await _occurrenceRepo.getOccurrencesByDate(date);
+      final occurrences = await _occurrenceRepo.getOccurrencesByDate(
+        date,
+        userId: userId,
+      );
       if (occurrences.isNotEmpty) {
         occurrenceMap[DateTime(date.year, date.month, date.day)] = occurrences;
       }
@@ -81,26 +90,67 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
         minute,
       );
 
+      // Check if marked as taken
       if (occurrence.isTaken == 1) {
-        final takenDiff = now.difference(scheduledDateTime);
-        if (!now.isBefore(scheduledDateTime) && takenDiff.inHours >= 2) {
-          return Colors.orange; // delayed
+        // Medicine was taken - show green (on time)
+        return AppColors.success;
+      }
+
+      // Not taken yet
+      if (now.isAfter(scheduledDateTime)) {
+        // Past the scheduled time
+        final diff = now.difference(scheduledDateTime);
+        if (diff.inHours < 2) {
+          // Less than 2 hours late - delayed (orange)
+          return Colors.orange;
+        } else {
+          // More than 2 hours late - missed (red)
+          return AppColors.error;
         }
-        return AppColors.success; // taken on time
+      }
+    } catch (e) {
+      print('ÔÜá´©Å Error calculating status color: $e');
+    }
+
+    // Future or pending
+    return AppColors.darkBlue.withOpacity(0.3);
+  }
+
+  String _getStatusText(Occurrence occurrence) {
+    final now = DateTime.now();
+    final occDate = occurrence.date;
+    final occTime = occurrence.time;
+
+    try {
+      final timeParts = occTime.split(':');
+      final hour = int.tryParse(timeParts[0]) ?? 0;
+      final minute = int.tryParse(timeParts[1]) ?? 0;
+      final scheduledDateTime = DateTime(
+        occDate.year,
+        occDate.month,
+        occDate.day,
+        hour,
+        minute,
+      );
+
+      if (occurrence.isTaken == 1) {
+        return AppLocalizations.of(context)!.marked_as_done;
       }
 
       if (now.isAfter(scheduledDateTime)) {
-        // Past time, not taken
         final diff = now.difference(scheduledDateTime);
         if (diff.inHours < 2) {
-          return Colors.orange; // delayed
+          return AppLocalizations.of(context)!.delayed;
         } else {
-          return AppColors.error; // missed
+          return AppLocalizations.of(context)!.missed;
         }
       }
-    } catch (_) {}
 
-    return AppColors.darkBlue.withOpacity(0.3); // pending/future
+      return 'Pending';
+    } catch (e) {
+      print('ÔÜá´©Å Error getting status text: $e');
+      return 'Unknown';
+    }
   }
 
   bool _hasMedicinesOnDay(DateTime day) {
@@ -231,77 +281,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Legend for status colors
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.success,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      AppLocalizations.of(
-                                        context,
-                                      )!.marked_as_done,
-                                      style: AppText.regular.copyWith(
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 16),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.orange,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      AppLocalizations.of(context)!.delayed,
-                                      style: AppText.regular.copyWith(
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 16),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.error,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      AppLocalizations.of(context)!.missed,
-                                      style: AppText.regular.copyWith(
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
                           // Title and View Report button (responsive)
                           Padding(
@@ -525,6 +505,86 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                             ),
                           ),
 
+                          const SizedBox(height: 16),
+
+                          // Legend for status colors
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 16,
+                                runSpacing: 8,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.success,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.marked_as_done,
+                                        style: AppText.regular.copyWith(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.orange,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        AppLocalizations.of(context)!.delayed,
+                                        style: AppText.regular.copyWith(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.error,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        AppLocalizations.of(context)!.missed,
+                                        style: AppText.regular.copyWith(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
                           const SizedBox(height: 24),
 
                           // Selected date title
@@ -617,6 +677,9 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: _selectedDayMedicines.map((occurrence) {
+          final statusColor = _getStatusColor(occurrence);
+          final statusText = _getStatusText(occurrence);
+
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
@@ -638,7 +701,9 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                         occurrence.medicineName ?? 'Unnamed Medicine',
                         style: AppText.bold.copyWith(
                           fontSize: 16,
-                          color: AppColors.darkBlue,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : AppColors.darkBlue,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -646,7 +711,17 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                         occurrence.time,
                         style: AppText.regular.copyWith(
                           fontSize: 12,
-                          color: AppColors.darkBlue.withOpacity(0.6),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : AppColors.darkBlue.withOpacity(0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        statusText,
+                        style: AppText.medium.copyWith(
+                          fontSize: 11,
+                          color: statusColor,
                         ),
                       ),
                     ],
@@ -656,7 +731,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
                   width: 16,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: _getStatusColor(occurrence),
+                    color: statusColor,
                     shape: BoxShape.circle,
                   ),
                 ),

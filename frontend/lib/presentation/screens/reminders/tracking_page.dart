@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
@@ -58,14 +58,19 @@ class _TrackingPageContent extends StatefulWidget {
   State<_TrackingPageContent> createState() => _TrackingPageContentState();
 }
 
-class _TrackingPageContentState extends State<_TrackingPageContent> {
+class _TrackingPageContentState extends State<_TrackingPageContent>
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   String _activeTab = "tracking";
   final OccurrenceRepository _occRepo = OccurrenceRepository();
   final Map<int, bool> _taking = {}; // occurrenceId -> loading
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Now it's safe to read the cubit because the provider is an ancestor
     // of this state (provided in the parent widget returned by build).
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -75,6 +80,28 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
         context.read<MedicineStatisticsCubit>().load(DateTime.now());
       } catch (_) {}
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Refresh data when app comes to foreground
+    if (state == AppLifecycleState.resumed && mounted) {
+      context.read<TrackingCubit>().loadDay(
+        context.read<TrackingCubit>().state.selectedDate,
+      );
+      try {
+        context.read<MedicineStatisticsCubit>().load(
+          context.read<TrackingCubit>().state.selectedDate,
+        );
+      } catch (_) {}
+    }
   }
 
   /// Allow external callers to change the active subpage shown in this content.
@@ -178,6 +205,10 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(
+      context,
+    ); // Must call super when using AutomaticKeepAliveClientMixin
+
     return BlocBuilder<TrackingCubit, TrackingState>(
       builder: (context, state) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -544,21 +575,28 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
     return Column(
       children: state.occurrences.map((occ) {
         final String status = _getOccurrenceStatus(occ);
-        Color base;
+        Color statusColor;
         if (status == 'delayed') {
-          base = Colors.orange;
+          statusColor = Colors.orange;
         } else if (status == 'done') {
-          base = AppColors.success;
+          statusColor = AppColors.success;
         } else if (status == 'missed') {
-          base = AppColors.error;
+          statusColor = AppColors.error;
         } else {
-          base = AppColors.primary;
+          statusColor = AppColors.primary;
         }
+
+        // Use importance color for card background, status color for circle
+        final Color cardBackgroundColor =
+            occ.importanceColor ?? AppColors.primary;
+
         // In dark mode, use true black background and white text for the card
-        final Color pillBg = isDark ? Colors.black : base.withOpacity(0.60);
+        final Color pillBg = isDark
+            ? Colors.black
+            : cardBackgroundColor.withOpacity(0.60);
         final Color textColor = isDark
             ? Colors.white
-            : (base.computeLuminance() > 0.55
+            : (cardBackgroundColor.computeLuminance() > 0.55
                   ? AppColors.darkBlue
                   : Colors.white);
 
@@ -574,7 +612,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                     width: 12,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: base,
+                      color: statusColor,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -606,7 +644,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                           BoxShadow(
                             color: isDark
                                 ? Colors.black.withOpacity(0.5)
-                                : base.withOpacity(0.18),
+                                : cardBackgroundColor.withOpacity(0.18),
                             blurRadius: 12,
                             spreadRadius: 1,
                             offset: const Offset(0, 6),
@@ -630,7 +668,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent> {
                                 // debug id/plan display removed
                                 const SizedBox(height: 6),
                                 Text(
-                                  '${occ.dateString} • ${occ.time}',
+                                  '${occ.dateString} ÔÇó ${occ.time}',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: textColor.withOpacity(0.85),
