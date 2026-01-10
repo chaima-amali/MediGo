@@ -2,7 +2,7 @@ name: frontend
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -48,6 +48,7 @@ dependencies:
   google_maps_flutter: ^2.13.1
   geocoding: ^4.0.0
   firebase_core: ^3.8.0
+  permission_handler: ^10.4.0
 
   # firebase_auth: ^6.1.1
   firebase_messaging: ^15.2.10
@@ -75,7 +76,6 @@ dependencies:
   share_plus: ^12.0.1
   crypto: ^3.0.3
 
-  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -94,9 +94,14 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+dependency_overrides:
+  permission_handler_android: ^13.0.1
+  permission_handler_apple: ^9.4.7
+  permission_handler_platform_interface: ^4.3.0
+  permission_handler_windows: ^0.2.1
+
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -22,30 +22,52 @@ with app.app_context():
     if supabase:
         try:
             print("\n🌐 Checking Supabase...")
+            # Fetch occurrences for the date from Supabase, then filter by exact datetimes
             response = supabase.table('occurrence_plan')\
                 .select('*, medicine_plan!inner(*, medicine_tracking!inner(*)), users:medicine_plan(user_id)')\
                 .eq('date', current_date)\
                 .eq('is_taken', 0)\
-                .gte('time', current_time)\
-                .lte('time', reminder_time)\
                 .execute()
-            
-            print(f"Found {len(response.data) if response.data else 0} occurrences in Supabase")
-            
-            if response.data:
-                for occ in response.data:
-                    user_id = occ['medicine_plan']['user_id']
-                    medicine_name = occ['medicine_plan']['medicine_tracking']['name']
-                    time = occ['time']
-                    
-                    # Check if user has FCM token
-                    user_resp = supabase.table('users').select('user_id, name, fcm_token').eq('user_id', user_id).execute()
-                    has_token = user_resp.data[0].get('fcm_token') if user_resp.data else None
-                    
-                    print(f"  ✓ {time}: {medicine_name} for user {user_id}")
-                    print(f"    FCM Token: {'✅ YES' if has_token else '❌ NO'}")
-                    if has_token:
-                        print(f"    Token preview: {has_token[:30]}...")
+
+            print(f"Found {len(response.data) if response.data else 0} occurrences in Supabase (raw)")
+
+            # Filter occurrences by datetime window to avoid string comparison issues
+            filtered = []
+            try:
+                from datetime import datetime as _dt
+                window_start = now
+                window_end = now + timedelta(minutes=5)
+                if response.data:
+                    for occ in response.data:
+                        occ_date = occ.get('date')
+                        occ_time = occ.get('time')
+                        try:
+                            occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M")
+                        except Exception:
+                            # try seconds format
+                            try:
+                                occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M:%S")
+                            except Exception:
+                                continue
+                        if window_start <= occ_dt <= window_end:
+                            filtered.append(occ)
+
+                print(f"Filtered {len(filtered)} occurrences in Supabase within window")
+
+                if filtered:
+                    for occ in filtered:
+                        user_id = occ['medicine_plan']['user_id']
+                        medicine_name = occ['medicine_plan']['medicine_tracking']['name']
+                        time = occ['time']
+                        # Check if user has FCM token
+                        user_resp = supabase.table('users').select('user_id, name, fcm_token').eq('user_id', user_id).execute()
+                        has_token = user_resp.data[0].get('fcm_token') if user_resp.data else None
+                        print(f"  ✓ {time}: {medicine_name} for user {user_id}")
+                        print(f"    FCM Token: {'✅ YES' if has_token else '❌ NO'}")
+                        if has_token:
+                            print(f"    Token preview: {has_token[:30]}...")
+            except Exception as e:
+                print(f"⚠️  Supabase post-filter error: {e}")
                         
         except Exception as e:
             print(f"❌ Supabase error: {e}")
@@ -68,15 +90,35 @@ with app.app_context():
     """
 
     rows = execute_query(query, (current_date, current_time, reminder_time))
-    print(f"Found {len(rows)} occurrences in local DB")
+    print(f"Found {len(rows)} occurrences in local DB (raw)")
 
-    if rows:
+    # Also filter local rows by exact datetime window to avoid format mismatches
+    try:
+        from datetime import datetime as _dt
+        window_start = now
+        window_end = now + timedelta(minutes=5)
+        filtered_local = []
         for row in rows:
-            has_token = row['fcm_token'] is not None
-            print(f"  ✓ {row['time']}: {row['medicine_name']} for user {row['user_id']} ({row['user_name']})")
-            print(f"    FCM Token: {'✅ YES' if has_token else '❌ NO'}")
-            if has_token:
-                print(f"    Token preview: {row['fcm_token'][:30]}...")
+            try:
+                occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M")
+            except Exception:
+                try:
+                    occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    continue
+            if window_start <= occ_dt <= window_end:
+                filtered_local.append(row)
+
+        print(f"Filtered {len(filtered_local)} occurrences in local DB within window")
+        if filtered_local:
+            for row in filtered_local:
+                has_token = row['fcm_token'] is not None
+                print(f"  ✓ {row['time']}: {row['medicine_name']} for user {row['user_id']} ({row['user_name']})")
+                print(f"    FCM Token: {'✅ YES' if has_token else '❌ NO'}")
+                if has_token:
+                    print(f"    Token preview: {row['fcm_token'][:30]}...")
+    except Exception as e:
+        print(f"⚠️ Local post-filter error: {e}")
 
     print("\n" + "="*60)
     print("💡 DIAGNOSIS:")

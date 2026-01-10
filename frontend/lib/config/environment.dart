@@ -10,7 +10,7 @@ class Environment {
   // UPDATE THIS IP ADDRESS TO YOUR BACKEND SERVER'S IP
   static const String flaskBaseUrl = String.fromEnvironment(
     'FLASK_BASE_URL',
-    defaultValue: 'http://192.168.1.3:5000/api', // CHANGE THIS TO YOUR PC'S IP
+    defaultValue: 'http://192.168.1.5:5000/api', // CHANGE THIS TO YOUR PC'S IP
   );
 
   // App Configuration

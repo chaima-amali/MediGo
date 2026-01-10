@@ -1,0 +1,28 @@
+"""Generate test time for notification testing"""
+from datetime import datetime, timedelta
+
+now = datetime.now()
+test_time = now + timedelta(minutes=2)
+
+print("\n" + "="*60)
+print("🧪 NOTIFICATION TEST HELPER")
+print("="*60)
+print(f"\n⏰ Current time: {now.strftime('%H:%M:%S')}")
+print(f"📅 Current date: {now.strftime('%Y-%m-%d')}")
+print("\n" + "="*60)
+print("📝 TO TEST NOTIFICATIONS:")
+print("="*60)
+print(f"\n1. In your app, create a new medicine")
+print(f"2. Set the time to: {test_time.strftime('%H:%M')}")
+print(f"3. Set the date to: {test_time.strftime('%Y-%m-%d')}")
+print(f"\n4. Wait for the backend scheduler to run")
+print(f"   (it checks every minute)")
+print(f"\n5. You should receive a notification around {test_time.strftime('%H:%M')}")
+print("\n" + "="*60)
+print("⚠️  IMPORTANT:")
+print("="*60)
+print("• Make sure you're logged in to the app")
+print("• Make sure the app has notification permissions")
+print("• Make sure your FCM token is registered")
+print("• Watch the backend terminal for scheduler logs")
+print("\n" + "="*60)

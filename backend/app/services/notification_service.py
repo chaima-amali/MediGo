@@ -120,7 +120,14 @@ class NotificationService:
             return True
             
         except Exception as e:
-            print(f'❌ Failed to send notification: {e}')
+            error_msg = str(e)
+            print(f'❌ Failed to send notification: {error_msg}')
+            
+            # If token is invalid, mark it for cleanup
+            if 'not found' in error_msg.lower() or 'unregistered' in error_msg.lower():
+                print(f'⚠️  Invalid FCM token detected: {fcm_token[:30]}...')
+                # Return False so caller knows to clean up
+            
             return False
     
     @staticmethod

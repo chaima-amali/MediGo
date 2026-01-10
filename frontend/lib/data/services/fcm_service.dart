@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Service for Firebase Cloud Messaging (FCM)
 class FCMService {
@@ -18,7 +20,7 @@ class FCMService {
   /// Initialize FCM
   Future<void> initialize() async {
     try {
-      // Request permission
+      // Request notification permission (iOS) and runtime POST_NOTIFICATIONS (Android 13+)
       NotificationSettings settings = await _messaging.requestPermission(
         alert: true,
         announcement: false,
@@ -28,6 +30,18 @@ class FCMService {
         provisional: false,
         sound: true,
       );
+
+      // On Android 13+ we must also request the POST_NOTIFICATIONS runtime permission
+      if (Platform.isAndroid) {
+        try {
+          final status = await Permission.notification.request();
+          if (!status.isGranted) {
+            debugPrint('⚠️ Android notification permission not granted');
+          }
+        } catch (e) {
+          debugPrint('⚠️ Permission request error: $e');
+        }
+      }
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         debugPrint('✅ FCM permission granted');
@@ -62,10 +76,10 @@ class FCMService {
 
     const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
     const InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
@@ -114,13 +128,13 @@ class FCMService {
   Future<void> _showLocalNotification(RemoteMessage message) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'medigo_channel',
-      'MediGo Notifications',
-      channelDescription: 'Notifications for MediGo app',
-      importance: Importance.high,
-      priority: Priority.high,
-      showWhen: true,
-    );
+          'medigo_channel',
+          'MediGo Notifications',
+          channelDescription: 'Notifications for MediGo app',
+          importance: Importance.high,
+          priority: Priority.high,
+          showWhen: true,
+        );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
       presentAlert: true,

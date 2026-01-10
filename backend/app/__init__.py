@@ -40,6 +40,13 @@ def create_app():
         print('✅ Medicine reminder scheduler started')
     except Exception as e:
         print(f'⚠️  Failed to start reminder scheduler: {e}')
+
+    # Start automatic sync service (runs once at startup and periodically)
+    try:
+        from app.services.sync_service import init_sync_service
+        init_sync_service(app, interval_minutes=5)
+    except Exception as e:
+        print(f'⚠️  Failed to start sync service: {e}')
     
     return app
 
