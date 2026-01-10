@@ -3,13 +3,21 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
+import 'dart:async' as _i12;
 
-import 'package:dio/dio.dart' as _i2;
-import 'package:frontend/data/models/user.dart' as _i6;
-import 'package:frontend/data/repositories/user_repo.dart' as _i4;
-import 'package:frontend/data/services/api_service.dart' as _i7;
-import 'package:frontend/data/services/sync_service.dart' as _i3;
+import 'package:frontend/data/models/user.dart' as _i13;
+import 'package:frontend/data/repositories/user_repo.dart' as _i11;
+import 'package:frontend/data/services/api/auth_api_service.dart' as _i2;
+import 'package:frontend/data/services/api/medication_log_api_service.dart'
+    as _i7;
+import 'package:frontend/data/services/api/medicine_api_service.dart' as _i4;
+import 'package:frontend/data/services/api/pharmacy_api_service.dart' as _i5;
+import 'package:frontend/data/services/api/reservation_api_service.dart' as _i6;
+import 'package:frontend/data/services/api/statistics_api_service.dart' as _i8;
+import 'package:frontend/data/services/api/sync_api_service.dart' as _i9;
+import 'package:frontend/data/services/api/user_api_service.dart' as _i3;
+import 'package:frontend/data/services/api_service.dart' as _i14;
+import 'package:frontend/data/services/sync_service.dart' as _i10;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -26,74 +34,117 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeResponse_0<T1> extends _i1.SmartFake implements _i2.Response<T1> {
-  _FakeResponse_0(Object parent, Invocation parentInvocation)
+class _FakeAuthApiService_0 extends _i1.SmartFake
+    implements _i2.AuthApiService {
+  _FakeAuthApiService_0(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeSyncResult_1 extends _i1.SmartFake implements _i3.SyncResult {
-  _FakeSyncResult_1(Object parent, Invocation parentInvocation)
+class _FakeUserApiService_1 extends _i1.SmartFake
+    implements _i3.UserApiService {
+  _FakeUserApiService_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeMedicineApiService_2 extends _i1.SmartFake
+    implements _i4.MedicineApiService {
+  _FakeMedicineApiService_2(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakePharmacyApiService_3 extends _i1.SmartFake
+    implements _i5.PharmacyApiService {
+  _FakePharmacyApiService_3(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeReservationApiService_4 extends _i1.SmartFake
+    implements _i6.ReservationApiService {
+  _FakeReservationApiService_4(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeMedicationLogApiService_5 extends _i1.SmartFake
+    implements _i7.MedicationLogApiService {
+  _FakeMedicationLogApiService_5(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeStatisticsApiService_6 extends _i1.SmartFake
+    implements _i8.StatisticsApiService {
+  _FakeStatisticsApiService_6(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeSyncApiService_7 extends _i1.SmartFake
+    implements _i9.SyncApiService {
+  _FakeSyncApiService_7(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeSyncResult_8 extends _i1.SmartFake implements _i10.SyncResult {
+  _FakeSyncResult_8(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
 /// A class which mocks [UserRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserRepository extends _i1.Mock implements _i4.UserRepository {
+class MockUserRepository extends _i1.Mock implements _i11.UserRepository {
   MockUserRepository() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i5.Future<int> insertUser(_i6.User? user) =>
+  _i12.Future<int> insertUser(_i13.User? user) =>
       (super.noSuchMethod(
             Invocation.method(#insertUser, [user]),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<_i6.User?> getUserById(int? userId) =>
+  _i12.Future<_i13.User?> getUserById(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#getUserById, [userId]),
-            returnValue: _i5.Future<_i6.User?>.value(),
+            returnValue: _i12.Future<_i13.User?>.value(),
           )
-          as _i5.Future<_i6.User?>);
+          as _i12.Future<_i13.User?>);
 
   @override
-  _i5.Future<_i6.User?> getUserByEmail(String? email) =>
+  _i12.Future<_i13.User?> getUserByEmail(String? email) =>
       (super.noSuchMethod(
             Invocation.method(#getUserByEmail, [email]),
-            returnValue: _i5.Future<_i6.User?>.value(),
+            returnValue: _i12.Future<_i13.User?>.value(),
           )
-          as _i5.Future<_i6.User?>);
+          as _i12.Future<_i13.User?>);
 
   @override
-  _i5.Future<_i6.User?> getUserByPhone(String? phone) =>
+  _i12.Future<_i13.User?> getUserByPhone(String? phone) =>
       (super.noSuchMethod(
             Invocation.method(#getUserByPhone, [phone]),
-            returnValue: _i5.Future<_i6.User?>.value(),
+            returnValue: _i12.Future<_i13.User?>.value(),
           )
-          as _i5.Future<_i6.User?>);
+          as _i12.Future<_i13.User?>);
 
   @override
-  _i5.Future<List<_i6.User>> getAllUsers() =>
+  _i12.Future<List<_i13.User>> getAllUsers() =>
       (super.noSuchMethod(
             Invocation.method(#getAllUsers, []),
-            returnValue: _i5.Future<List<_i6.User>>.value(<_i6.User>[]),
+            returnValue: _i12.Future<List<_i13.User>>.value(<_i13.User>[]),
           )
-          as _i5.Future<List<_i6.User>>);
+          as _i12.Future<List<_i13.User>>);
 
   @override
-  _i5.Future<int> updateUser(_i6.User? user) =>
+  _i12.Future<int> updateUser(_i13.User? user) =>
       (super.noSuchMethod(
             Invocation.method(#updateUser, [user]),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<int> updateUserLocation(
+  _i12.Future<int> updateUserLocation(
     int? userId,
     double? latitude,
     double? longitude, {
@@ -105,98 +156,185 @@ class MockUserRepository extends _i1.Mock implements _i4.UserRepository {
               [userId, latitude, longitude],
               {#locationName: locationName},
             ),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<int> updateUserPremium(int? userId, String? premium) =>
+  _i12.Future<int> updateUserPremium(int? userId, bool? premium) =>
       (super.noSuchMethod(
             Invocation.method(#updateUserPremium, [userId, premium]),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<int> deleteUser(int? userId) =>
+  _i12.Future<int> deleteUser(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#deleteUser, [userId]),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<bool> emailExists(String? email) =>
+  _i12.Future<bool> emailExists(String? email) =>
       (super.noSuchMethod(
             Invocation.method(#emailExists, [email]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i12.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i12.Future<bool>);
 
   @override
-  _i5.Future<bool> phoneExists(String? phone) =>
+  _i12.Future<bool> phoneExists(String? phone) =>
       (super.noSuchMethod(
             Invocation.method(#phoneExists, [phone]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i12.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i12.Future<bool>);
 
   @override
-  _i5.Future<_i6.User?> authenticateUser(String? email, String? password) =>
+  _i12.Future<_i13.User?> authenticateUser(String? email, String? password) =>
       (super.noSuchMethod(
             Invocation.method(#authenticateUser, [email, password]),
-            returnValue: _i5.Future<_i6.User?>.value(),
+            returnValue: _i12.Future<_i13.User?>.value(),
           )
-          as _i5.Future<_i6.User?>);
+          as _i12.Future<_i13.User?>);
 
   @override
-  _i5.Future<List<_i6.User>> getPremiumUsers() =>
+  _i12.Future<List<_i13.User>> getPremiumUsers() =>
       (super.noSuchMethod(
             Invocation.method(#getPremiumUsers, []),
-            returnValue: _i5.Future<List<_i6.User>>.value(<_i6.User>[]),
+            returnValue: _i12.Future<List<_i13.User>>.value(<_i13.User>[]),
           )
-          as _i5.Future<List<_i6.User>>);
+          as _i12.Future<List<_i13.User>>);
 
   @override
-  _i5.Future<int> getUserCount() =>
+  _i12.Future<int> getUserCount() =>
       (super.noSuchMethod(
             Invocation.method(#getUserCount, []),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<int> deleteAllUsers() =>
+  _i12.Future<int> deleteAllUsers() =>
       (super.noSuchMethod(
             Invocation.method(#deleteAllUsers, []),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<int> deleteUserByEmail(String? email) =>
+  _i12.Future<int> deleteUserByEmail(String? email) =>
       (super.noSuchMethod(
             Invocation.method(#deleteUserByEmail, [email]),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
 
   @override
-  _i5.Future<int> deleteUserById(int? userId) =>
+  _i12.Future<int> deleteUserById(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#deleteUserById, [userId]),
-            returnValue: _i5.Future<int>.value(0),
+            returnValue: _i12.Future<int>.value(0),
           )
-          as _i5.Future<int>);
+          as _i12.Future<int>);
+
+  @override
+  _i12.Future<int> deleteUserByPhone(String? phone) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteUserByPhone, [phone]),
+            returnValue: _i12.Future<int>.value(0),
+          )
+          as _i12.Future<int>);
 }
 
 /// A class which mocks [ApiService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockApiService extends _i1.Mock implements _i7.ApiService {
+class MockApiService extends _i1.Mock implements _i14.ApiService {
   MockApiService() {
     _i1.throwOnMissingStub(this);
   }
+
+  @override
+  _i2.AuthApiService get auth =>
+      (super.noSuchMethod(
+            Invocation.getter(#auth),
+            returnValue: _FakeAuthApiService_0(this, Invocation.getter(#auth)),
+          )
+          as _i2.AuthApiService);
+
+  @override
+  _i3.UserApiService get users =>
+      (super.noSuchMethod(
+            Invocation.getter(#users),
+            returnValue: _FakeUserApiService_1(this, Invocation.getter(#users)),
+          )
+          as _i3.UserApiService);
+
+  @override
+  _i4.MedicineApiService get medicines =>
+      (super.noSuchMethod(
+            Invocation.getter(#medicines),
+            returnValue: _FakeMedicineApiService_2(
+              this,
+              Invocation.getter(#medicines),
+            ),
+          )
+          as _i4.MedicineApiService);
+
+  @override
+  _i5.PharmacyApiService get pharmacies =>
+      (super.noSuchMethod(
+            Invocation.getter(#pharmacies),
+            returnValue: _FakePharmacyApiService_3(
+              this,
+              Invocation.getter(#pharmacies),
+            ),
+          )
+          as _i5.PharmacyApiService);
+
+  @override
+  _i6.ReservationApiService get reservations =>
+      (super.noSuchMethod(
+            Invocation.getter(#reservations),
+            returnValue: _FakeReservationApiService_4(
+              this,
+              Invocation.getter(#reservations),
+            ),
+          )
+          as _i6.ReservationApiService);
+
+  @override
+  _i7.MedicationLogApiService get medicationLogs =>
+      (super.noSuchMethod(
+            Invocation.getter(#medicationLogs),
+            returnValue: _FakeMedicationLogApiService_5(
+              this,
+              Invocation.getter(#medicationLogs),
+            ),
+          )
+          as _i7.MedicationLogApiService);
+
+  @override
+  _i8.StatisticsApiService get statistics =>
+      (super.noSuchMethod(
+            Invocation.getter(#statistics),
+            returnValue: _FakeStatisticsApiService_6(
+              this,
+              Invocation.getter(#statistics),
+            ),
+          )
+          as _i8.StatisticsApiService);
+
+  @override
+  _i9.SyncApiService get sync =>
+      (super.noSuchMethod(
+            Invocation.getter(#sync),
+            returnValue: _FakeSyncApiService_7(this, Invocation.getter(#sync)),
+          )
+          as _i9.SyncApiService);
 
   @override
   void initialize() => super.noSuchMethod(
@@ -217,257 +355,143 @@ class MockApiService extends _i1.Mock implements _i7.ApiService {
   );
 
   @override
-  _i5.Future<_i2.Response<T>> get<T>(
-    String? path, {
-    Map<String, dynamic>? queryParameters,
-    _i2.Options? options,
-  }) =>
+  _i12.Future<Map<String, dynamic>> register(Map<String, dynamic>? userData) =>
       (super.noSuchMethod(
-            Invocation.method(
-              #get,
-              [path],
-              {#queryParameters: queryParameters, #options: options},
-            ),
-            returnValue: _i5.Future<_i2.Response<T>>.value(
-              _FakeResponse_0<T>(
-                this,
-                Invocation.method(
-                  #get,
-                  [path],
-                  {#queryParameters: queryParameters, #options: options},
-                ),
-              ),
+            Invocation.method(#register, [userData]),
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
             ),
           )
-          as _i5.Future<_i2.Response<T>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<_i2.Response<T>> post<T>(
-    String? path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    _i2.Options? options,
-  }) =>
+  _i12.Future<Map<String, dynamic>> login(String? email, String? password) =>
       (super.noSuchMethod(
-            Invocation.method(
-              #post,
-              [path],
-              {
-                #data: data,
-                #queryParameters: queryParameters,
-                #options: options,
-              },
-            ),
-            returnValue: _i5.Future<_i2.Response<T>>.value(
-              _FakeResponse_0<T>(
-                this,
-                Invocation.method(
-                  #post,
-                  [path],
-                  {
-                    #data: data,
-                    #queryParameters: queryParameters,
-                    #options: options,
-                  },
-                ),
-              ),
+            Invocation.method(#login, [email, password]),
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
             ),
           )
-          as _i5.Future<_i2.Response<T>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<_i2.Response<T>> put<T>(
-    String? path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    _i2.Options? options,
-  }) =>
+  _i12.Future<Map<String, dynamic>> verifyUser(String? email) =>
       (super.noSuchMethod(
-            Invocation.method(
-              #put,
-              [path],
-              {
-                #data: data,
-                #queryParameters: queryParameters,
-                #options: options,
-              },
-            ),
-            returnValue: _i5.Future<_i2.Response<T>>.value(
-              _FakeResponse_0<T>(
-                this,
-                Invocation.method(
-                  #put,
-                  [path],
-                  {
-                    #data: data,
-                    #queryParameters: queryParameters,
-                    #options: options,
-                  },
-                ),
-              ),
+            Invocation.method(#verifyUser, [email]),
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
             ),
           )
-          as _i5.Future<_i2.Response<T>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<_i2.Response<T>> delete<T>(
-    String? path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    _i2.Options? options,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(
-              #delete,
-              [path],
-              {
-                #data: data,
-                #queryParameters: queryParameters,
-                #options: options,
-              },
-            ),
-            returnValue: _i5.Future<_i2.Response<T>>.value(
-              _FakeResponse_0<T>(
-                this,
-                Invocation.method(
-                  #delete,
-                  [path],
-                  {
-                    #data: data,
-                    #queryParameters: queryParameters,
-                    #options: options,
-                  },
-                ),
-              ),
-            ),
-          )
-          as _i5.Future<_i2.Response<T>>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> createUser(Map<String, dynamic>? userData) =>
+  _i12.Future<Map<String, dynamic>> createUser(
+    Map<String, dynamic>? userData,
+  ) =>
       (super.noSuchMethod(
             Invocation.method(#createUser, [userData]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<Map<String, dynamic>> getUser(int? userId) =>
+  _i12.Future<Map<String, dynamic>> getUser(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#getUser, [userId]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<Map<String, dynamic>> updateUser(
+  _i12.Future<Map<String, dynamic>> updateUser(
     int? userId,
     Map<String, dynamic>? userData,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#updateUser, [userId, userData]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<List<dynamic>> getMedicines(int? userId) =>
+  _i12.Future<void> updateFCMToken(int? userId, String? token) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateFCMToken, [userId, token]),
+            returnValue: _i12.Future<void>.value(),
+            returnValueForMissingStub: _i12.Future<void>.value(),
+          )
+          as _i12.Future<void>);
+
+  @override
+  _i12.Future<List<dynamic>> getMedicines(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#getMedicines, [userId]),
-            returnValue: _i5.Future<List<dynamic>>.value(<dynamic>[]),
+            returnValue: _i12.Future<List<dynamic>>.value(<dynamic>[]),
           )
-          as _i5.Future<List<dynamic>>);
+          as _i12.Future<List<dynamic>>);
 
   @override
-  _i5.Future<Map<String, dynamic>> createMedicine(
+  _i12.Future<Map<String, dynamic>> createMedicine(
     Map<String, dynamic>? medicineData,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#createMedicine, [medicineData]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<Map<String, dynamic>> updateMedicine(
+  _i12.Future<Map<String, dynamic>> updateMedicine(
     int? medicineId,
     Map<String, dynamic>? medicineData,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#updateMedicine, [medicineId, medicineData]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<void> deleteMedicine(int? medicineId) =>
+  _i12.Future<void> deleteMedicine(int? medicineId) =>
       (super.noSuchMethod(
             Invocation.method(#deleteMedicine, [medicineId]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i12.Future<void>.value(),
+            returnValueForMissingStub: _i12.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i12.Future<void>);
 
   @override
-  _i5.Future<List<dynamic>> searchPharmacies({
-    double? latitude,
-    double? longitude,
-    double? radius,
-    String? medicineName,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#searchPharmacies, [], {
-              #latitude: latitude,
-              #longitude: longitude,
-              #radius: radius,
-              #medicineName: medicineName,
-            }),
-            returnValue: _i5.Future<List<dynamic>>.value(<dynamic>[]),
-          )
-          as _i5.Future<List<dynamic>>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> getPharmacy(int? pharmacyId) =>
-      (super.noSuchMethod(
-            Invocation.method(#getPharmacy, [pharmacyId]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
-              <String, dynamic>{},
-            ),
-          )
-          as _i5.Future<Map<String, dynamic>>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> createReservation(
+  _i12.Future<Map<String, dynamic>> createReservation(
     Map<String, dynamic>? reservationData,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#createReservation, [reservationData]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<List<dynamic>> getReservations(int? userId) =>
+  _i12.Future<List<dynamic>> getReservations(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#getReservations, [userId]),
-            returnValue: _i5.Future<List<dynamic>>.value(<dynamic>[]),
+            returnValue: _i12.Future<List<dynamic>>.value(<dynamic>[]),
           )
-          as _i5.Future<List<dynamic>>);
+          as _i12.Future<List<dynamic>>);
 
   @override
-  _i5.Future<Map<String, dynamic>> updateReservationStatus(
+  _i12.Future<Map<String, dynamic>> updateReservationStatus(
     int? reservationId,
     String? status,
   ) =>
@@ -476,26 +500,26 @@ class MockApiService extends _i1.Mock implements _i7.ApiService {
               reservationId,
               status,
             ]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<Map<String, dynamic>> logMedicationIntake(
+  _i12.Future<Map<String, dynamic>> logMedicationIntake(
     Map<String, dynamic>? logData,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#logMedicationIntake, [logData]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<List<dynamic>> getMedicationLogs(
+  _i12.Future<List<dynamic>> getMedicationLogs(
     int? userId, {
     String? startDate,
     String? endDate,
@@ -506,47 +530,38 @@ class MockApiService extends _i1.Mock implements _i7.ApiService {
               [userId],
               {#startDate: startDate, #endDate: endDate},
             ),
-            returnValue: _i5.Future<List<dynamic>>.value(<dynamic>[]),
+            returnValue: _i12.Future<List<dynamic>>.value(<dynamic>[]),
           )
-          as _i5.Future<List<dynamic>>);
+          as _i12.Future<List<dynamic>>);
 
   @override
-  _i5.Future<Map<String, dynamic>> getAdherenceStats(
+  _i12.Future<Map<String, dynamic>> getAdherenceStats(
     int? userId, {
     String? period,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getAdherenceStats, [userId], {#period: period}),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<void> updateFCMToken(int? userId, String? token) =>
-      (super.noSuchMethod(
-            Invocation.method(#updateFCMToken, [userId, token]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
-          )
-          as _i5.Future<void>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> syncData(Map<String, dynamic>? syncData) =>
+  _i12.Future<Map<String, dynamic>> syncData(Map<String, dynamic>? syncData) =>
       (super.noSuchMethod(
             Invocation.method(#syncData, [syncData]),
-            returnValue: _i5.Future<Map<String, dynamic>>.value(
+            returnValue: _i12.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
           )
-          as _i5.Future<Map<String, dynamic>>);
+          as _i12.Future<Map<String, dynamic>>);
 }
 
 /// A class which mocks [SyncService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSyncService extends _i1.Mock implements _i3.SyncService {
+class MockSyncService extends _i1.Mock implements _i10.SyncService {
   MockSyncService() {
     _i1.throwOnMissingStub(this);
   }
@@ -557,28 +572,28 @@ class MockSyncService extends _i1.Mock implements _i3.SyncService {
           as bool);
 
   @override
-  _i5.Future<bool> hasConnection() =>
+  _i12.Future<bool> hasConnection() =>
       (super.noSuchMethod(
             Invocation.method(#hasConnection, []),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i12.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i12.Future<bool>);
 
   @override
-  _i5.Future<_i3.SyncResult> syncAll(int? userId) =>
+  _i12.Future<_i10.SyncResult> syncAll(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#syncAll, [userId]),
-            returnValue: _i5.Future<_i3.SyncResult>.value(
-              _FakeSyncResult_1(this, Invocation.method(#syncAll, [userId])),
+            returnValue: _i12.Future<_i10.SyncResult>.value(
+              _FakeSyncResult_8(this, Invocation.method(#syncAll, [userId])),
             ),
           )
-          as _i5.Future<_i3.SyncResult>);
+          as _i12.Future<_i10.SyncResult>);
 
   @override
-  _i5.Future<bool> pushItem(String? table, Map<String, dynamic>? data) =>
+  _i12.Future<bool> pushItem(String? table, Map<String, dynamic>? data) =>
       (super.noSuchMethod(
             Invocation.method(#pushItem, [table, data]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i12.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i12.Future<bool>);
 }
