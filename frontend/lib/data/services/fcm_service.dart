@@ -131,9 +131,15 @@ class FCMService {
           'medigo_channel',
           'MediGo Notifications',
           channelDescription: 'Notifications for MediGo app',
-          importance: Importance.high,
-          priority: Priority.high,
+          importance: Importance.max,
+          priority: Priority.max,
           showWhen: true,
+          enableVibration: true,
+          playSound: true,
+          ticker: 'Medicine Reminder',
+          visibility: NotificationVisibility.public,
+          fullScreenIntent: true,
+          channelShowBadge: true,
         );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(

@@ -660,6 +660,15 @@ class UserCubit extends Cubit<UserState> {
   Future<void> _saveUserSession(int userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final previousUserId = prefs.getInt('user_id');
+
+      // If switching to a different user, clear the previous user's medicine data
+      if (previousUserId != null && previousUserId != userId) {
+        print('🔄 Switching users: $previousUserId -> $userId');
+        print('🗑️ Clearing previous user medicine data...');
+        await DBHelper.clearUserMedicineData(previousUserId);
+      }
+
       await prefs.setInt('user_id', userId);
       await prefs.setBool('is_logged_in', true);
 

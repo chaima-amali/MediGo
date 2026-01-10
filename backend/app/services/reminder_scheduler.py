@@ -61,8 +61,8 @@ class ReminderScheduler:
             current_date = now.strftime('%Y-%m-%d')
             current_time = now.strftime('%H:%M')
             
-            # Time window for "at time" notifications (current time to next 2 minutes)
-            at_time_window = (now + timedelta(minutes=2)).strftime('%H:%M')
+            # Time window for "at time" notifications (current minute only)
+            at_time_window = (now + timedelta(minutes=1)).strftime('%H:%M')
             
             # Time for "1 hour before" notifications
             one_hour_ahead = now + timedelta(hours=1)
@@ -89,7 +89,7 @@ class ReminderScheduler:
                         .execute()
 
                     # Post-filter occurrences into the exact windows
-                    def _filter_window(data, start_dt, end_dt):
+                    def _filter_window(data, target_time_str):
                         from datetime import datetime as _dt
                         out = []
                         if not data:
@@ -98,22 +98,30 @@ class ReminderScheduler:
                             occ_date = occ.get('date')
                             occ_time = occ.get('time')
                             try:
-                                occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M")
-                            except Exception:
+                                # Parse and extract just HH:MM for comparison
                                 try:
-                                    occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M:%S")
+                                    occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M")
                                 except Exception:
-                                    continue
-                            if start_dt <= occ_dt <= end_dt:
-                                out.append(occ)
+                                    occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M:%S")
+                                
+                                # Compare only hour and minute (ignore seconds)
+                                if occ_dt.strftime('%H:%M') == target_time_str:
+                                    out.append(occ)
+                            except Exception:
+                                continue
                         return out
 
-                    start_dt = now
-                    end_dt = now + timedelta(minutes=2)
-                    at_time_filtered = _filter_window(at_time_response.data if at_time_response and getattr(at_time_response, 'data', None) else [], start_dt, end_dt)
+                    # Check for exact current time match only
+                    at_time_filtered = _filter_window(
+                        at_time_response.data if at_time_response and getattr(at_time_response, 'data', None) else [], 
+                        current_time
+                    )
 
                     one_hour_dt = one_hour_ahead
-                    one_hour_filtered = _filter_window(one_hour_response.data if one_hour_response and getattr(one_hour_response, 'data', None) else [], one_hour_dt, one_hour_dt)
+                    one_hour_filtered = _filter_window(
+                        one_hour_response.data if one_hour_response and getattr(one_hour_response, 'data', None) else [], 
+                        one_hour_time
+                    )
                     
                     # Process "at time" notifications (filtered)
                     if at_time_filtered:
@@ -240,29 +248,35 @@ class ReminderScheduler:
                                 (current_date,)
                             )
 
-                            # Filter candidates for the at_time window
+                            # Filter candidates for exact current time match only
                             from datetime import datetime as _dt
-                            start_dt = now
-                            end_dt = now + timedelta(minutes=2)
                             for row in candidate_rows:
                                 try:
-                                    occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M")
-                                except Exception:
                                     try:
-                                        occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M:%S")
+                                        occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M")
                                     except Exception:
-                                        continue
-                                if start_dt <= occ_dt <= end_dt:
-                                    reminders_to_send.append({
-                                        'fcm_token': row['fcm_token'],
-                                        'medicine_name': row['medicine_name'],
-                                        'dosage': row['dosage'] or '',
-                                        'time': row['time'],
-                                        'occurrence_id': row['occurrence_id'],
-                                        'plan_id': row['plan_id'],
-                                        'user_id': row['user_id'],
-                                        'notification_timing': 'at_time',
-                                    })
+                                        occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M:%S")
+                                    
+                                    # Check if time matches exactly (HH:MM)
+                                    if occ_dt.strftime('%H:%M') == current_time:
+                                        # Check if notification was already sent
+                                        already_sent = execute_query(
+                                            "SELECT 1 FROM notification WHERE occurrence_id = ? AND notification_type = 'at_time' AND is_sent = 1",
+                                            (row['occurrence_id'],)
+                                        )
+                                        if not already_sent:
+                                            reminders_to_send.append({
+                                                'fcm_token': row['fcm_token'],
+                                                'medicine_name': row['medicine_name'],
+                                                'dosage': row['dosage'] or '',
+                                                'time': row['time'],
+                                                'occurrence_id': row['occurrence_id'],
+                                                'plan_id': row['plan_id'],
+                                                'user_id': row['user_id'],
+                                                'notification_timing': 'at_time',
+                                            })
+                                except Exception as e:
+                                    continue
                             
                             # Query for "1 hour before" notifications
                             one_hour_query = """
@@ -302,26 +316,33 @@ class ReminderScheduler:
                             )
 
                             try:
-                                one_hour_dt = one_hour_ahead
                                 for row in candidate_one_hour:
                                     try:
-                                        occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M")
-                                    except Exception:
                                         try:
-                                            occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M:%S")
+                                            occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M")
                                         except Exception:
-                                            continue
-                                    if occ_dt == one_hour_dt:
-                                        reminders_to_send.append({
-                                            'fcm_token': row['fcm_token'],
-                                            'medicine_name': row['medicine_name'],
-                                            'dosage': row['dosage'] or '',
-                                            'time': row['time'],
-                                            'occurrence_id': row['occurrence_id'],
-                                            'plan_id': row['plan_id'],
-                                            'user_id': row['user_id'],
-                                            'notification_timing': 'one_hour_before',
-                                        })
+                                            occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M:%S")
+                                        
+                                        # Check if time matches exactly (HH:MM)
+                                        if occ_dt.strftime('%H:%M') == one_hour_time:
+                                            # Check if notification was already sent
+                                            already_sent = execute_query(
+                                                "SELECT 1 FROM notification WHERE occurrence_id = ? AND notification_type = 'one_hour_before' AND is_sent = 1",
+                                                (row['occurrence_id'],)
+                                            )
+                                            if not already_sent:
+                                                reminders_to_send.append({
+                                                    'fcm_token': row['fcm_token'],
+                                                    'medicine_name': row['medicine_name'],
+                                                    'dosage': row['dosage'] or '',
+                                                    'time': row['time'],
+                                                    'occurrence_id': row['occurrence_id'],
+                                                    'plan_id': row['plan_id'],
+                                                    'user_id': row['user_id'],
+                                                    'notification_timing': 'one_hour_before',
+                                                })
+                                    except Exception:
+                                        continue
                             except Exception:
                                 pass
                 

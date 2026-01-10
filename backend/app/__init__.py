@@ -3,6 +3,7 @@ Flask Application Factory
 Initializes and configures the Flask app with all extensions and routes
 """
 
+import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -32,21 +33,24 @@ def create_app():
     # Register error handlers
     register_error_handlers(app)
     
-    # Start reminder scheduler for medicine notifications
-    try:
-        from app.services.reminder_scheduler import scheduler
-        scheduler.app = app  # Set Flask app context for scheduler
-        scheduler.start()
-        print('✅ Medicine reminder scheduler started')
-    except Exception as e:
-        print(f'⚠️  Failed to start reminder scheduler: {e}')
+    # Only start schedulers in the main worker process (not in Flask reloader's parent process)
+    # This prevents duplicate scheduler instances when debug mode is enabled
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not settings.DEBUG:
+        # Start reminder scheduler for medicine notifications
+        try:
+            from app.services.reminder_scheduler import scheduler
+            scheduler.app = app  # Set Flask app context for scheduler
+            scheduler.start()
+            print('✅ Medicine reminder scheduler started')
+        except Exception as e:
+            print(f'⚠️  Failed to start reminder scheduler: {e}')
 
-    # Start automatic sync service (runs once at startup and periodically)
-    try:
-        from app.services.sync_service import init_sync_service
-        init_sync_service(app, interval_minutes=5)
-    except Exception as e:
-        print(f'⚠️  Failed to start sync service: {e}')
+        # Start automatic sync service (runs once at startup and periodically)
+        try:
+            from app.services.sync_service import init_sync_service
+            init_sync_service(app, interval_minutes=5)
+        except Exception as e:
+            print(f'⚠️  Failed to start sync service: {e}')
     
     return app
 

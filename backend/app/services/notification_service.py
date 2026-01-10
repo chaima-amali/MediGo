@@ -93,14 +93,18 @@ class NotificationService:
                     'plan_id': str(plan_id),
                     'notification_timing': notification_timing,
                     'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                    'title': title,  # Add title to data payload
+                    'body': body,    # Add body to data payload
                 },
                 android=messaging.AndroidConfig(
                     priority='high',
                     notification=messaging.AndroidNotification(
+                        title=title,
+                        body=body,
                         icon='notification_icon',
                         color='#4CAF50',
                         sound='default',
-                        channel_id='medicine_reminders',
+                        channel_id='medigo_channel',
                     ),
                 ),
                 apns=messaging.APNSConfig(
