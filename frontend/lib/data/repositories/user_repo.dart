@@ -1,9 +1,15 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 import '../databases/db_helper.dart';
 import '../databases/db_user.dart';
 import '../models/user.dart';
+import '../services/api/user_api_service.dart';
 
 class UserRepository {
+  final UserApiService _apiService = UserApiService();
+
   // Get database instance
   Future<Database> get _db async => await DBHelper.getDatabase();
 
@@ -121,12 +127,41 @@ class UserRepository {
     );
   }
 
-  // UPDATE - Update user premium status
-  Future<int> updateUserPremium(int userId, String premium) async {
+  // UPDATE - Update user premium status (Remote-first)
+  Future<int> updateUserPremium(int userId, bool premium) async {
+    try {
+      // Check internet connection
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult != ConnectivityResult.none) {
+        print('☁️ Updating premium status remotely...');
+
+        final response = await _apiService.updateUserPremium(userId, premium);
+
+        if (response['success'] == true && response['user'] != null) {
+          print('✅ Premium status updated remotely');
+
+          // Sync to local database
+          final db = await _db;
+          final result = await db.update(
+            DBUserTable.table,
+            {'premium': premium ? 1 : 0},
+            where: 'user_id = ?',
+            whereArgs: [userId],
+          );
+          print('💾 Premium status synced to local DB');
+          return result;
+        }
+      }
+    } catch (e) {
+      print('❌ Remote premium update failed: $e');
+    }
+
+    // Fallback to local update only
+    print('💾 Updating premium status locally only...');
     final db = await _db;
     return await db.update(
       DBUserTable.table,
-      {'premium': premium},
+      {'premium': premium ? 1 : 0},
       where: 'user_id = ?',
       whereArgs: [userId],
     );
@@ -172,11 +207,17 @@ class UserRepository {
   // AUTHENTICATION - Verify user credentials
   Future<User?> authenticateUser(String email, String password) async {
     final db = await _db;
+
+    // Hash the provided password to compare with stored hash
+    final hashedPassword = sha256.convert(utf8.encode(password)).toString();
+
     print('🔐 Authenticating: email=$email, password=$password');
+    print('🔒 Hashed password: $hashedPassword');
+
     final List<Map<String, dynamic>> maps = await db.query(
       DBUserTable.table,
       where: 'email = ? AND password = ?',
-      whereArgs: [email, password],
+      whereArgs: [email, hashedPassword],
     );
     print('📊 Authentication query returned ${maps.length} results');
 

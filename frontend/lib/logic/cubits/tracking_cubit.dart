@@ -1,4 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+﻿import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/repositories/occurrence_repository.dart';
 import '../../data/models/occurrence_plan.dart';
@@ -55,18 +55,18 @@ class TrackingCubit extends Cubit<TrackingState> {
   }
 
   Future<void> loadDay(DateTime date) async {
-    print('🔄 TrackingCubit.loadDay: Starting load for date=$date');
+    print('­ƒöä TrackingCubit.loadDay: Starting load for date=$date');
     emit(state.copyWith(loading: true, selectedDate: date));
 
     final userId = await _getCurrentUserId();
-    print('👤 TrackingCubit.loadDay: userId=$userId');
+    print('­ƒæñ TrackingCubit.loadDay: userId=$userId');
 
     final result = await repository.getOccurrencesByDate(date, userId: userId);
-    print('📊 TrackingCubit.loadDay: Loaded ${result.length} occurrences');
+    print('­ƒôè TrackingCubit.loadDay: Loaded ${result.length} occurrences');
 
     emit(state.copyWith(loading: false, occurrences: result));
     print(
-      '✅ TrackingCubit.loadDay: State emitted with ${result.length} occurrences',
+      'Ô£à TrackingCubit.loadDay: State emitted with ${result.length} occurrences',
     );
   }
 
@@ -99,18 +99,18 @@ class TrackingCubit extends Cubit<TrackingState> {
     required List<String> times,
   }) async {
     try {
-      print('🔄 TrackingCubit.addMedicine: Starting save...');
+      print('­ƒöä TrackingCubit.addMedicine: Starting save...');
       final repo = MedicineRepository();
       await repo.saveMedicine(tracking: tracking, plan: plan, times: times);
-      print('✅ TrackingCubit.addMedicine: Medicine saved successfully');
+      print('Ô£à TrackingCubit.addMedicine: Medicine saved successfully');
 
       // Reload the current day to show new medicine
       await loadDay(state.selectedDate);
-      print('✅ TrackingCubit.addMedicine: Day reloaded with new data');
+      print('Ô£à TrackingCubit.addMedicine: Day reloaded with new data');
 
       return true;
     } catch (e) {
-      print('❌ TrackingCubit.addMedicine error: $e');
+      print('ÔØî TrackingCubit.addMedicine error: $e');
       return false;
     }
   }

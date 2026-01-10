@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'edit_medicine_page.dart';
@@ -213,7 +213,7 @@ class _EditContentState extends State<EditContent> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            '${occ.dateString} • ${occ.time}',
+                                            '${occ.dateString} ÔÇó ${occ.time}',
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -286,7 +286,7 @@ class _EditContentState extends State<EditContent> {
                                   ],
                                 ),
                               ),
-                              // Removed explicit 'Marked as done' badge — toggle shown via button
+                              // Removed explicit 'Marked as done' badge ÔÇö toggle shown via button
                             ],
                           ),
                         ),

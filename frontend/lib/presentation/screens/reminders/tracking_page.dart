@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
@@ -668,7 +668,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent>
                                 // debug id/plan display removed
                                 const SizedBox(height: 6),
                                 Text(
-                                  '${occ.dateString} • ${occ.time}',
+                                  '${occ.dateString} ÔÇó ${occ.time}',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: textColor.withOpacity(0.85),

@@ -9,6 +9,7 @@ import 'package:frontend/data/repositories/pharmacy_repo.dart';
 import 'package:frontend/data/models/reservation.dart';
 import 'package:frontend/data/models/pharmacy.dart';
 import 'package:frontend/logic/cubits/reservation_cubit.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
 
 class ReservationPendingPage extends StatefulWidget {
   final int reservationId;
@@ -84,9 +85,24 @@ class _ReservationPendingPageState extends State<ReservationPendingPage> {
                   child: ElevatedButton(
                     onPressed: () async {
                       Navigator.pop(context);
+
+                      // Get user premium status
+                      final userState = context.read<UserCubit>().state;
+                      bool isPremium = false;
+                      int? userId;
+                      if (userState is UserAuthenticated) {
+                        isPremium = userState.user.premium ?? false;
+                        userId = userState.user.userId;
+                      } else if (userState is UserLoaded) {
+                        isPremium = userState.user.premium ?? false;
+                        userId = userState.user.userId;
+                      }
+
                       await _reservationRepo.updateReservationStatus(
                         reservationData!.reservationId!,
                         'cancelled',
+                        isPremium: isPremium,
+                        userId: userId,
                       );
                       setState(() {
                         reservationData = reservationData!.copyWith(
@@ -473,11 +489,25 @@ class _ReservationPendingPageState extends State<ReservationPendingPage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
+                          // Get user premium status
+                          final userState = context.read<UserCubit>().state;
+                          bool isPremium = false;
+                          int? userId;
+                          if (userState is UserAuthenticated) {
+                            isPremium = userState.user.premium ?? false;
+                            userId = userState.user.userId;
+                          } else if (userState is UserLoaded) {
+                            isPremium = userState.user.premium ?? false;
+                            userId = userState.user.userId;
+                          }
+
                           await context
                               .read<ReservationCubit>()
                               .updateReservationStatus(
                                 reservationData!.reservationId!,
                                 'confirmed',
+                                isPremium: isPremium,
+                                userId: userId,
                               );
                           setState(() {
                             reservationData = reservationData!.copyWith(

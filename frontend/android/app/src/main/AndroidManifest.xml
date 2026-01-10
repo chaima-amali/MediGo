@@ -16,12 +16,6 @@
         android:label="frontend"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        
-        <!-- Firebase Cloud Messaging default notification channel -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="medigo_channel" />
-        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -71,5 +65,4 @@
             <data android:scheme="geo" />
         </intent>
     </queries>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 </manifest>

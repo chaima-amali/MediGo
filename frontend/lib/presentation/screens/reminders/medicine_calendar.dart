@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
@@ -37,7 +37,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
     // Get current user ID
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('user_id');
-    print('📅 MedicineCalendar: Loading occurrences for userId=$userId');
+    print('­ƒôà MedicineCalendar: Loading occurrences for userId=$userId');
 
     // Load occurrences for the entire month
     final firstDay = DateTime(_focusedDay.year, _focusedDay.month, 1);
@@ -109,7 +109,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
         }
       }
     } catch (e) {
-      print('⚠️ Error calculating status color: $e');
+      print('ÔÜá´©Å Error calculating status color: $e');
     }
 
     // Future or pending
@@ -148,7 +148,7 @@ class _MedicineCalendarScreenState extends State<MedicineCalendarScreen> {
 
       return 'Pending';
     } catch (e) {
-      print('⚠️ Error getting status text: $e');
+      print('ÔÜá´©Å Error getting status text: $e');
       return 'Unknown';
     }
   }

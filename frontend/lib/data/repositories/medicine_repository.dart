@@ -1,4 +1,4 @@
-import 'package:sqflite/sqflite.dart';
+﻿import 'package:sqflite/sqflite.dart';
 import 'dart:convert';
 
 import '../models/medicine_tracking.dart';
@@ -34,7 +34,7 @@ class MedicineRepository {
       );
     } catch (e) {
       // ignore: avoid_print
-      print('⚠️  _safeUpsert failed for table $table: $e');
+      print('ÔÜá´©Å  _safeUpsert failed for table $table: $e');
     }
   }
 
@@ -113,7 +113,7 @@ class MedicineRepository {
       if (occurrencesData.isNotEmpty) {
         await _apiService.createOccurrencesBatch(occurrencesData);
         // ignore: avoid_print
-        print('✅ Remote: ${occurrencesData.length} occurrences created');
+        print('Ô£à Remote: ${occurrencesData.length} occurrences created');
       }
 
       // Also upsert remote plan/tracking into local DB for consistency
@@ -146,12 +146,12 @@ class MedicineRepository {
         });
       } catch (e) {
         // ignore: avoid_print
-        print('⚠️  Failed to upsert remote plan/tracking locally: $e');
+        print('ÔÜá´©Å  Failed to upsert remote plan/tracking locally: $e');
       }
 
       // Also save to local database as a backup
       // ignore: avoid_print
-      print('💾 Saving to local database as backup...');
+      print('­ƒÆ¥ Saving to local database as backup...');
       await _saveMedicineLocal(tracking, plan, times);
 
       // Notify listeners
@@ -160,19 +160,19 @@ class MedicineRepository {
       } catch (_) {}
 
       // ignore: avoid_print
-      print('✅ Medicine saved successfully to both remote and local!');
+      print('Ô£à Medicine saved successfully to both remote and local!');
       return;
     } catch (e, stackTrace) {
       // ignore: avoid_print
-      print('❌ Remote API failed: $e');
+      print('ÔØî Remote API failed: $e');
       // ignore: avoid_print
-      print('❌ Stack trace: $stackTrace');
+      print('ÔØî Stack trace: $stackTrace');
       // Fallback to local only
       // ignore: avoid_print
-      print('📱 Falling back to local database...');
+      print('­ƒô▒ Falling back to local database...');
       await _saveMedicineLocal(tracking, plan, times);
       // ignore: avoid_print
-      print('✅ Medicine saved locally (not synced to Supabase)');
+      print('Ô£à Medicine saved locally (not synced to Supabase)');
       return;
     }
   }
@@ -222,8 +222,8 @@ class MedicineRepository {
       );
     } catch (_) {}
 
-    // 1️⃣ insert medicine_tracking
-    print('📝 MedicineRepository: Inserting medicine tracking...');
+    // 1´©ÅÔâú insert medicine_tracking
+    print('­ƒôØ MedicineRepository: Inserting medicine tracking...');
     // Ensure medicine_tracking has expected columns (defensive migration)
     try {
       final trackCols = await db.rawQuery(
@@ -254,7 +254,7 @@ class MedicineRepository {
     } catch (_) {}
 
     final trackingId = await db.insert('medicine_tracking', tracking.toMap());
-    print('✅ MedicineRepository: Tracking inserted with ID: $trackingId');
+    print('Ô£à MedicineRepository: Tracking inserted with ID: $trackingId');
 
     // update plan with tracking id
     final updatedPlan = MedicinePlan(
@@ -269,11 +269,11 @@ class MedicineRepository {
       customDates: plan.customDates,
     );
 
-    // 2️⃣ insert medicine_plan
+    // 2´©ÅÔâú insert medicine_plan
     final planId = await db.insert('medicine_plan', updatedPlan.toMap());
-    print('✅ MedicineRepository: Plan inserted with ID: $planId');
+    print('Ô£à MedicineRepository: Plan inserted with ID: $planId');
 
-    // 3️⃣ generate all occurrences
+    // 3´©ÅÔâú generate all occurrences
     final occurrences = _generateOccurrences(
       planId: planId,
       start: plan.startDate,
@@ -317,14 +317,14 @@ class MedicineRepository {
       );
     } catch (_) {}
 
-    // 4️⃣ insert occurrences
+    // 4´©ÅÔâú insert occurrences
     print(
-      '📝 MedicineRepository: Inserting ${occurrences.length} occurrences...',
+      '­ƒôØ MedicineRepository: Inserting ${occurrences.length} occurrences...',
     );
     for (var occ in occurrences) {
       await db.insert("occurrence_plan", occ.toMap());
     }
-    print('✅ MedicineRepository: All occurrences inserted successfully');
+    print('Ô£à MedicineRepository: All occurrences inserted successfully');
 
     // notify listeners that DB changed (new medicine + occurrences)
     try {
@@ -444,7 +444,7 @@ class MedicineRepository {
               'custom_dates': remote['custom_dates'],
             }, conflictAlgorithm: ConflictAlgorithm.replace);
           } catch (e) {
-            print('⚠️  Failed to upsert remote plan locally: $e');
+            print('ÔÜá´©Å  Failed to upsert remote plan locally: $e');
           }
           return MedicinePlan.fromMap(remote);
         }
@@ -483,7 +483,7 @@ class MedicineRepository {
               'unit': remote['unit'] ?? '',
             }, conflictAlgorithm: ConflictAlgorithm.replace);
           } catch (e) {
-            print('⚠️  Failed to upsert remote tracking locally: $e');
+            print('ÔÜá´©Å  Failed to upsert remote tracking locally: $e');
           }
           return MedicineTracking.fromMap(remote);
         }
@@ -512,7 +512,7 @@ class MedicineRepository {
         // Debug: show payload
         // ignore: avoid_print
         print(
-          '🌐 Updating medicine tracking remotely: ID=$id payload=${tracking.toMap()}',
+          '­ƒîÉ Updating medicine tracking remotely: ID=$id payload=${tracking.toMap()}',
         );
         await _apiService.updateMedicine(id, {
           'name': tracking.name,
@@ -521,7 +521,7 @@ class MedicineRepository {
           if (tracking.userId != null) 'user_id': tracking.userId,
         });
         // ignore: avoid_print
-        print('✅ Remote: Medicine tracking updated successfully');
+        print('Ô£à Remote: Medicine tracking updated successfully');
 
         // Also update local
         final db = await dbFuture;
@@ -532,7 +532,7 @@ class MedicineRepository {
           whereArgs: [id],
         );
         // ignore: avoid_print
-        print('💾 Local: medicine_tracking rows updated: $rows');
+        print('­ƒÆ¥ Local: medicine_tracking rows updated: $rows');
 
         try {
           DatabaseChangeNotifier.instance.notify();
@@ -541,7 +541,7 @@ class MedicineRepository {
       }
     } catch (e) {
       // ignore: avoid_print
-      print('⚠️  Remote update failed: $e, using local only');
+      print('ÔÜá´©Å  Remote update failed: $e, using local only');
     }
 
     // Fallback to local only
@@ -556,7 +556,7 @@ class MedicineRepository {
         whereArgs: [id],
       );
       // ignore: avoid_print
-      print('💾 Fallback local: medicine_tracking rows updated: $rows');
+      print('­ƒÆ¥ Fallback local: medicine_tracking rows updated: $rows');
       if (rows > 0) {
         try {
           DatabaseChangeNotifier.instance.notify();
@@ -576,7 +576,7 @@ class MedicineRepository {
         // Debug: show payload
         // ignore: avoid_print
         print(
-          '🌐 Updating medicine plan remotely: ID=$id payload=${plan.toMap()}',
+          '­ƒîÉ Updating medicine plan remotely: ID=$id payload=${plan.toMap()}',
         );
         await _apiService.updateMedicinePlan(id, {
           'importance': plan.importance,
@@ -591,7 +591,7 @@ class MedicineRepository {
             'custom_dates': jsonEncode(plan.customDates),
         });
         // ignore: avoid_print
-        print('✅ Remote: Medicine plan updated successfully');
+        print('Ô£à Remote: Medicine plan updated successfully');
 
         // Also update local
         final db = await dbFuture;
@@ -602,7 +602,7 @@ class MedicineRepository {
           whereArgs: [id],
         );
         // ignore: avoid_print
-        print('💾 Local: medicine_plan rows updated: $rows');
+        print('­ƒÆ¥ Local: medicine_plan rows updated: $rows');
 
         try {
           DatabaseChangeNotifier.instance.notify();
@@ -611,7 +611,7 @@ class MedicineRepository {
       }
     } catch (e) {
       // ignore: avoid_print
-      print('⚠️  Remote update failed: $e, using local only');
+      print('ÔÜá´©Å  Remote update failed: $e, using local only');
     }
 
     // Fallback to local only
@@ -626,7 +626,7 @@ class MedicineRepository {
         whereArgs: [id],
       );
       // ignore: avoid_print
-      print('💾 Fallback local: medicine_plan rows updated: $rows');
+      print('­ƒÆ¥ Fallback local: medicine_plan rows updated: $rows');
       if (rows > 0) {
         try {
           DatabaseChangeNotifier.instance.notify();

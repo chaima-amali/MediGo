@@ -16,8 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
     longitude REAL,
     location_name TEXT,
     premium TEXT,
-    fcm_token TEXT,
-    notifications_enabled INTEGER DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -91,43 +89,6 @@ CREATE TABLE IF NOT EXISTS occurrence_plan (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (plan_id) REFERENCES medicine_plan(plan_id) ON DELETE CASCADE
 );
-
--- NOTIFICATION TABLE
-CREATE TABLE IF NOT EXISTS notification (
-    notification_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    occurrence_id INTEGER,
-    sent_at TEXT,
-    is_sent INTEGER DEFAULT 0,
-    notification_type TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (occurrence_id) REFERENCES occurrence_plan(id) ON DELETE CASCADE
-);
-
--- MEDICATION INTAKE LOG TABLE
-CREATE TABLE IF NOT EXISTS medication_intake_log (
-    log_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    occurrence_id INTEGER,
-    medicine_track_id INTEGER,
-    scheduled_date TEXT,
-    scheduled_time TEXT,
-    actual_time TEXT,
-    status TEXT,
-    dosage TEXT,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (occurrence_id) REFERENCES occurrence_plan(id) ON DELETE CASCADE,
-    FOREIGN KEY (medicine_track_id) REFERENCES medicine_tracking(medicine_track_id) ON DELETE CASCADE
-);
-
--- DAILY DOSAGE CHECKING TABLE
-CREATE TABLE IF NOT EXISTS daily_dosage_checking (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    plan_id INTEGER,
-    check_date TEXT,
-    total_dosage REAL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (plan_id) REFERENCES medicine_plan(plan_id) ON DELETE CASCADE
-);
 """
 
 def init_database():
@@ -141,7 +102,7 @@ def init_database():
     conn.commit()
     conn.close()
     
-    print("✅ Local database initialized (users, medicine, medicine_tracking, medicine_plan, occurrence_plan, notification, medication_intake_log, daily_dosage_checking, ...)")
+    print("✅ Local database initialized with 'users' table")
 
 if __name__ == '__main__':
     init_database()

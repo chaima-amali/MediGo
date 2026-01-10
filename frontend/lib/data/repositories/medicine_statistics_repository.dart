@@ -3,7 +3,6 @@ import 'package:frontend/data/repositories/occurrence_repository.dart';
 import 'package:frontend/data/repositories/medicine_repository.dart';
 import 'package:frontend/data/repositories/database_change_notifier.dart';
 import 'package:frontend/data/repositories/daily_dosage_repository.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MedicineStatisticsRepository {
   final OccurrenceRepository _occRepo;
@@ -17,26 +16,13 @@ class MedicineStatisticsRepository {
 
   final DailyDosageRepository _dailyRepo = DailyDosageRepository();
 
-  /// Get current user ID from SharedPreferences
-  Future<int?> _getCurrentUserId() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getInt('user_id');
-    } catch (e) {
-      // ignore: avoid_print
-      print('MedicineStatisticsRepository._getCurrentUserId error: $e');
-      return null;
-    }
-  }
-
   /// Stream that emits whenever the DB has been changed (insert/update/delete)
   Stream<void> watchChanges() => DatabaseChangeNotifier.instance.stream;
 
   /// Compute today's overall progress: fraction between 0.0 and 1.0
   Future<double> computeTodayProgress(DateTime date) async {
     // Always use occurrences as the source of truth for today's progress
-    final userId = await _getCurrentUserId();
-    final occs = await _occRepo.getOccurrencesByDate(date, userId: userId);
+    final occs = await _occRepo.getOccurrencesByDate(date);
     if (occs.isEmpty) return 0.0;
     final total = occs.length;
     final taken = occs.where((o) => o.isTaken == 1).length;
@@ -45,8 +31,7 @@ class MedicineStatisticsRepository {
 
   /// Compute per-medicine progress (treatment elapsed percent between start/end)
   Future<List<MedicineProgress>> computeMedicineProgress(DateTime date) async {
-    final userId = await _getCurrentUserId();
-    final occs = await _occRepo.getOccurrencesByDate(date, userId: userId);
+    final occs = await _occRepo.getOccurrencesByDate(date);
 
     // Collect distinct plan ids and last-seen medicine name
     final Map<int, String> planNames = {};

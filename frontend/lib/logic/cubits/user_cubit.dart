@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/user_repo.dart';
 import '../../data/services/api_service.dart';
-import '../../data/databases/db_helper.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 // States
@@ -77,15 +76,6 @@ class UserCubit extends Cubit<UserState> {
     restoreSession();
   }
 
-  // Normalize premium field from remote responses (bool/num/string) to 'true'/'false'
-  String _normalizePremium(dynamic premiumRaw) {
-    if (premiumRaw is bool) return premiumRaw ? 'true' : 'false';
-    if (premiumRaw is num) return premiumRaw != 0 ? 'true' : 'false';
-    if (premiumRaw == null) return 'false';
-    final s = premiumRaw.toString();
-    return (s.toLowerCase() == 'true' || s == '1') ? 'true' : 'false';
-  }
-
   /// Check if device has internet connection
   Future<bool> _hasConnection() async {
     try {
@@ -130,7 +120,7 @@ class UserCubit extends Cubit<UserState> {
               latitude: remoteUser['latitude'],
               longitude: remoteUser['longitude'],
               locationName: remoteUser['location_name'],
-              premium: _normalizePremium(remoteUser['premium']),
+              premium: remoteUser['premium'],
             );
 
             // Save to local database for offline access
@@ -232,7 +222,11 @@ class UserCubit extends Cubit<UserState> {
               latitude: remoteUser['latitude'],
               longitude: remoteUser['longitude'],
               locationName: remoteUser['location_name'],
-              premium: _normalizePremium(remoteUser['premium']),
+              premium: remoteUser['premium'] == 'false'
+                  ? false
+                  : (remoteUser['premium'] == 'true'
+                        ? true
+                        : remoteUser['premium']),
             );
 
             // Sync to local database
@@ -257,7 +251,6 @@ class UserCubit extends Cubit<UserState> {
             print(
               '📍 User location: Lat=${user.latitude}, Lon=${user.longitude}',
             );
-            print('💾 Saving user session with userId=${user.userId}');
             await _saveUserSession(user.userId!);
             emit(UserAuthenticated(user));
             return;
@@ -281,7 +274,6 @@ class UserCubit extends Cubit<UserState> {
       if (user != null) {
         print('✅ Local login successful: ${user.name} (ID: ${user.userId})');
         print('📍 User location: Lat=${user.latitude}, Lon=${user.longitude}');
-        print('💾 Saving user session with userId=${user.userId}');
         await _saveUserSession(user.userId!);
         emit(UserAuthenticated(user));
 
@@ -341,7 +333,7 @@ class UserCubit extends Cubit<UserState> {
               latitude: response['latitude'],
               longitude: response['longitude'],
               locationName: response['location_name'],
-              premium: _normalizePremium(response['premium']),
+              premium: response['premium'] ?? 'false',
             );
 
             // Sync to local database
@@ -547,35 +539,22 @@ class UserCubit extends Cubit<UserState> {
   }
 
   // Update premium status
-  Future<void> updateUserPremium(int userId, String premium) async {
+  Future<void> updateUserPremium(int userId, bool premium) async {
     try {
       emit(UserLoading());
 
       print('💎 Updating premium status for user $userId to $premium');
 
-      // Update local first
+      // Update with remote-first logic (repository handles it)
       final result = await userRepository.updateUserPremium(userId, premium);
       if (result > 0) {
-        // Try to sync to remote if online
-        final hasInternet = await _hasConnection();
-        if (hasInternet) {
-          try {
-            final user = await userRepository.getUserById(userId);
-            if (user != null) {
-              await _apiService.updateUser(userId, user.toMap());
-              print('✅ Premium status synced to remote');
-            }
-          } catch (e) {
-            print('⚠️ Failed to sync premium to remote: $e');
-          }
-        }
-
         // Reload user
         final user = await userRepository.getUserById(userId);
         if (user != null) {
           emit(
             UserAuthenticated(user),
           ); // Keep user authenticated after premium upgrade
+          print('✅ Premium status updated successfully');
         } else {
           emit(const UserError('Failed to reload user after premium update'));
         }
@@ -605,9 +584,6 @@ class UserCubit extends Cubit<UserState> {
 
   // Logout user
   Future<void> logoutUser() async {
-    // Debug
-    // ignore: avoid_print
-    print('UserCubit.logoutUser: logout initiated');
     await _clearUserSession();
     emit(UserUnauthenticated());
   }
@@ -662,10 +638,7 @@ class UserCubit extends Cubit<UserState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('user_id', userId);
       await prefs.setBool('is_logged_in', true);
-
-      // Verify it was saved correctly
-      final savedUserId = prefs.getInt('user_id');
-      print('💾 User session saved: userId=$userId, verified=$savedUserId');
+      print('💾 User session saved: userId=$userId');
     } catch (e) {
       print('❌ Failed to save user session: $e');
     }
@@ -675,15 +648,6 @@ class UserCubit extends Cubit<UserState> {
   Future<void> _clearUserSession() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getInt('user_id');
-
-      // Clear user-specific medicine data from the database
-      // NOTE: previously the app cleared user medicine data on logout which
-      // caused medicines to disappear after re-login. Keep local medicine data
-      // intact so that medicines persist across logout/login. If you want to
-      // remove this data on logout, call `DBHelper.clearUserMedicineData(userId)`
-      // from an explicit 'Delete Account' flow instead.
-
       await prefs.remove('user_id');
       await prefs.setBool('is_logged_in', false);
       print('🗑️ User session cleared');
@@ -724,7 +688,7 @@ class UserCubit extends Cubit<UserState> {
                 latitude: response['latitude'],
                 longitude: response['longitude'],
                 locationName: response['location_name'],
-                premium: _normalizePremium(response['premium']),
+                premium: response['premium'] ?? 'false',
               );
 
               // Sync to local database

@@ -1,5 +1,4 @@
 import 'api_client.dart';
-import 'package:flutter/foundation.dart';
 
 /// Authentication API Service
 /// Handles user registration, login, and verification

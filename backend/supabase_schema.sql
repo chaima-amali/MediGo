@@ -16,9 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
     latitude REAL,
     longitude REAL,
     location_name TEXT,
-    premium TEXT,
-    fcm_token TEXT,
-    notifications_enabled BOOLEAN DEFAULT true,
+    premium BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
