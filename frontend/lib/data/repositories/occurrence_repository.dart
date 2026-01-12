@@ -1,4 +1,4 @@
-import 'package:sqflite/sqflite.dart';
+﻿import 'package:sqflite/sqflite.dart';
 import 'package:frontend/data/models/occurrence_plan.dart';
 import 'package:frontend/data/repositories/database_change_notifier.dart';
 import 'package:frontend/data/repositories/daily_dosage_repository.dart';
@@ -17,7 +17,7 @@ class OccurrenceRepository {
       try {
         final formatted = date.toIso8601String().split('T').first;
         print(
-          '🌐 Fetching occurrences from remote: date=$formatted, userId=$userId',
+          '­ƒîÉ Fetching occurrences from remote: date=$formatted, userId=$userId',
         );
 
         final remoteData = await _apiService.getOccurrencesByDate(
@@ -26,7 +26,7 @@ class OccurrenceRepository {
         );
 
         if (remoteData.isNotEmpty) {
-          print('✅ Remote: Found ${remoteData.length} occurrences');
+          print('Ô£à Remote: Found ${remoteData.length} occurrences');
 
           final List<Occurrence> occurrences = [];
           final Database db = await DBHelper.getDatabase();
@@ -76,7 +76,7 @@ class OccurrenceRepository {
                       conflictAlgorithm: ConflictAlgorithm.replace,
                     );
                   } catch (e) {
-                    print('⚠️  Failed to upsert medicine_tracking locally: $e');
+                    print('ÔÜá´©Å  Failed to upsert medicine_tracking locally: $e');
                     // fallback: filtered insert based on PRAGMA
                     try {
                       final cols = await db.rawQuery(
@@ -108,13 +108,13 @@ class OccurrenceRepository {
                           );
                         } catch (e2) {
                           print(
-                            '⚠️  Failed to insert medicine_tracking filtered row: $e2',
+                            'ÔÜá´©Å  Failed to insert medicine_tracking filtered row: $e2',
                           );
                         }
                       }
                     } catch (e2) {
                       print(
-                        '⚠️  Failed to upsert medicine_tracking locally: $e2',
+                        'ÔÜá´©Å  Failed to upsert medicine_tracking locally: $e2',
                       );
                     }
                   }
@@ -155,12 +155,12 @@ class OccurrenceRepository {
                       );
                     } catch (e2) {
                       print(
-                        '⚠️  Failed to insert medicine_plan filtered row: $e2',
+                        'ÔÜá´©Å  Failed to insert medicine_plan filtered row: $e2',
                       );
                     }
                   }
                 } catch (e) {
-                  print('⚠️  Failed to upsert medicine_plan locally: $e');
+                  print('ÔÜá´©Å  Failed to upsert medicine_plan locally: $e');
                 }
               }
 
@@ -178,11 +178,11 @@ class OccurrenceRepository {
                 });
                 occurrences.add(occ);
               } catch (e) {
-                print('⚠️ Failed to parse remote occurrence: $e');
+                print('ÔÜá´©Å Failed to parse remote occurrence: $e');
               }
             } catch (e) {
               print(
-                '⚠️  Error processing nested medicine_plan/medicine_tracking: $e',
+                'ÔÜá´©Å  Error processing nested medicine_plan/medicine_tracking: $e',
               );
             }
           }
@@ -191,13 +191,13 @@ class OccurrenceRepository {
           try {
             await _syncOccurrencesToLocal(occurrences);
           } catch (e) {
-            print('⚠️  Failed to sync occurrences to local: $e');
+            print('ÔÜá´©Å  Failed to sync occurrences to local: $e');
           }
 
           return occurrences;
         }
       } catch (e) {
-        print('⚠️  Remote API failed: $e, falling back to local');
+        print('ÔÜá´©Å  Remote API failed: $e, falling back to local');
       }
     }
 
@@ -209,7 +209,7 @@ class OccurrenceRepository {
       final formatted = date.toIso8601String().split('T').first;
 
       print(
-        '🔍 OccurrenceRepository.getOccurrencesByDate: date=$formatted, userId=$userId',
+        '­ƒöì OccurrenceRepository.getOccurrencesByDate: date=$formatted, userId=$userId',
       );
 
       final sql = userId != null
@@ -233,7 +233,7 @@ class OccurrenceRepository {
           : await db.rawQuery(sql, [formatted]);
 
       print(
-        '📊 OccurrenceRepository.getOccurrencesByDate: Found ${result.length} occurrences',
+        '­ƒôè OccurrenceRepository.getOccurrencesByDate: Found ${result.length} occurrences',
       );
 
       // debug: print each returned row's id and plan_id to help diagnose
@@ -283,7 +283,7 @@ class OccurrenceRepository {
           );
         }
       } catch (e) {
-        print('⚠️  Failed to sync occurrence ${occ.id}: $e');
+        print('ÔÜá´©Å  Failed to sync occurrence ${occ.id}: $e');
       }
     }
   }
@@ -293,10 +293,10 @@ class OccurrenceRepository {
     // Try remote API first
     try {
       print(
-        '🌐 Updating occurrence remotely: ID=$occurrenceId, isTaken=$isTaken',
+        '­ƒîÉ Updating occurrence remotely: ID=$occurrenceId, isTaken=$isTaken',
       );
       await _apiService.updateOccurrence(occurrenceId, {'is_taken': isTaken});
-      print('✅ Remote: Occurrence updated successfully');
+      print('Ô£à Remote: Occurrence updated successfully');
 
       // Also update local
       try {
@@ -323,12 +323,12 @@ class OccurrenceRepository {
           DatabaseChangeNotifier.instance.notify();
         } catch (_) {}
       } catch (e) {
-        print('⚠️  Failed to update local occurrence: $e');
+        print('ÔÜá´©Å  Failed to update local occurrence: $e');
       }
 
       return true;
     } catch (e) {
-      print('⚠️  Remote update failed: $e, using local only');
+      print('ÔÜá´©Å  Remote update failed: $e, using local only');
     }
 
     // Fallback to local only
@@ -444,7 +444,7 @@ class OccurrenceRepository {
       // Try remote API first
       try {
         print(
-          '🌐 Deleting occurrences by plan and time remotely: planId=$planId, time=$time',
+          '­ƒîÉ Deleting occurrences by plan and time remotely: planId=$planId, time=$time',
         );
         // Get all occurrences for this plan and time to delete them from remote
         final Database db = await DBHelper.getDatabase();
@@ -463,13 +463,13 @@ class OccurrenceRepository {
             try {
               await _apiService.deleteOccurrence(occId as int);
             } catch (e) {
-              print('⚠️  Failed to delete occurrence $occId from remote: $e');
+              print('ÔÜá´©Å  Failed to delete occurrence $occId from remote: $e');
             }
           }
         }
-        print('✅ Remote: Deleted ${occRows.length} occurrences');
+        print('Ô£à Remote: Deleted ${occRows.length} occurrences');
       } catch (e) {
-        print('⚠️  Remote API delete failed: $e, continuing with local delete');
+        print('ÔÜá´©Å  Remote API delete failed: $e, continuing with local delete');
       }
 
       // Delete from local database
@@ -486,7 +486,7 @@ class OccurrenceRepository {
 
       if (planRows.isEmpty) {
         print(
-          '⚠️ deleteOccurrencesByPlanTime: No plan found with plan_id=$planId',
+          'ÔÜá´©Å deleteOccurrencesByPlanTime: No plan found with plan_id=$planId',
         );
         return false;
       }
@@ -506,7 +506,7 @@ class OccurrenceRepository {
       );
 
       print(
-        '🗑️ deleteOccurrencesByPlanTime: Deleted $rows occurrences for medicineTrackId=$medicineTrackId, time=$time',
+        '­ƒùæ´©Å deleteOccurrencesByPlanTime: Deleted $rows occurrences for medicineTrackId=$medicineTrackId, time=$time',
       );
 
       // notify listeners that DB changed
@@ -526,11 +526,11 @@ class OccurrenceRepository {
     try {
       // Try remote API first
       try {
-        print('🌐 Deleting occurrence remotely: ID=$occurrenceId');
+        print('­ƒîÉ Deleting occurrence remotely: ID=$occurrenceId');
         await _apiService.deleteOccurrence(occurrenceId);
-        print('✅ Remote: Occurrence deleted successfully');
+        print('Ô£à Remote: Occurrence deleted successfully');
       } catch (e) {
-        print('⚠️  Remote API delete failed: $e, continuing with local delete');
+        print('ÔÜá´©Å  Remote API delete failed: $e, continuing with local delete');
       }
 
       // Delete from local database
@@ -678,7 +678,7 @@ class OccurrenceRepository {
           try {
             await _syncOccurrencesToLocal(occurrences);
           } catch (e) {
-            print('⚠️  Failed to sync remote plan occurrences to local: $e');
+            print('ÔÜá´©Å  Failed to sync remote plan occurrences to local: $e');
           }
 
           final times =

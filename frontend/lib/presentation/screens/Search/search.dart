@@ -360,8 +360,8 @@ class _SearchScreenState extends State<SearchScreen> {
           distance = LocationService.calculateDistance(
             currentUser.latitude!,
             currentUser.longitude!,
-            result['latitude'],
-            result['longitude'],
+            result['latitude'] as double,
+            result['longitude'] as double,
           );
         }
 
@@ -572,7 +572,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     // Check premium status
-    if (currentUser.premium.toLowerCase() != 'premium') {
+    if (!currentUser.premium) {
       _showPremiumRequiredDialog(context);
       return;
     }
@@ -692,7 +692,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     // Check premium status
-    if (currentUser.premium.toLowerCase() != 'premium') {
+    if (!currentUser.premium) {
       _showPremiumRequiredForNotification(context);
       return;
     }

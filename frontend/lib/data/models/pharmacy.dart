@@ -7,6 +7,7 @@ class Pharmacy {
   final String openingHours;
   final double rating;
   final String? imageUrl;
+  final String? address;
 
   Pharmacy({
     this.pharmacyId,
@@ -17,6 +18,7 @@ class Pharmacy {
     required this.openingHours,
     required this.rating,
     this.imageUrl,
+    this.address,
   });
 
   Pharmacy copyWith({
@@ -28,6 +30,7 @@ class Pharmacy {
     String? openingHours,
     double? rating,
     String? imageUrl,
+    String? address,
   }) {
     return Pharmacy(
       pharmacyId: pharmacyId ?? this.pharmacyId,
@@ -38,6 +41,7 @@ class Pharmacy {
       openingHours: openingHours ?? this.openingHours,
       rating: rating ?? this.rating,
       imageUrl: imageUrl ?? this.imageUrl,
+      address: address ?? this.address,
     );
   }
 
@@ -47,10 +51,11 @@ class Pharmacy {
       name: map['name'] as String,
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),
-      phone: map['phone'] as String,
-      openingHours: map['opening_hours'] as String,
+      phone: map['phone'] as String? ?? '',
+      openingHours: map['opening_hours'] as String? ?? '',
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
       imageUrl: map['image_url'] as String?,
+      address: map['address'] as String?,
     );
   }
 
@@ -64,6 +69,7 @@ class Pharmacy {
       'opening_hours': openingHours,
       'rating': rating,
       'image_url': imageUrl,
+      'address': address,
     };
   }
 }

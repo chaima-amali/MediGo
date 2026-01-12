@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'api_client.dart';
 
@@ -17,12 +17,12 @@ class TrackingApiService {
     String? dosage,
   }) async {
     try {
-      debugPrint('📤 [Tracking] Adding medicine: $name for userId: $userId');
+      debugPrint('­ƒôñ [Tracking] Adding medicine: $name for userId: $userId');
       debugPrint(
-        '📤 [Tracking] Backend URL: ${_client.dio.options.baseUrl}/tracking/medicines',
+        '­ƒôñ [Tracking] Backend URL: ${_client.dio.options.baseUrl}/tracking/medicines',
       );
       debugPrint(
-        '📤 [Tracking] Request data: {user_id: $userId, name: $name, type: $type, dosage: $dosage}',
+        '­ƒôñ [Tracking] Request data: {user_id: $userId, name: $name, type: $type, dosage: $dosage}',
       );
 
       final response = await _client.post(
@@ -30,21 +30,21 @@ class TrackingApiService {
         data: {'user_id': userId, 'name': name, 'type': type, 'dosage': dosage},
       );
 
-      debugPrint('✅ [Tracking] Response status: ${response.statusCode}');
-      debugPrint('✅ [Tracking] Response data: ${response.data}');
+      debugPrint('Ô£à [Tracking] Response status: ${response.statusCode}');
+      debugPrint('Ô£à [Tracking] Response data: ${response.data}');
 
       final data = response.data as Map<String, dynamic>;
 
       // Verify response structure
       if (!data.containsKey('medicine')) {
-        debugPrint('⚠️  [Tracking] Response missing "medicine" field!');
-        debugPrint('⚠️  [Tracking] Response keys: ${data.keys.toList()}');
+        debugPrint('ÔÜá´©Å  [Tracking] Response missing "medicine" field!');
+        debugPrint('ÔÜá´©Å  [Tracking] Response keys: ${data.keys.toList()}');
       }
 
       return data;
     } catch (e, stackTrace) {
-      debugPrint('❌ [Tracking] addMedicine error: $e');
-      debugPrint('❌ [Tracking] Stack trace: $stackTrace');
+      debugPrint('ÔØî [Tracking] addMedicine error: $e');
+      debugPrint('ÔØî [Tracking] Stack trace: $stackTrace');
       rethrow;
     }
   }

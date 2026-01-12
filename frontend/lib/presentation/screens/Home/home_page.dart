@@ -496,12 +496,17 @@ class _HomeScreenState extends State<HomeScreen> {
           dob: '1990-01-01',
           latitude: 36.7538,
           longitude: 3.0588,
-          premium: 'no',
+          premium: false,
         );
+
+    print(
+      '📍 Calculating distances from: lat=${user.latitude}, lon=${user.longitude}',
+    );
 
     final nearbyPharmacies = await _pharmacyController.getNearestPharmacies(
       user: user,
-      limit: 4,
+      limit: 999,
+      maxDistanceKm: 30.0,
     );
 
     setState(() {

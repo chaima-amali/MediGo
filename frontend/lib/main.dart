@@ -21,8 +21,8 @@ import 'package:frontend/logic/cubits/user_cubit.dart';
 import 'package:frontend/logic/cubits/medicine_search_cubit.dart';
 import 'package:frontend/logic/cubits/reservation_cubit.dart';
 import 'package:frontend/logic/cubits/theme_cubit.dart';
-import 'package:frontend/data/services/fcm_service.dart';
-import 'package:frontend/data/services/crashlytics_service.dart';
+// import 'package:frontend/data/services/fcm_service.dart';
+// import 'package:frontend/data/services/crashlytics_service.dart';
 import 'package:frontend/data/services/api_service.dart';
 import 'package:frontend/data/services/background_jobs_service.dart';
 
@@ -91,6 +91,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+
 void main() async {
   // Run app in error zone for crash reporting
   runZonedGuarded(
@@ -98,29 +99,24 @@ void main() async {
       WidgetsFlutterBinding.ensureInitialized();
 
       // Initialize Firebase
-      try {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
-        debugPrint('✅ Firebase initialized successfully');
+      // try {
+      //   await Firebase.initializeApp();
+      //   debugPrint('✅ Firebase initialized successfully');
 
-        // Register the background message handler (single registration)
-        FirebaseMessaging.onBackgroundMessage(
-          firebaseMessagingBackgroundHandler,
-        );
+      //   // Initialize Firebase services
+      //   await CrashlyticsService().initialize();
 
-        // Initialize Firebase-related services
-        await CrashlyticsService().initialize();
-        //await NotificationService().init();
-        //String? token = await FirebaseMessaging.instance.getToken();
-        //debugPrint("FCM Token: $token");
+      //   // Set up background message handler
+      //   FirebaseMessaging.onBackgroundMessage(
+      //     _firebaseMessagingBackgroundHandler,
+      //   );
 
-        // Pass all uncaught Flutter errors to Crashlytics
-        FlutterError.onError =
-            FirebaseCrashlytics.instance.recordFlutterFatalError;
-      } catch (e) {
-        debugPrint('❌ Firebase initialization error: $e');
-      }
+      //   // Pass all uncaught errors to Crashlytics
+      //   FlutterError.onError =
+      //       FirebaseCrashlytics.instance.recordFlutterFatalError;
+      // } catch (e) {
+      //   debugPrint('❌ Firebase initialization error: $e');
+      // }
 
       // Initialize local database
       try {
@@ -128,11 +124,11 @@ void main() async {
         debugPrint('✅ Database initialized successfully');
       } catch (e) {
         debugPrint('❌ Database initialization error: $e');
-        await CrashlyticsService().logError(
-          e,
-          StackTrace.current,
-          reason: 'Database init failed',
-        );
+        // await CrashlyticsService().logError(
+        //   e,
+        //   StackTrace.current,
+        //   reason: 'Database init failed',
+        // );
       }
 
       // Initialize API Service (Flask Backend)
@@ -141,15 +137,20 @@ void main() async {
         debugPrint('✅ API Service initialized successfully');
       } catch (e) {
         debugPrint('❌ API Service initialization error: $e');
-        await CrashlyticsService().logError(
-          e,
-          StackTrace.current,
-          reason: 'API Service init failed',
-        );
+        // await CrashlyticsService().logError(
+        //   e,
+        //   StackTrace.current,
+        //   reason: 'API Service init failed',
+        // );
       }
 
-      // Note: FCM initialization moved to localization.dart
-      // to request notification permission after location permission
+      // Initialize FCM
+      // try {
+      //   await FCMService().initialize();
+      //   debugPrint('✅ FCM initialized successfully');
+      // } catch (e) {
+      //   debugPrint('❌ FCM initialization error: $e');
+      // }
 
       // Initialize Background Jobs
       try {
@@ -164,7 +165,7 @@ void main() async {
     (error, stack) {
       // Catch async errors
       debugPrint('❌ Async error: $error');
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      // FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     },
   );
 }
@@ -190,6 +191,7 @@ class MediGoAppState extends State<MediGoApp> {
     _loadSavedLanguage();
     // Note: FCM message handling is done in FCMService
     // which is initialized after user login/registration in localization.dart
+ develop
   }
 
   Future<void> _loadSavedLanguage() async {

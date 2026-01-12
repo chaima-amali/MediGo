@@ -1,11 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:frontend/data/databases/db_helper.dart';
 import 'package:frontend/data/models/daily_dosage_checking.dart';
-import 'package:frontend/data/services/api/tracking_api_service.dart';
 
 class DailyDosageRepository {
-  final TrackingApiService _apiService = TrackingApiService();
-  
   Future<Database> _db() => DBHelper.getDatabase();
 
   /// Insert a new daily check row or update an existing one matching
@@ -18,26 +15,6 @@ class DailyDosageRepository {
     required String status,
     DateTime? takenAt,
   }) async {
-    // Try remote API first
-    if (planId != null) {
-      try {
-        final dateStr = doseDate.toIso8601String().split('T').first;
-        print('🌐 Creating/updating dosage check remotely');
-        
-        await _apiService.createDosageCheck(
-          planId: planId,
-          doseDate: dateStr,
-          doseTime: doseTime,
-          status: status,
-          takenAt: takenAt?.toIso8601String(),
-        );
-        print('✅ Remote: Dosage check saved successfully');
-      } catch (e) {
-        print('⚠️  Remote dosage check failed: $e, using local only');
-      }
-    }
-    
-    // Always save to local for offline access
     try {
       final db = await _db();
       final dateStr = doseDate.toIso8601String().split('T').first;

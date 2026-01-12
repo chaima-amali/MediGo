@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
@@ -16,7 +16,7 @@ import 'package:frontend/data/repositories/occurrence_repository.dart';
 import 'package:frontend/logic/cubits/tracking_cubit.dart';
 
 /// =============================================================
-/// MAIN STATISTICS PAGE — ALWAYS WRAPPED WITH BLOC PROVIDER
+/// MAIN STATISTICS PAGE ÔÇö ALWAYS WRAPPED WITH BLOC PROVIDER
 /// =============================================================
 class StatisticsPage extends StatelessWidget {
   final VoidCallback? onBack;
@@ -243,7 +243,7 @@ class StatisticsPanel extends StatelessWidget {
 }
 
 /// =============================================================
-/// INTERNAL CONTENT — must only be used inside StatisticsPage
+/// INTERNAL CONTENT ÔÇö must only be used inside StatisticsPage
 /// =============================================================
 class _StatisticsContent extends StatelessWidget {
   final VoidCallback? onBack;

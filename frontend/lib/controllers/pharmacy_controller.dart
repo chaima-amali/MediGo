@@ -10,6 +10,7 @@ class PharmacyController {
   Future<List<PharmacyWithDistance>> getNearestPharmacies({
     required User user,
     int limit = 10,
+    double? maxDistanceKm,
   }) async {
     // Check if user has location data
     if (user.latitude == null || user.longitude == null) {
@@ -26,6 +27,7 @@ class PharmacyController {
       userLon: user.longitude!,
       pharmacies: allPharmacies,
       limit: limit,
+      maxDistanceKm: maxDistanceKm,
     );
 
     return nearestPharmacies;

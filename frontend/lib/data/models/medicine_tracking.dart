@@ -1,4 +1,4 @@
-class MedicineTracking {
+﻿class MedicineTracking {
   final int? id;
   final int? userId;
   final String name;

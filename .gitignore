@@ -6,6 +6,7 @@ backend/**/__pycache__/
 backend/*.pyc
 backend/venv/
 backend/.venv/
+backend/firebase-service-account.json
 
 # Flutter build outputs
 frontend/build/
