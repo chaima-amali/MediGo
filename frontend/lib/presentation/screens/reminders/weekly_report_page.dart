@@ -497,6 +497,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
 
       final pdfService = ReportPdfService();
       final pdfFile = await pdfService.generateAndSavePdf(report);
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -508,6 +509,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${l10n.failedToGeneratePDF}: ${e.toString()}'),
@@ -526,8 +528,10 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
 
       final pdfService = ReportPdfService();
       final pdfFile = await pdfService.generatePdf(report);
+      if (!mounted) return;
       await pdfService.sharePdf(pdfFile);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${l10n.failedToGeneratePDF}: ${e.toString()}'),

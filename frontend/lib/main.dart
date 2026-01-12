@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:frontend/firebase_options.dart';
+import 'package:frontend/notification_service.dart';
 import 'package:frontend/presentation/screens/Home/splash_screen.dart';
 import 'package:frontend/presentation/theme/app_theme.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
@@ -23,12 +26,71 @@ import 'package:frontend/logic/cubits/theme_cubit.dart';
 import 'package:frontend/data/services/api_service.dart';
 import 'package:frontend/data/services/background_jobs_service.dart';
 
-/// Background FCM message handler
-// @pragma('vm:entry-point')
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   await Firebase.initializeApp();
-//   debugPrint('📨 Background message: ${message.messageId}');
-// }
+/// BACKGROUND HANDLER (TOP LEVEL — REQUIRED)
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  debugPrint('📬 Background message received: ${message.messageId}');
+  debugPrint('Title: ${message.notification?.title}');
+  debugPrint('Body: ${message.notification?.body}');
+
+  // Show local notification when app is in background/terminated
+  try {
+    final FlutterLocalNotificationsPlugin localNotifications =
+        FlutterLocalNotificationsPlugin();
+
+    // Initialize the plugin before using it
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+    );
+
+    await localNotifications.initialize(initSettings);
+
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'medigo_channel',
+          'MediGo Notifications',
+          channelDescription: 'Medicine reminder notifications',
+          importance: Importance.max,
+          priority: Priority.max,
+          showWhen: true,
+          enableVibration: true,
+          playSound: true,
+          ticker: 'Medicine Reminder',
+          visibility: NotificationVisibility.public,
+          fullScreenIntent: true,
+          channelShowBadge: true,
+        );
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
+
+    // Use title and body from notification or fall back to data payload
+    final title =
+        message.notification?.title ?? message.data['title'] ?? 'MediGo';
+    final body =
+        message.notification?.body ??
+        message.data['body'] ??
+        'You have a new notification';
+
+    await localNotifications.show(
+      message.hashCode,
+      title,
+      body,
+      notificationDetails,
+    );
+
+    debugPrint('✅ Background notification displayed');
+  } catch (e) {
+    debugPrint('❌ Failed to show background notification: $e');
+  }
+}
+
 
 void main() async {
   // Run app in error zone for crash reporting
@@ -127,6 +189,9 @@ class MediGoAppState extends State<MediGoApp> {
   void initState() {
     super.initState();
     _loadSavedLanguage();
+    // Note: FCM message handling is done in FCMService
+    // which is initialized after user login/registration in localization.dart
+ develop
   }
 
   Future<void> _loadSavedLanguage() async {

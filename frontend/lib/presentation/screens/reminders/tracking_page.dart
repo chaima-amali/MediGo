@@ -194,6 +194,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent>
 
     setState(() => _taking[occ.id!] = true);
     final success = await context.read<TrackingCubit>().markTaken(occ.id!, 1);
+    if (!mounted) return;
     setState(() => _taking.remove(occ.id!));
 
     if (success) {
@@ -229,6 +230,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent>
                     );
 
                     // reload occurrences after adding
+                    if (!mounted) return;
                     context.read<TrackingCubit>().loadDay(state.selectedDate);
                   },
                   child: const Icon(Icons.add, size: 32, color: Colors.white),

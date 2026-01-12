@@ -13,6 +13,116 @@ from typing import Optional, List
 bp = Blueprint('tracking', __name__)
 
 
+# ------------------------
+# Helper: ensure remote parents
+# ------------------------
+def ensure_remote_user(local_user_id: int):
+    """Ensure a user exists in Supabase for the given local user_id.
+    Returns remote user_id or None.
+    """
+    try:
+        rows = execute_query("SELECT user_id, name, email FROM users WHERE user_id = ?", (local_user_id,))
+        if not rows:
+            return None
+        local = rows[0]
+        email = local.get('email')
+        if not email:
+            return None
+
+        # Try to find remote by email
+        try:
+            resp = supabase.table('users').select('user_id,email').eq('email', email).execute()
+            if resp.data and len(resp.data) > 0:
+                return resp.data[0]['user_id']
+        except Exception as e:
+            print(f"⚠️  Supabase lookup error for user email={email}: {e}")
+
+        # Not found remotely — create a minimal remote user
+        payload = {'email': email, 'name': local.get('name')}
+        try:
+            create = supabase.table('users').insert(payload).execute()
+            if create.data and len(create.data) > 0:
+                return create.data[0].get('user_id')
+        except Exception as e:
+            print(f"⚠️  Supabase create user failed for {email}: {e}")
+        return None
+    except Exception as e:
+        print(f"⚠️  ensure_remote_user unexpected error: {e}")
+        return None
+
+
+def ensure_remote_medicine_tracking(local_medicine_track_id: int):
+    """Ensure a medicine_tracking row exists in Supabase for the given local medicine_track_id.
+    Returns remote medicine_track_id or None.
+    """
+    try:
+        rows = execute_query("SELECT medicine_track_id, user_id, name, type, dosage FROM medicine_tracking WHERE medicine_track_id = ?", (local_medicine_track_id,))
+        # If we don't find a local row, the caller may already be passing a remote id.
+        # Try to detect that by querying Supabase for a medicine_tracking with that id.
+        if not rows:
+            try:
+                resp = supabase.table('medicine_tracking').select('medicine_track_id').eq('medicine_track_id', local_medicine_track_id).limit(1).execute()
+                if resp.data and len(resp.data) > 0:
+                    return resp.data[0].get('medicine_track_id')
+            except Exception:
+                # fallthrough to returning None
+                pass
+            return None
+        local = rows[0]
+        local_user_id = local.get('user_id')
+
+        # Ensure remote user exists
+        remote_user_id = ensure_remote_user(local_user_id)
+        if not remote_user_id:
+            print(f"⚠️  ensure_remote_medicine_tracking: no remote user for local_user_id={local_user_id}")
+            return None
+
+        # Try to find remote medicine by (user_id, name)
+        try:
+            resp = supabase.table('medicine_tracking')\
+                .select('medicine_track_id')\
+                .eq('user_id', remote_user_id)\
+                .eq('name', local.get('name'))\
+                .execute()
+            if resp.data and len(resp.data) > 0:
+                return resp.data[0].get('medicine_track_id')
+        except Exception as e:
+            print(f"⚠️  Supabase lookup failed for medicine_tracking local_id={local_medicine_track_id}: {e}")
+
+        # Not found remotely — create it. Use idempotent insert by checking existence first
+        payload = {
+            'user_id': remote_user_id,
+            'name': local.get('name'),
+            'type': local.get('type'),
+            'dosage': local.get('dosage')
+        }
+        try:
+            # pre-check
+            try:
+                exist = supabase.table('medicine_tracking')\
+                    .select('medicine_track_id')\
+                    .eq('user_id', remote_user_id)\
+                    .eq('name', local.get('name'))\
+                    .limit(1)\
+                    .execute()
+                if exist.data and len(exist.data) > 0:
+                    return exist.data[0].get('medicine_track_id')
+            except Exception as e:
+                print(f"⚠️  Supabase pre-check failed for medicine local_id={local_medicine_track_id}: {e}")
+
+            create = supabase.table('medicine_tracking').insert(payload).execute()
+            if create.data and len(create.data) > 0:
+                return create.data[0].get('medicine_track_id')
+            print(f"⚠️  Supabase create returned no data for medicine local_id={local_medicine_track_id}: {create}")
+        except Exception as e:
+            print(f"⚠️  Supabase create medicine_tracking failed for local_id={local_medicine_track_id}: {e}")
+        return None
+    except Exception as e:
+        print(f"⚠️  ensure_remote_medicine_tracking unexpected error: {e}")
+        return None
+
+
+
 # =====================================================
 # SCHEMAS
 # =====================================================
@@ -85,25 +195,47 @@ def add_medicine():
         # Try Supabase first
         if supabase:
             try:
+                # Ensure remote user exists (create if missing) and use remote id when available
+                remote_user_id = ensure_remote_user(medicine_data.user_id) or medicine_data.user_id
+
                 new_medicine = {
-                    'user_id': medicine_data.user_id,
+                    'user_id': remote_user_id,
                     'name': medicine_data.name,
                     'type': medicine_data.type,
                     'dosage': medicine_data.dosage
                 }
-                
+
                 print(f"📤 [Backend] Attempting Supabase insert: {new_medicine}")
                 response = supabase.table('medicine_tracking').insert(new_medicine).execute()
                 print(f"📤 [Backend] Supabase response: {response}")
-                
+
                 if response.data and len(response.data) > 0:
                     print(f"✅ [Backend] Supabase insert successful")
+                    # Ensure a local copy exists so subsequent operations that expect a local id work.
+                    try:
+                        remote_med = response.data[0]
+                        remote_id = remote_med.get('medicine_track_id')
+                        # Insert local row with the remote id if it doesn't exist locally
+                        existing = execute_query("SELECT medicine_track_id FROM medicine_tracking WHERE medicine_track_id = ?", (remote_id,))
+                        if not existing:
+                            try:
+                                execute_insert(
+                                    "INSERT INTO medicine_tracking (medicine_track_id, user_id, name, type, dosage) VALUES (?, ?, ?, ?, ?)",
+                                    (remote_id, medicine_data.user_id, medicine_data.name, medicine_data.type, medicine_data.dosage)
+                                )
+                            except Exception:
+                                # non-fatal — continue
+                                pass
+
+                    except Exception:
+                        pass
+
                     return jsonify({
                         'success': True,
                         'medicine': response.data[0],
                         'source': 'remote'
                     }), 201
-                    
+
             except Exception as supabase_error:
                 print(f"⚠️  [Backend] Supabase add medicine failed: {str(supabase_error)}")
                 print(f"⚠️  [Backend] Error type: {type(supabase_error)}")
@@ -348,30 +480,59 @@ def create_medicine_plan():
         # Try Supabase first
         if supabase:
             try:
-                new_plan = {
-                    'medicine_track_id': plan_data.medicine_track_id,
-                    'user_id': plan_data.user_id,
-                    'importance': plan_data.importance,
-                    'start_date': plan_data.start_date,
-                    'end_date': plan_data.end_date,
-                    'frequency_type': plan_data.frequency_type,
-                    'interval_days': plan_data.interval_days,
-                    'weekdays': plan_data.weekdays,
-                    'month_days': plan_data.month_days,
-                    'custom_dates': plan_data.custom_dates
-                }
-                
-                response = supabase.table('medicine_plan').insert(new_plan).execute()
-                
-                if response.data and len(response.data) > 0:
-                    return jsonify({
-                        'success': True,
-                        'plan': response.data[0],
-                        'source': 'remote'
-                    }), 201
-                    
+                # First check if medicine_track_id already exists in Supabase
+                remote_med_id = plan_data.medicine_track_id
+                try:
+                    med_check = supabase.table('medicine_tracking').select('medicine_track_id,user_id').eq('medicine_track_id', remote_med_id).execute()
+                    if not med_check.data or len(med_check.data) == 0:
+                        # Medicine doesn't exist remotely, try to ensure it
+                        print(f"Medicine {remote_med_id} not found in Supabase, trying to ensure it exists...")
+                        remote_med_id = ensure_remote_medicine_tracking(plan_data.medicine_track_id)
+                    else:
+                        print(f"✅ Medicine {remote_med_id} already exists in Supabase")
+                except Exception as check_error:
+                    print(f"⚠️ Error checking medicine existence: {check_error}")
+                    remote_med_id = ensure_remote_medicine_tracking(plan_data.medicine_track_id)
+
+                # Also ensure user exists (use user_id from medicine or from plan_data)
+                remote_user_id = plan_data.user_id
+
+                if remote_med_id is not None:
+                    new_plan = {
+                        'medicine_track_id': remote_med_id,
+                        'user_id': remote_user_id,
+                        'importance': plan_data.importance,
+                        'start_date': plan_data.start_date,
+                        'end_date': plan_data.end_date,
+                        'frequency_type': plan_data.frequency_type,
+                        'interval_days': plan_data.interval_days,
+                        'weekdays': plan_data.weekdays,
+                        'month_days': plan_data.month_days,
+                        'custom_dates': plan_data.custom_dates
+                    }
+
+                    print(f"📝 Creating plan in Supabase: {new_plan}")
+                    try:
+                        response = supabase.table('medicine_plan').insert(new_plan).execute()
+                        if response.data and len(response.data) > 0:
+                            print(f"✅ Plan created successfully in Supabase: plan_id={response.data[0].get('plan_id')}")
+                            return jsonify({
+                                'success': True,
+                                'plan': response.data[0],
+                                'source': 'remote'
+                            }), 201
+                        else:
+                            print(f"⚠️  Supabase create plan returned no data: {response}")
+                    except Exception as e:
+                        # Log the full exception for easier tracing (including payload)
+                        print(f"❌ Supabase create plan failed: {e}\npayload={new_plan}")
+                        # Re-raise to trigger fallback
+                        raise
+                else:
+                    print(f"⚠️  Remote medicine_tracking not found/created for local id {plan_data.medicine_track_id}; skipping remote plan insert")
+
             except Exception as supabase_error:
-                print(f"⚠️  Supabase create plan failed: {supabase_error}")
+                print(f"❌ Supabase create plan exception: {supabase_error}")
         
         # Fallback to local database
         query = """
@@ -707,9 +868,14 @@ def create_occurrences_batch():
         # Try Supabase first
         if supabase:
             try:
-                response = supabase.table('occurrence_plan').insert(occurrences_data).execute()
+                print(f"📝 Creating {len(occurrences_data)} occurrences in Supabase...")
+                print(f"   Sample data: {occurrences_data[0] if occurrences_data else 'none'}")
                 
+                response = supabase.table('occurrence_plan').insert(occurrences_data).execute()
+
                 if response.data:
+                    print(f"✅ Created {len(response.data)} occurrences in Supabase")
+                    
                     # Also create daily dosage checks for each created occurrence
                     try:
                         checks = []
@@ -730,11 +896,16 @@ def create_occurrences_batch():
                         'success': True,
                         'count': len(response.data),
                         'occurrences': response.data,
+                        'occurrence_ids': [occ.get('id') for occ in response.data],
                         'source': 'remote'
                     }), 201
                     
             except Exception as supabase_error:
-                print(f"⚠️  Supabase batch create occurrences failed: {supabase_error}")
+                # Log payload and full error to ease debugging of FK/constraint issues
+                print(f"❌ Supabase batch create occurrences failed: {supabase_error}")
+                print(f"   Payload sample: {occurrences_data[:3] if len(occurrences_data) > 3 else occurrences_data}")
+                # Re-raise to prevent silent fallback on real errors
+                raise
         
         # Fallback to local database
         inserted_ids = []

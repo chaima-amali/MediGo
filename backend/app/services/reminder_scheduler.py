@@ -7,7 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from datetime import datetime, timedelta
 from app.supabase_client import supabase
-from app.core.database import execute_query, execute_insert
+from app.core.database import execute_query, execute_insert, execute_update
 from app.services.notification_service import NotificationService
 
 
@@ -61,8 +61,8 @@ class ReminderScheduler:
             current_date = now.strftime('%Y-%m-%d')
             current_time = now.strftime('%H:%M')
             
-            # Time window for "at time" notifications (current time to next 2 minutes)
-            at_time_window = (now + timedelta(minutes=2)).strftime('%H:%M')
+            # Time window for "at time" notifications (current minute only)
+            at_time_window = (now + timedelta(minutes=1)).strftime('%H:%M')
             
             # Time for "1 hour before" notifications
             one_hour_ahead = now + timedelta(hours=1)
@@ -75,26 +75,57 @@ class ReminderScheduler:
             # Try Supabase first
             if supabase:
                 try:
-                    # Get "at time" occurrences (within next 2 minutes)
+                    # Fetch occurrences for the dates then filter in Python to avoid string/format issues
                     at_time_response = supabase.table('occurrence_plan')\
                         .select('*, medicine_plan!inner(*, medicine_tracking!inner(*)), users:medicine_plan(user_id)')\
                         .eq('date', current_date)\
                         .eq('is_taken', 0)\
-                        .gte('time', current_time)\
-                        .lte('time', at_time_window)\
                         .execute()
-                    
-                    # Get "1 hour before" occurrences
+
                     one_hour_response = supabase.table('occurrence_plan')\
                         .select('*, medicine_plan!inner(*, medicine_tracking!inner(*)), users:medicine_plan(user_id)')\
                         .eq('date', one_hour_date)\
                         .eq('is_taken', 0)\
-                        .eq('time', one_hour_time)\
                         .execute()
+
+                    # Post-filter occurrences into the exact windows
+                    def _filter_window(data, target_time_str):
+                        from datetime import datetime as _dt
+                        out = []
+                        if not data:
+                            return out
+                        for occ in data:
+                            occ_date = occ.get('date')
+                            occ_time = occ.get('time')
+                            try:
+                                # Parse and extract just HH:MM for comparison
+                                try:
+                                    occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M")
+                                except Exception:
+                                    occ_dt = _dt.strptime(f"{occ_date} {occ_time}", "%Y-%m-%d %H:%M:%S")
+                                
+                                # Compare only hour and minute (ignore seconds)
+                                if occ_dt.strftime('%H:%M') == target_time_str:
+                                    out.append(occ)
+                            except Exception:
+                                continue
+                        return out
+
+                    # Check for exact current time match only
+                    at_time_filtered = _filter_window(
+                        at_time_response.data if at_time_response and getattr(at_time_response, 'data', None) else [], 
+                        current_time
+                    )
+
+                    one_hour_dt = one_hour_ahead
+                    one_hour_filtered = _filter_window(
+                        one_hour_response.data if one_hour_response and getattr(one_hour_response, 'data', None) else [], 
+                        one_hour_time
+                    )
                     
-                    # Process "at time" notifications
-                    if at_time_response.data:
-                        for occ in at_time_response.data:
+                    # Process "at time" notifications (filtered)
+                    if at_time_filtered:
+                        for occ in at_time_filtered:
                             user_id = occ['medicine_plan']['user_id']
                             user_response = supabase.table('users')\
                                 .select('fcm_token, notifications_enabled')\
@@ -131,9 +162,9 @@ class ReminderScheduler:
                                             'notification_timing': 'at_time',
                                         })
                     
-                    # Process "1 hour before" notifications
-                    if one_hour_response.data:
-                        for occ in one_hour_response.data:
+                    # Process "1 hour before" notifications (filtered)
+                    if one_hour_filtered:
+                        for occ in one_hour_filtered:
                             user_id = occ['medicine_plan']['user_id']
                             user_response = supabase.table('users')\
                                 .select('fcm_token, notifications_enabled')\
@@ -209,19 +240,43 @@ class ReminderScheduler:
                                 )
                             """
                             
-                            at_time_rows = execute_query(at_time_query, (current_date, current_time, at_time_window))
-                            
-                            for row in at_time_rows:
-                                reminders_to_send.append({
-                                    'fcm_token': row['fcm_token'],
-                                    'medicine_name': row['medicine_name'],
-                                    'dosage': row['dosage'] or '',
-                                    'time': row['time'],
-                                    'occurrence_id': row['occurrence_id'],
-                                    'plan_id': row['plan_id'],
-                                    'user_id': row['user_id'],
-                                    'notification_timing': 'at_time',
-                                })
+                            # Fetch candidate rows for today and post-filter in Python
+                            candidate_rows = execute_query(
+                                "SELECT o.id as occurrence_id, o.plan_id, o.time, o.date, mt.name as medicine_name, mt.dosage, mp.user_id, u.fcm_token, u.notifications_enabled "
+                                "FROM occurrence_plan o JOIN medicine_plan mp ON o.plan_id = mp.plan_id JOIN medicine_tracking mt ON mp.medicine_track_id = mt.medicine_track_id JOIN users u ON mp.user_id = u.user_id "
+                                "WHERE o.date = ? AND o.is_taken = 0 AND u.fcm_token IS NOT NULL AND (u.notifications_enabled IS NULL OR u.notifications_enabled = 1)",
+                                (current_date,)
+                            )
+
+                            # Filter candidates for exact current time match only
+                            from datetime import datetime as _dt
+                            for row in candidate_rows:
+                                try:
+                                    try:
+                                        occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M")
+                                    except Exception:
+                                        occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M:%S")
+                                    
+                                    # Check if time matches exactly (HH:MM)
+                                    if occ_dt.strftime('%H:%M') == current_time:
+                                        # Check if notification was already sent
+                                        already_sent = execute_query(
+                                            "SELECT 1 FROM notification WHERE occurrence_id = ? AND notification_type = 'at_time' AND is_sent = 1",
+                                            (row['occurrence_id'],)
+                                        )
+                                        if not already_sent:
+                                            reminders_to_send.append({
+                                                'fcm_token': row['fcm_token'],
+                                                'medicine_name': row['medicine_name'],
+                                                'dosage': row['dosage'] or '',
+                                                'time': row['time'],
+                                                'occurrence_id': row['occurrence_id'],
+                                                'plan_id': row['plan_id'],
+                                                'user_id': row['user_id'],
+                                                'notification_timing': 'at_time',
+                                            })
+                                except Exception as e:
+                                    continue
                             
                             # Query for "1 hour before" notifications
                             one_hour_query = """
@@ -252,19 +307,44 @@ class ReminderScheduler:
                                 )
                             """
                             
-                            one_hour_rows = execute_query(one_hour_query, (one_hour_date, one_hour_time))
-                            
-                            for row in one_hour_rows:
-                                reminders_to_send.append({
-                                    'fcm_token': row['fcm_token'],
-                                    'medicine_name': row['medicine_name'],
-                                    'dosage': row['dosage'] or '',
-                                    'time': row['time'],
-                                    'occurrence_id': row['occurrence_id'],
-                                    'plan_id': row['plan_id'],
-                                    'user_id': row['user_id'],
-                                    'notification_timing': 'one_hour_before',
-                                })
+                            # Fetch candidates for one-hour-before and filter
+                            candidate_one_hour = execute_query(
+                                "SELECT o.id as occurrence_id, o.plan_id, o.time, o.date, mt.name as medicine_name, mt.dosage, mp.user_id, u.fcm_token, u.notifications_enabled "
+                                "FROM occurrence_plan o JOIN medicine_plan mp ON o.plan_id = mp.plan_id JOIN medicine_tracking mt ON mp.medicine_track_id = mt.medicine_track_id JOIN users u ON mp.user_id = u.user_id "
+                                "WHERE o.date = ? AND o.is_taken = 0 AND u.fcm_token IS NOT NULL AND (u.notifications_enabled IS NULL OR u.notifications_enabled = 1)",
+                                (one_hour_date,)
+                            )
+
+                            try:
+                                for row in candidate_one_hour:
+                                    try:
+                                        try:
+                                            occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M")
+                                        except Exception:
+                                            occ_dt = _dt.strptime(f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M:%S")
+                                        
+                                        # Check if time matches exactly (HH:MM)
+                                        if occ_dt.strftime('%H:%M') == one_hour_time:
+                                            # Check if notification was already sent
+                                            already_sent = execute_query(
+                                                "SELECT 1 FROM notification WHERE occurrence_id = ? AND notification_type = 'one_hour_before' AND is_sent = 1",
+                                                (row['occurrence_id'],)
+                                            )
+                                            if not already_sent:
+                                                reminders_to_send.append({
+                                                    'fcm_token': row['fcm_token'],
+                                                    'medicine_name': row['medicine_name'],
+                                                    'dosage': row['dosage'] or '',
+                                                    'time': row['time'],
+                                                    'occurrence_id': row['occurrence_id'],
+                                                    'plan_id': row['plan_id'],
+                                                    'user_id': row['user_id'],
+                                                    'notification_timing': 'one_hour_before',
+                                                })
+                                    except Exception:
+                                        continue
+                            except Exception:
+                                pass
                 
                 except Exception as e:
                     print(f'❌ Local database query failed: {e}')
@@ -273,11 +353,17 @@ class ReminderScheduler:
             if reminders_to_send:
                 print(f'📤 Sending {len(reminders_to_send)} medicine reminders')
                 
+                success_count = 0
+                failed_count = 0
+                invalid_tokens = []
+                
                 for reminder in reminders_to_send:
                     notification_timing = reminder.get('notification_timing', 'at_time')
+                    user_id = reminder.get('user_id')
+                    fcm_token = reminder['fcm_token']
                     
                     success = NotificationService.send_medicine_reminder(
-                        fcm_token=reminder['fcm_token'],
+                        fcm_token=fcm_token,
                         medicine_name=reminder['medicine_name'],
                         dosage=reminder['dosage'],
                         time=reminder['time'],
@@ -287,8 +373,20 @@ class ReminderScheduler:
                     )
                     
                     if success:
+                        success_count += 1
                         # Record notification in database
                         self._record_notification(reminder, notification_timing)
+                    else:
+                        failed_count += 1
+                        # Track invalid token for cleanup
+                        invalid_tokens.append((user_id, fcm_token))
+                
+                print(f'📊 Notification results: {success_count} sent, {failed_count} failed')
+                
+                # Clean up invalid tokens
+                if invalid_tokens:
+                    print(f'🧹 Cleaning up {len(invalid_tokens)} invalid FCM tokens')
+                    self._cleanup_invalid_tokens(invalid_tokens)
             else:
                 print('✓ No reminders to send at this time')
         
@@ -397,6 +495,34 @@ class ReminderScheduler:
         
         except Exception as e:
             print(f'❌ Failed to record notification: {e}')
+    
+    def _cleanup_invalid_tokens(self, invalid_tokens: list):
+        """Remove invalid FCM tokens from the database"""
+        try:
+            for user_id, token in invalid_tokens:
+                # Try Supabase first
+                if supabase:
+                    try:
+                        supabase.table('users')\
+                            .update({'fcm_token': None})\
+                            .eq('user_id', user_id)\
+                            .execute()
+                        print(f'  ✓ Cleared invalid token for user {user_id}')
+                    except Exception as e:
+                        print(f'  ⚠️  Failed to clear token for user {user_id}: {e}')
+                
+                # Fallback to local
+                if self.app:
+                    with self.app.app_context():
+                        try:
+                            execute_update(
+                                "UPDATE users SET fcm_token = NULL WHERE user_id = ?",
+                                (user_id,)
+                            )
+                        except Exception:
+                            pass
+        except Exception as e:
+            print(f'❌ Failed to cleanup invalid tokens: {e}')
 
 
 # Global scheduler instance

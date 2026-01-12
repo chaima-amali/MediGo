@@ -214,7 +214,9 @@ class TrackingApiService {
   }
 
   /// Create multiple occurrences at once
-  Future<List<dynamic>> createOccurrencesBatch(
+  /// Create multiple occurrences at once. Returns the full response map so
+  /// callers can access generated `occurrence_ids` or other metadata.
+  Future<Map<String, dynamic>> createOccurrencesBatch(
     List<Map<String, dynamic>> occurrences,
   ) async {
     try {
@@ -223,7 +225,7 @@ class TrackingApiService {
         data: {'occurrences': occurrences},
       );
       final data = response.data as Map<String, dynamic>;
-      return data['occurrences'] as List<dynamic>? ?? [];
+      return data;
     } catch (e) {
       rethrow;
     }
