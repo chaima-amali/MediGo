@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS reservation (
     status TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT fk_reservation_search FOREIGN KEY (medicine_find_id) REFERENCES medicine_search_history(id) ON DELETE SET NULL,
-    CONSTRAINT fk_reservation_user FOREIGN KEY (user_id) REFERENCES "user"(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_reservation_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_reservation_pharmacy FOREIGN KEY (pharmacy_id) REFERENCES pharmacy(pharmacy_id) ON DELETE CASCADE
 );
 
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS notification (
     type TEXT,
     is_read INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES "user"(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_notification_plan FOREIGN KEY (plan_id) REFERENCES medicine_plan(plan_id) ON DELETE SET NULL,
     CONSTRAINT fk_notification_reservation FOREIGN KEY (reservation_id) REFERENCES reservation(reservation_id) ON DELETE SET NULL,
     CONSTRAINT fk_notification_search FOREIGN KEY (medicine_find_id) REFERENCES medicine_search_history(id) ON DELETE SET NULL,
@@ -241,8 +241,8 @@ CREATE TABLE IF NOT EXISTS notification (
 -- =====================================================
 
 -- User indexes
-CREATE INDEX IF NOT EXISTS idx_user_email ON "user"(email);
-CREATE INDEX IF NOT EXISTS idx_user_location ON "user"(latitude, longitude);
+CREATE INDEX IF NOT EXISTS idx_user_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_user_location ON users(latitude, longitude);
 
 -- Medicine tracking indexes
 CREATE INDEX IF NOT EXISTS idx_medicine_tracking_user_id ON medicine_tracking(user_id);

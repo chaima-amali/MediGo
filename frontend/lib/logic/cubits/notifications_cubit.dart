@@ -37,15 +37,23 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
+      print('🔍 Fetching notifications for user $userId...');
+      
       // Fetch notifications from Supabase API
       final notificationsData = await _repository.getUserNotifications(
         userId: userId,
         limit: 100,
       );
 
+      print('✅ Fetched ${notificationsData.length} notifications from API');
+
       // Convert to NotificationItem objects
       final List<NotificationItem> allNotifications = notificationsData
-          .map((data) => NotificationItem.fromJson(data))
+          .map((data) {
+            final notif = NotificationItem.fromJson(data);
+            print('   📬 Notification ${notif.notificationId}: ${notif.type} - ${notif.createdAt}');
+            return notif;
+          })
           .toList();
 
       // Sort by created_at descending (newest first)
@@ -53,6 +61,11 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
       // Group notifications by day
       final grouped = _groupNotificationsByDay(allNotifications);
+      
+      print('📊 Grouped into ${grouped.length} groups:');
+      for (final group in grouped) {
+        print('   - ${group.label}: ${group.notifications.length} notifications');
+      }
 
       emit(state.copyWith(groupedNotifications: grouped, isLoading: false));
     } catch (e) {
@@ -98,6 +111,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       'Today': [],
       'Yesterday': [],
       '2 days ago': [],
+      'Earlier': [], // Add group for older notifications
     };
 
     for (final notification in notifications) {
@@ -113,6 +127,9 @@ class NotificationsCubit extends Cubit<NotificationsState> {
         groups['Yesterday']!.add(notification);
       } else if (notifDate == dayBeforeYesterday) {
         groups['2 days ago']!.add(notification);
+      } else {
+        // Add all older notifications to 'Earlier' group
+        groups['Earlier']!.add(notification);
       }
     }
 

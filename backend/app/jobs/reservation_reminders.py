@@ -42,31 +42,24 @@ def check_and_send_reservation_reminders():
         # Get all pending reservations with user premium status
         # Query reservations and join with users table
         try:
+            # Get all pending reservations
             reservations_response = supabase.table('reservation')\
-                .select('*, users!reservation_user_id_fkey(user_id, premium)')\
+                .select('*')\
                 .eq('status', 'pending')\
                 .execute()
+            
+            # Manually fetch user data for each reservation
+            if reservations_response.data:
+                for reservation in reservations_response.data:
+                    user_response = supabase.table('users')\
+                        .select('user_id, premium')\
+                        .eq('user_id', reservation['user_id'])\
+                        .execute()
+                    if user_response.data:
+                        reservation['users'] = user_response.data[0]
         except Exception as query_error:
-            print(f"⚠️  First query attempt failed, trying alternative: {query_error}")
-            # Try without explicit foreign key name
-            try:
-                reservations_response = supabase.table('reservation')\
-                    .select('*')\
-                    .eq('status', 'pending')\
-                    .execute()
-                
-                # Manually fetch user data for each reservation
-                if reservations_response.data:
-                    for reservation in reservations_response.data:
-                        user_response = supabase.table('users')\
-                            .select('user_id, premium')\
-                            .eq('user_id', reservation['user_id'])\
-                            .execute()
-                        if user_response.data:
-                            reservation['users'] = user_response.data[0]
-            except Exception as fallback_error:
-                print(f"❌ Fallback query also failed: {fallback_error}")
-                return
+            print(f"❌ Query failed: {query_error}")
+            return
         
         if not reservations_response.data:
             print("✅ No pending reservations found")
