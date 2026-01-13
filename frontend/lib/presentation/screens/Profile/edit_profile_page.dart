@@ -29,30 +29,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // Helper function to normalize gender to English
   String? _normalizeGender(String? gender) {
     if (gender == null || gender.isEmpty) return null;
-    
+
     // If already in English format, return as is
     if (gender == 'Male' || gender == 'Female') return gender;
-    
+
     // Convert from Arabic
     if (gender == 'ذكر' || gender.toLowerCase().contains('male')) return 'Male';
-    if (gender == 'أنثى' || gender.toLowerCase().contains('female')) return 'Female';
-    
+    if (gender == 'أنثى' || gender.toLowerCase().contains('female'))
+      return 'Female';
+
     // Convert from French
     if (gender == 'Homme') return 'Male';
     if (gender == 'Femme') return 'Female';
-    
+
     return null;
   }
 
   // Fetch location name from coordinates using reverse geocoding
-  Future<void> _fetchLocationFromCoordinates(double latitude, double longitude) async {
+  Future<void> _fetchLocationFromCoordinates(
+    double latitude,
+    double longitude,
+  ) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latitude,
+        longitude,
+      );
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
-        final locationName = '${place.locality ?? ''}, ${place.country ?? ''}'.trim();
+        final locationName = '${place.locality ?? ''}, ${place.country ?? ''}'
+            .trim();
         setState(() {
-          _locationController.text = locationName.isNotEmpty ? locationName : 'Unknown location';
+          _locationController.text = locationName.isNotEmpty
+              ? locationName
+              : 'Unknown location';
         });
         // Note: Location name is only displayed, not saved to DB until user clicks save
       }
@@ -76,10 +86,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _loadUserData() {
     final userState = context.read<UserCubit>().state;
     if (userState is UserAuthenticated || userState is UserLoaded) {
-      _currentUser = userState is UserAuthenticated 
-          ? userState.user 
+      _currentUser = userState is UserAuthenticated
+          ? userState.user
           : (userState as UserLoaded).user;
-      
+
       print('👤 Loading user data:');
       print('   Name: ${_currentUser?.name}');
       print('   Email: ${_currentUser?.email}');
@@ -87,37 +97,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print('   Gender: ${_currentUser?.gender}');
       print('   DOB: ${_currentUser?.dob}');
       print('   Location: ${_currentUser?.locationName}');
-      print('   Lat: ${_currentUser?.latitude}, Lon: ${_currentUser?.longitude}');
-      
+      print(
+        '   Lat: ${_currentUser?.latitude}, Lon: ${_currentUser?.longitude}',
+      );
+
       // Initialize controllers with current data
       _nameController.text = _currentUser?.name ?? '';
       _emailController.text = _currentUser?.email ?? '';
       _phoneController.text = _currentUser?.phone ?? '';
       // Normalize gender to English format for consistency
       _selectedGender = _normalizeGender(_currentUser?.gender);
-      
+
       // Get location name from database or fetch from coordinates
-      if (_currentUser?.locationName != null && _currentUser!.locationName!.isNotEmpty) {
+      if (_currentUser?.locationName != null &&
+          _currentUser!.locationName!.isNotEmpty) {
         _locationController.text = _currentUser!.locationName!;
-      } else if (_currentUser?.latitude != null && _currentUser?.longitude != null) {
+      } else if (_currentUser?.latitude != null &&
+          _currentUser?.longitude != null) {
         // Fetch location name from coordinates
-        _fetchLocationFromCoordinates(_currentUser!.latitude!, _currentUser!.longitude!);
+        _fetchLocationFromCoordinates(
+          _currentUser!.latitude!,
+          _currentUser!.longitude!,
+        );
       } else {
         _locationController.text = 'No location set';
       }
-      
+
       // Format date if available - convert from YYYY-MM-DD to DD/MM/YYYY for display
       if (_currentUser?.dob != null && _currentUser!.dob.isNotEmpty) {
         try {
           final dob = DateTime.parse(_currentUser!.dob);
-          _dateController.text = '${dob.day.toString().padLeft(2, '0')}/${dob.month.toString().padLeft(2, '0')}/${dob.year}';
+          _dateController.text =
+              '${dob.day.toString().padLeft(2, '0')}/${dob.month.toString().padLeft(2, '0')}/${dob.year}';
         } catch (e) {
           print('Error parsing date: $e');
           // If parsing fails, maybe it's already in DD/MM/YYYY format
           _dateController.text = _currentUser!.dob;
         }
       }
-      
+
       setState(() {});
     }
   }
@@ -165,20 +183,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _saveProfile() async {
     if (_formKey.currentState!.validate() && _currentUser != null) {
       final loc = AppLocalizations.of(context)!;
-      
+
       // Parse date from DD/MM/YYYY format to YYYY-MM-DD format
       String dobFormatted = _currentUser!.dob;
       if (_dateController.text.isNotEmpty) {
         try {
           final parts = _dateController.text.split('/');
           if (parts.length == 3) {
-            dobFormatted = '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}';
+            dobFormatted =
+                '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}';
           }
         } catch (e) {
           print('Error formatting date: $e');
         }
       }
-      
+
       // Create updated user object
       final updatedUser = _currentUser!.copyWith(
         name: _nameController.text,
@@ -186,13 +205,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         gender: _selectedGender ?? _currentUser!.gender,
         dob: dobFormatted,
       );
-      
+
       // Update user in database
       await context.read<UserCubit>().updateUser(updatedUser);
-      
+
       // Wait a moment for the state to fully propagate
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       // Check if update was successful - updateUser already reloads and emits UserLoaded
       final state = context.read<UserCubit>().state;
       print('🔍 Edit profile save state: ${state.runtimeType}');
@@ -235,8 +254,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.lightBlue,
+      backgroundColor: AppColors.lightBlue, // Always green top
       body: SafeArea(
         child: Column(
           children: [
@@ -252,7 +272,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         loc.editProfile,
                         style: AppText.bold.copyWith(
                           fontSize: 24,
-                          color: AppColors.darkBlue,
+                          color: AppColors.darkBlue, // Always black
                         ),
                       ),
                     ),
@@ -266,9 +286,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.black : AppColors.white,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
@@ -281,12 +301,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        // Full Name field
                         Text(
                           loc.fullName,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -295,27 +314,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           decoration: InputDecoration(
                             hintText: loc.enterFullName,
                             hintStyle: AppText.regular.copyWith(
-                              color: AppColors.darkBlue.withOpacity(0.4),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
                             ),
                             prefixIcon: Icon(
                               Icons.person_outline,
-                              color: AppColors.darkBlue.withOpacity(0.5),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.5),
                             ),
                             filled: true,
-                            fillColor: AppColors.darkBlue.withOpacity(0.05),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
+                            fillColor: isDark
+                                ? Colors.black
+                                : AppColors.darkBlue.withOpacity(0.05),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.primary,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.lightBlue
+                                    : AppColors.primary,
                                 width: 2,
                               ),
                             ),
@@ -324,9 +361,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               vertical: 16,
                             ),
                           ),
+                          style: AppText.regular.copyWith(
+                            color: isDark ? Colors.white : AppColors.darkBlue,
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return loc.pleaseEnterName;
+                            }
+                            // Validate name: at least 2 characters, alphanumeric and spaces
+                            if (value.trim().length < 2) {
+                              return 'Name must be at least 2 characters';
+                            }
+                            if (value.trim().length > 100) {
+                              return 'Name must be less than 100 characters';
                             }
                             return null;
                           },
@@ -337,7 +384,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           loc.email,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -348,27 +395,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           decoration: InputDecoration(
                             hintText: loc.enterEmail,
                             hintStyle: AppText.regular.copyWith(
-                              color: AppColors.darkBlue.withOpacity(0.4),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
                             ),
                             prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: AppColors.darkBlue.withOpacity(0.5),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.5),
                             ),
                             filled: true,
-                            fillColor: AppColors.darkBlue.withOpacity(0.05),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
+                            fillColor: isDark
+                                ? Colors.black
+                                : AppColors.darkBlue.withOpacity(0.05),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.primary,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.lightBlue
+                                    : AppColors.primary,
                                 width: 2,
                               ),
                             ),
@@ -376,6 +441,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               horizontal: 16,
                               vertical: 16,
                             ),
+                          ),
+                          style: AppText.regular.copyWith(
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -393,7 +461,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           loc.phoneNumber,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -403,27 +471,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           decoration: InputDecoration(
                             hintText: '+213794691377',
                             hintStyle: AppText.regular.copyWith(
-                              color: AppColors.darkBlue.withOpacity(0.4),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
                             ),
                             prefixIcon: Icon(
                               Icons.phone_outlined,
-                              color: AppColors.darkBlue.withOpacity(0.5),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.5),
                             ),
                             filled: true,
-                            fillColor: AppColors.darkBlue.withOpacity(0.05),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
+                            fillColor: isDark
+                                ? Colors.black
+                                : AppColors.darkBlue.withOpacity(0.05),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.primary,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.lightBlue
+                                    : AppColors.primary,
                                 width: 2,
                               ),
                             ),
@@ -432,9 +518,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               vertical: 16,
                             ),
                           ),
+                          style: AppText.regular.copyWith(
+                            color: isDark ? Colors.white : AppColors.darkBlue,
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return loc.enterPhoneNumber;
+                            }
+                            // Validate Algerian phone format: 0[567]XXXXXXXX (10 digits starting with 05, 06, or 07)
+                            final phoneRegex = RegExp(r'^0[567]\d{8}$');
+                            if (!phoneRegex.hasMatch(value)) {
+                              return 'Phone must be 10 digits starting with 05, 06, or 07';
                             }
                             return null;
                           },
@@ -445,7 +539,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           loc.dateOfBirth,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -456,28 +550,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           decoration: InputDecoration(
                             hintText: loc.dobFormat,
                             hintStyle: AppText.regular.copyWith(
-                              color: AppColors.darkBlue.withOpacity(0.4),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
                             ),
                             prefixIcon: Icon(
                               Icons.calendar_today,
-                              color: AppColors.darkBlue.withOpacity(0.5),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.5),
                               size: 20,
                             ),
                             filled: true,
-                            fillColor: AppColors.darkBlue.withOpacity(0.05),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
+                            fillColor: isDark
+                                ? Colors.black
+                                : AppColors.darkBlue.withOpacity(0.05),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.primary,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.lightBlue
+                                    : AppColors.primary,
                                 width: 2,
                               ),
                             ),
@@ -486,6 +598,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               vertical: 16,
                             ),
                           ),
+                          style: AppText.regular.copyWith(
+                            color: isDark ? Colors.white : AppColors.darkBlue,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         // Gender field
@@ -493,36 +608,60 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           loc.gender,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          value: _selectedGender == null || (_selectedGender != 'Male' && _selectedGender != 'Female') ? null : _selectedGender,
+                          value:
+                              _selectedGender == null ||
+                                  (_selectedGender != 'Male' &&
+                                      _selectedGender != 'Female')
+                              ? null
+                              : _selectedGender,
+                          dropdownColor: isDark ? Colors.black : Colors.white,
                           decoration: InputDecoration(
                             hintText: loc.selectGender,
                             hintStyle: AppText.regular.copyWith(
-                              color: AppColors.darkBlue.withOpacity(0.4),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
                             ),
                             prefixIcon: Icon(
                               Icons.person_outline,
-                              color: AppColors.darkBlue.withOpacity(0.5),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.5),
                             ),
                             filled: true,
-                            fillColor: AppColors.darkBlue.withOpacity(0.05),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
+                            fillColor: isDark
+                                ? Colors.black
+                                : AppColors.darkBlue.withOpacity(0.05),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.primary,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.lightBlue
+                                    : AppColors.primary,
                                 width: 2,
                               ),
                             ),
@@ -532,8 +671,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                           ),
                           items: [
-                            DropdownMenuItem(value: 'Male', child: Text(loc.male)),
-                            DropdownMenuItem(value: 'Female', child: Text(loc.female)),
+                            DropdownMenuItem(
+                              value: 'Male',
+                              child: Text(
+                                loc.male,
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
+                                ),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Female',
+                              child: Text(
+                                loc.female,
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
+                                ),
+                              ),
+                            ),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -547,7 +706,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           loc.location,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -566,7 +725,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ),
                               ),
                             );
-                            
                             // Reload user data if location was updated
                             if (result == true) {
                               _loadUserData();
@@ -575,27 +733,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           decoration: InputDecoration(
                             hintText: loc.location,
                             hintStyle: AppText.regular.copyWith(
-                              color: AppColors.darkBlue.withOpacity(0.4),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.4),
                               fontSize: 14,
                             ),
                             prefixIcon: Icon(
                               Icons.location_on_outlined,
-                              color: AppColors.darkBlue.withOpacity(0.5),
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.darkBlue.withOpacity(0.5),
                             ),
                             filled: true,
-                            fillColor: AppColors.darkBlue.withOpacity(0.05),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
+                            fillColor: isDark
+                                ? Colors.black
+                                : AppColors.darkBlue.withOpacity(0.05),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white54
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.primary,
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.lightBlue
+                                    : AppColors.primary,
                                 width: 2,
                               ),
                             ),
@@ -603,6 +779,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               horizontal: 16,
                               vertical: 16,
                             ),
+                          ),
+                          style: AppText.regular.copyWith(
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 40),
@@ -613,10 +792,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: ElevatedButton(
                                 onPressed: _cancel,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color(0xFFFF9494), // Coral/pink
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
+                                  backgroundColor: const Color(
+                                    0xFFFF9494,
+                                  ), // Coral/pink
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -636,9 +817,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: ElevatedButton(
                                 onPressed: _saveProfile,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF5DD3D3), // Cyan/turquoise
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
+                                  backgroundColor: const Color(
+                                    0xFF5DD3D3,
+                                  ), // Cyan/turquoise
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -678,4 +862,3 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 }
-

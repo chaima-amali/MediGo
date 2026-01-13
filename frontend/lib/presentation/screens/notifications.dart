@@ -1,19 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/logic/cubits/notifications_cubit.dart';
+import 'package:frontend/data/repositories/occurrence_repository.dart';
+import 'package:frontend/data/models/notification_item.dart';
+import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
-class NotificationsPage extends StatefulWidget {
+class NotificationsPage extends StatelessWidget {
   const NotificationsPage({Key? key}) : super(key: key);
 
   @override
-  State<NotificationsPage> createState() => _NotificationsPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          NotificationsCubit(OccurrenceRepository())..loadNotifications(),
+      child: const _NotificationsView(),
+    );
+  }
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _NotificationsView extends StatefulWidget {
+  const _NotificationsView();
+
+  @override
+  State<_NotificationsView> createState() => _NotificationsViewState();
+}
+
+class _NotificationsViewState extends State<_NotificationsView> {
   String selectedFilter = 'All';
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Color(0xFFE0F7FA),
+      backgroundColor: isDark ? Colors.black : Color(0xFFE0F7FA),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,126 +45,219 @@ class _NotificationsPageState extends State<NotificationsPage> {
               child: Row(
                 children: [
                   CustomBackArrow(
-                    backgroundColor: Color(0xFF80DEEA),
-                    iconColor: Color(0xFF4DD0E1),
+                    backgroundColor: isDark
+                        ? Colors.grey[900]
+                        : Color(0xFF80DEEA),
+                    iconColor: isDark ? Colors.white : Color(0xFF4DD0E1),
                   ),
                   SizedBox(width: 12),
                   Text(
-                    'Notifications',
+                    l10n.notifications,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Filter Buttons
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  FilterButton(
-                    label: 'All',
-                    isSelected: selectedFilter == 'All',
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = 'All';
-                      });
-                    },
-                  ),
-                  SizedBox(width: 8),
-                  FilterButton(
-                    label: 'Reminders',
-                    isSelected: selectedFilter == 'Reminders',
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = 'Reminders';
-                      });
-                    },
-                  ),
-                  SizedBox(width: 8),
-                  FilterButton(
-                    label: 'medstock/Reserv',
-                    isSelected: selectedFilter == 'medicine stock/Reservation',
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = 'medicine stock/Reservation';
-                      });
-                    },
-                  ),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    FilterButton(
+                      label: l10n.all,
+                      isSelected: selectedFilter == 'All',
+                      onTap: () {
+                        setState(() {
+                          selectedFilter = 'All';
+                        });
+                      },
+                      isDark: isDark,
+                    ),
+                    SizedBox(width: 8),
+                    FilterButton(
+                      label: l10n.reminders,
+                      isSelected: selectedFilter == 'Reminders',
+                      onTap: () {
+                        setState(() {
+                          selectedFilter = 'Reminders';
+                        });
+                      },
+                      isDark: isDark,
+                    ),
+                    SizedBox(width: 8),
+                    FilterButton(
+                      label: l10n.medstock_reserv,
+                      isSelected:
+                          selectedFilter == 'medicine stock/Reservation',
+                      onTap: () {
+                        setState(() {
+                          selectedFilter = 'medicine stock/Reservation';
+                        });
+                      },
+                      isDark: isDark,
+                    ),
+                  ],
+                ),
               ),
             ),
-            
+
             SizedBox(height: 16),
-            
+
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  // Today Section
-                  Text(
-                    'Today',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+              child: BlocBuilder<NotificationsCubit, NotificationsState>(
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF4DD0E1),
+                      ),
+                    );
+                  }
+
+                  if (state.error != null) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          state.error!,
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Filter notifications based on selected filter
+                  final filteredGroups =
+                      selectedFilter == 'medicine stock/Reservation'
+                      ? <
+                          GroupedNotifications
+                        >[] // Empty list for medstock/reserv (no medicine reminders)
+                      : state
+                            .groupedNotifications; // Show all for 'All' and 'Reminders'
+
+                  if (filteredGroups.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.notifications_none,
+                            size: 64,
+                            color: isDark ? Colors.white54 : Colors.grey[400],
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            l10n.no_notifications_yet,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isDark ? Colors.white : Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            selectedFilter == 'medicine stock/Reservation'
+                                ? l10n.no_medstock_or_reservation_notifications
+                                : l10n.add_medicines_to_see_reminders,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark ? Colors.white70 : Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () =>
+                        context.read<NotificationsCubit>().loadNotifications(),
+                    color: Color(0xFF4DD0E1),
+                    child: ListView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filteredGroups.length,
+                      itemBuilder: (context, index) {
+                        final group = filteredGroups[index];
+
+                        // Translate group labels
+                        String translatedLabel;
+                        if (group.label == 'Today') {
+                          translatedLabel = l10n.today;
+                        } else if (group.label == 'Yesterday') {
+                          translatedLabel = l10n.yesterday;
+                        } else if (group.label == '2 days ago') {
+                          translatedLabel = l10n.days_ago(2);
+                        } else {
+                          translatedLabel = group.label;
+                        }
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (index > 0) SizedBox(height: 24),
+                            Text(
+                              translatedLabel,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            ...group.notifications.map((notification) {
+                              // Get the localized message based on messageIndex
+                              String message = '';
+                              switch (notification.messageIndex) {
+                                case 1:
+                                  message = l10n.notification_message_1(
+                                    notification.medicineName,
+                                  );
+                                  break;
+                                case 2:
+                                  message = l10n.notification_message_2(
+                                    notification.medicineName,
+                                  );
+                                  break;
+                                case 3:
+                                  message = l10n.notification_message_3(
+                                    notification.medicineName,
+                                  );
+                                  break;
+                                case 4:
+                                  message = l10n.notification_message_4(
+                                    notification.medicineName,
+                                  );
+                                  break;
+                                case 5:
+                                  message = l10n.notification_message_5(
+                                    notification.medicineName,
+                                  );
+                                  break;
+                                default:
+                                  message = l10n.notification_message_1(
+                                    notification.medicineName,
+                                  );
+                              }
+
+                              return NotificationCard(
+                                time: notification.formattedTime,
+                                message: message,
+                              );
+                            }).toList(),
+                          ],
+                        );
+                      },
                     ),
-                  ),
-                  SizedBox(height: 12),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Time for your medicine "Aspirin" — your health will thank you',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Hey there! Don\'t forget your dose of "Telfast" small steps for a healthier you.',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Evening dose time  take your medicine "Aspirin" and rest easy tonight',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 am',
-                    message: 'Good morning! It\'s time to take your medicine and start your day right.',
-                  ),
-                  
-                  SizedBox(height: 24),
-                  
-                  // Yesterday Section
-                  Text(
-                    'Yesterday',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Time for your medicine "Aspirin" — your health will thank you',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Hey there! Don\'t forget your dose of "Telfast" small steps for a healthier you.',
-                  ),
-                  
-                  NotificationCard(
-                    time: '8:30 pm',
-                    message: 'Hey there! Don\'t forget your dose of "Telfast" small steps for a healthier you.',
-                  ),
-                  
-                  SizedBox(height: 20),
-                ],
+                  );
+                },
               ),
             ),
           ],
@@ -157,12 +271,14 @@ class FilterButton extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool isDark;
 
   const FilterButton({
     Key? key,
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.isDark = false,
   }) : super(key: key);
 
   @override
@@ -172,10 +288,14 @@ class FilterButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Color(0xFFB2EBF2),
+          color: isDark
+              ? (isSelected ? Colors.black : Colors.grey[900])
+              : (isSelected ? Colors.white : Color(0xFFB2EBF2)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? Color(0xFF4DD0E1) : Colors.transparent,
+            color: isSelected
+                ? (isDark ? Colors.white : Color(0xFF4DD0E1))
+                : Colors.transparent,
             width: 1.5,
           ),
         ),
@@ -184,7 +304,9 @@ class FilterButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: Colors.black87,
+            color: isDark
+                ? (isSelected ? Colors.white : Colors.white70)
+                : Colors.black87,
           ),
         ),
       ),
@@ -196,11 +318,8 @@ class NotificationCard extends StatelessWidget {
   final String time;
   final String message;
 
-  const NotificationCard({
-    Key? key,
-    required this.time,
-    required this.message,
-  }) : super(key: key);
+  const NotificationCard({Key? key, required this.time, required this.message})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {

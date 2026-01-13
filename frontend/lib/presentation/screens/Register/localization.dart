@@ -9,6 +9,7 @@ import '../../../logic/cubits/user_cubit.dart';
 import '../../../data/models/user.dart';
 import '../Home/home_page.dart';
 import 'Enter_location.dart';
+import 'notification_permission_page.dart';
 
 class LocalizationPage extends StatelessWidget {
   final String email;
@@ -231,10 +232,13 @@ class LocalizationPage extends StatelessWidget {
                                 final state = userCubit.state;
                                 if (state is UserAuthenticated) {
                                   print('✅ User registered successfully');
+                                  // Navigate to notification permission page
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => MainScreen(),
+                                      builder: (context) => NotificationPermissionPage(
+                                        userData: state.user,
+                                      ),
                                     ),
                                   );
                                 } else if (state is UserError) {

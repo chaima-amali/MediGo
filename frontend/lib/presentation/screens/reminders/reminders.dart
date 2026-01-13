@@ -4,6 +4,8 @@ import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/services/mock_database_service.dart';
 
 class RemindersScreen extends StatelessWidget {
+  const RemindersScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final schedule = MockDataService.getTodayMedicineSchedule();
@@ -164,7 +166,7 @@ class RemindersScreen extends StatelessWidget {
           SizedBox(height: 20),
 
           // Circular progress (92% from design)
-          Container(
+          SizedBox(
             width: 150,
             height: 150,
             child: Stack(
@@ -218,7 +220,7 @@ class RemindersScreen extends StatelessWidget {
 class MedicineTrackingCard extends StatelessWidget {
   final Map<String, dynamic> medicine;
 
-  MedicineTrackingCard({required this.medicine});
+  const MedicineTrackingCard({super.key, required this.medicine});
 
   @override
   Widget build(BuildContext context) {

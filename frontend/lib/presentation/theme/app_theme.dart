@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-ThemeData appTheme = ThemeData(
-  primaryColor: AppColors.primary,
-  scaffoldBackgroundColor: AppColors.white,
-  fontFamily: 'Poppins',
-  textTheme: const TextTheme(
-    bodyLarge: TextStyle(fontFamily: 'Poppins'),
-    bodyMedium: TextStyle(fontFamily: 'Poppins'),
-    bodySmall: TextStyle(fontFamily: 'Poppins'),
+final ColorScheme lightColorScheme = ColorScheme.fromSeed(
+  seedColor: AppColors.primary,
+  brightness: Brightness.light,
+);
+
+final ColorScheme darkColorScheme = ColorScheme.fromSeed(
+  seedColor: AppColors.primary,
+  brightness: Brightness.dark,
+);
+
+ThemeData appTheme = ThemeData.from(colorScheme: lightColorScheme).copyWith(
+  textTheme: ThemeData.light().textTheme.apply(
+    bodyColor: lightColorScheme.onBackground,
+    displayColor: lightColorScheme.onBackground,
+    fontFamily: 'Poppins',
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
-      shape: RoundedRectangleBorder(
+      backgroundColor: lightColorScheme.primary,
+      foregroundColor: lightColorScheme.onPrimary,
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       textStyle: const TextStyle(
@@ -23,6 +30,46 @@ ThemeData appTheme = ThemeData(
       ),
     ),
   ),
+  appBarTheme: AppBarTheme(
+    backgroundColor: lightColorScheme.primary,
+    foregroundColor: lightColorScheme.onPrimary,
+    elevation: 0,
+  ),
+  scaffoldBackgroundColor: lightColorScheme.background,
+  cardColor: lightColorScheme.surface,
+);
+
+ThemeData darkTheme = ThemeData.from(colorScheme: darkColorScheme).copyWith(
+  useMaterial3: false,
+  textTheme: ThemeData.dark().textTheme.apply(
+    bodyColor: AppColors.onSurfaceDark,
+    displayColor: AppColors.onSurfaceDark,
+    fontFamily: 'Poppins',
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: darkColorScheme.primary,
+      foregroundColor: darkColorScheme.onPrimary,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(8)),
+      ),
+      textStyle: const TextStyle(
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+  appBarTheme: AppBarTheme(
+    backgroundColor: AppColors.surfaceDark,
+    foregroundColor: AppColors.onSurfaceDark,
+    elevation: 0,
+  ),
+  scaffoldBackgroundColor: Colors.black, // true black background
+ 
+  cardColor: AppColors.surfaceDark, // dark gray for cards
+  dialogBackgroundColor: AppColors.surfaceDark,
+  canvasColor: Colors.black,
+  // Keep red and green as is by not overriding error/success colors
 );
 /*use it like this :
 MaterialApp(

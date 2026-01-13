@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
 import 'package:frontend/data/repositories/medicine_repository.dart';
@@ -26,7 +27,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   String? _selectedFrequency;
   String? _selectedUnit;
   int _timesPerDay = 1;
-  List<TimeOfDay> _selectedTimes = [const TimeOfDay(hour: 9, minute: 0)];
+  final List<TimeOfDay> _selectedTimes = [const TimeOfDay(hour: 9, minute: 0)];
   Color? _selectedImportanceColor = AppColors.primary;
   DateTime? _startDate;
   DateTime? _endDate;
@@ -44,6 +45,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   final Map<String, bool> _selectedWeekDays = {};
   final Map<String, int> _weekDayTimesCount = {};
   final Map<String, List<TimeOfDay>> _weekDayTimes = {};
+  final List<DateTime> _customDates = [];
 
   final List<String> medicineTypes = [
     'Tablet',
@@ -111,11 +113,29 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
     final initial = isStart
         ? (_startDate ?? DateTime.now())
         : (_endDate ?? DateTime.now());
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: isDark
+              ? const ColorScheme.dark(
+                  primary: Colors.black, // header background
+                  surface: Colors.black,
+                  background: Colors.black,
+                  onSurface: Colors.white,
+                )
+              : const ColorScheme.light(
+                  primary: AppColors.primary,
+                  onSurface: Colors.black,
+                ),
+          dialogBackgroundColor: isDark ? Colors.black : null,
+        ),
+        child: child!,
+      ),
     );
     if (picked != null && mounted) {
       setState(() {
@@ -164,15 +184,16 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
     TextEditingController? controller,
     String? hint,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.darkBlue,
+            color: isDark ? Colors.white : AppColors.darkBlue,
           ),
         ),
         const SizedBox(height: 8),
@@ -184,15 +205,23 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(
             children: [
-              Icon(icon, size: 22, color: Colors.black45),
+              Icon(
+                icon,
+                size: 22,
+                color: isDark ? Colors.white70 : Colors.black45,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child:
                     child ??
                     TextField(
                       controller: controller,
+                      style: TextStyle(color: isDark ? Colors.white : null),
                       decoration: InputDecoration(
                         hintText: hint,
+                        hintStyle: TextStyle(
+                          color: isDark ? Colors.white54 : null,
+                        ),
                         border: InputBorder.none,
                       ),
                     ),
@@ -208,6 +237,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: AppColors.lightBlue,
       body: SafeArea(
@@ -225,7 +255,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                         loc.addMedicine,
                         style: AppText.bold.copyWith(
                           fontSize: 24,
-                          color: AppColors.darkBlue,
+                          color: isDark ? Colors.white : AppColors.darkBlue,
                         ),
                       ),
                     ),
@@ -240,8 +270,8 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: AppColors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
@@ -258,13 +288,20 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
 
                         TextFormField(
                           controller: _nameController,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : null,
+                          ),
                           decoration: _inputDecoration(
                             loc.enterMedicineName,
                             Icons.medication_outlined,
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().isEmpty)
+                            if (v == null || v.trim().isEmpty) {
                               return loc.name_is_required;
+                            }
                             return null;
                           },
                         ),
@@ -275,13 +312,13 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           loc.medicineType,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
                           decoration: _dropdownDecoration(icon: Icons.category),
-                          value: _selectedType,
+                          initialValue: _selectedType,
                           validator: (v) => (v == null || v.isEmpty)
                               ? AppLocalizations.of(context)!.type_is_required
                               : null,
@@ -302,7 +339,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           loc.dose,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -316,8 +353,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           ),
                           validator: (v) {
                             final d = double.tryParse(v ?? '');
-                            if (d == null || d <= 0)
+                            if (d == null || d <= 0) {
                               return loc.dose_must_be_greater_than_zero;
+                            }
                             return null;
                           },
                         ),
@@ -327,7 +365,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           loc.unit,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -335,7 +373,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           decoration: _dropdownDecoration(
                             icon: Icons.straighten_outlined,
                           ),
-                          value: _selectedUnit,
+                          initialValue: _selectedUnit,
                           validator: (v) => (v == null || v.isEmpty)
                               ? AppLocalizations.of(context)!.unit_is_required
                               : null,
@@ -354,7 +392,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           loc.frequency,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -363,7 +401,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           decoration: _dropdownDecoration(
                             icon: Icons.calendar_today_outlined,
                           ),
-                          value: _selectedFrequency,
+                          initialValue: _selectedFrequency,
                           validator: (v) => (v == null || v.isEmpty)
                               ? AppLocalizations.of(
                                   context,
@@ -387,7 +425,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                             loc.eachNDays,
                             style: AppText.medium.copyWith(
                               fontSize: 14,
-                              color: AppColors.darkBlue,
+                              color: isDark ? Colors.white : AppColors.darkBlue,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -408,7 +446,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                             loc.select_weekdays ?? 'Select weekdays',
                             style: AppText.medium.copyWith(
                               fontSize: 14,
-                              color: AppColors.darkBlue,
+                              color: isDark ? Colors.white : AppColors.darkBlue,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -460,7 +498,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                             loc.howManyTimesOnDay(day),
                                             style: AppText.medium.copyWith(
                                               fontSize: 13,
-                                              color: AppColors.darkBlue,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : AppColors.darkBlue,
                                             ),
                                           ),
                                           const SizedBox(height: 6),
@@ -468,7 +508,8 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                             decoration: _dropdownDecoration(
                                               icon: Icons.repeat,
                                             ),
-                                            value: _weekDayTimesCount[day] ?? 1,
+                                            initialValue:
+                                                _weekDayTimesCount[day] ?? 1,
                                             items:
                                                 List.generate(6, (i) => i + 1)
                                                     .map(
@@ -484,15 +525,17 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                                 _weekDayTimesCount[day] = count;
                                                 final list =
                                                     _weekDayTimes[day] ?? [];
-                                                while (list.length < count)
+                                                while (list.length < count) {
                                                   list.add(
                                                     const TimeOfDay(
                                                       hour: 9,
                                                       minute: 0,
                                                     ),
                                                   );
-                                                while (list.length > count)
+                                                }
+                                                while (list.length > count) {
                                                   list.removeLast();
+                                                }
                                                 _weekDayTimes[day] = list;
                                               });
                                             },
@@ -501,9 +544,17 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                           // time pickers for this weekday
                                           Column(
                                             children: List.generate(_weekDayTimes[day]?.length ?? 0, (
-                                              i,
+                                              int i,
                                             ) {
-                                              final t = _weekDayTimes[day]![i];
+                                              final dayTimes =
+                                                  _weekDayTimes[day];
+                                              if (dayTimes == null ||
+                                                  i >= dayTimes.length) {
+                                                return const SizedBox.shrink();
+                                              }
+                                              final t = dayTimes[i];
+                                              if (t == null)
+                                                return const SizedBox.shrink();
                                               return Padding(
                                                 padding: const EdgeInsets.only(
                                                   bottom: 8.0,
@@ -550,12 +601,18 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                                         );
                                                       },
                                                     );
-                                                    if (picked != null)
-                                                      setState(
-                                                        () =>
-                                                            _weekDayTimes[day]![i] =
-                                                                picked,
-                                                      );
+                                                    if (picked != null) {
+                                                      setState(() {
+                                                        final dayTimes =
+                                                            _weekDayTimes[day];
+                                                        if (dayTimes != null &&
+                                                            i <
+                                                                dayTimes
+                                                                    .length) {
+                                                          dayTimes[i] = picked;
+                                                        }
+                                                      });
+                                                    }
                                                   },
                                                   child: Container(
                                                     height: 44,
@@ -581,10 +638,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                                         const SizedBox(
                                                           width: 12,
                                                         ),
-                                                        Text(
-                                                          _weekDayTimes[day]![i]
-                                                              .format(context),
-                                                        ),
+                                                        Text(t.format(context)),
                                                       ],
                                                     ),
                                                   ),
@@ -601,158 +655,291 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                             }).toList(),
                           ),
                           const SizedBox(height: 20),
+                        ] else if (_selectedFrequency == 'customized') ...[
+                          Text(
+                            'Select Custom Dates',
+                            style: AppText.medium.copyWith(
+                              fontSize: 14,
+                              color: isDark ? Colors.white : AppColors.darkBlue,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(
+                                  const Duration(days: 365),
+                                ),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: AppColors.primary,
+                                        onSurface: Colors.black,
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              if (picked != null &&
+                                  !_customDates.contains(picked)) {
+                                setState(() {
+                                  _customDates.add(picked);
+                                  _customDates.sort();
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.calendar_today),
+                            label: const Text('Add Date'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          if (_customDates.isNotEmpty) ...[
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _customDates.map((date) {
+                                return Chip(
+                                  label: Text(
+                                    '${date.day}/${date.month}/${date.year}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  deleteIcon: const Icon(Icons.close, size: 18),
+                                  onDeleted: () {
+                                    setState(() {
+                                      _customDates.remove(date);
+                                    });
+                                  },
+                                  backgroundColor: AppColors.primary
+                                      .withOpacity(0.1),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          const SizedBox(height: 20),
                         ],
 
                         // TIMES PER DAY -------------------------
-                        Text(
-                          AppLocalizations.of(context)!.timesPerDay,
-                          style: AppText.medium.copyWith(
-                            fontSize: 14,
-                            color: AppColors.darkBlue,
+                        // Only show times per day section if NOT "Per week" (weekdays have their own times)
+                        if (_selectedFrequency != 'Per week') ...[
+                          Text(
+                            AppLocalizations.of(context)!.timesPerDay,
+                            style: AppText.medium.copyWith(
+                              fontSize: 14,
+                              color: isDark ? Colors.white : AppColors.darkBlue,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
+                          const SizedBox(height: 8),
 
-                        DropdownButtonFormField<int>(
-                          decoration: _dropdownDecoration(icon: Icons.repeat),
-                          value: _timesPerDay,
-                          validator: (v) => (v == null || v <= 0)
-                              ? AppLocalizations.of(
-                                  context,
-                                )!.times_per_day_required
-                              : null,
-                          items: List.generate(6, (i) => i + 1)
-                              .map(
-                                (n) => DropdownMenuItem(
-                                  value: n,
-                                  child: Text('$n'),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (v) {
-                            setState(() {
-                              _timesPerDay = v ?? 1;
-                              // adjust times list length
-                              while (_selectedTimes.length < _timesPerDay) {
-                                _selectedTimes.add(
-                                  const TimeOfDay(hour: 9, minute: 0),
-                                );
-                              }
-                              while (_selectedTimes.length > _timesPerDay) {
-                                _selectedTimes.removeLast();
-                              }
-                            });
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // TIME PICKERS FOR EACH OCCURRENCE
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: List.generate(_timesPerDay, (i) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  final t = await showTimePicker(
-                                    context: context,
-                                    initialTime: _selectedTimes[i],
-                                    initialEntryMode: TimePickerEntryMode.input,
-                                    builder: (context, child) {
-                                      return Theme(
-                                        data: Theme.of(context).copyWith(
-                                          colorScheme: const ColorScheme.light(
-                                            primary: AppColors.primary,
-                                            onSurface: Colors.black,
-                                          ),
-                                          timePickerTheme: TimePickerThemeData(
-                                            backgroundColor: Colors.white,
-                                            dialBackgroundColor: Colors.white,
-                                            dialHandColor: AppColors.primary,
-                                            hourMinuteColor: Colors.white,
-                                            hourMinuteTextColor:
-                                                AppColors.primary,
-                                            entryModeIconColor:
-                                                AppColors.primary,
-                                          ),
-                                        ),
-                                        child: child!,
-                                      );
-                                    },
+                          DropdownButtonFormField<int>(
+                            decoration: _dropdownDecoration(icon: Icons.repeat),
+                            initialValue: _timesPerDay,
+                            validator: (v) => (v == null || v <= 0)
+                                ? AppLocalizations.of(
+                                    context,
+                                  )!.times_per_day_required
+                                : null,
+                            items: List.generate(6, (i) => i + 1)
+                                .map(
+                                  (n) => DropdownMenuItem(
+                                    value: n,
+                                    child: Text('$n'),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (v) {
+                              setState(() {
+                                _timesPerDay = v ?? 1;
+                                // adjust times list length
+                                while (_selectedTimes.length < _timesPerDay) {
+                                  _selectedTimes.add(
+                                    const TimeOfDay(hour: 9, minute: 0),
                                   );
-                                  if (t != null)
-                                    setState(() => _selectedTimes[i] = t);
-                                },
-                                child: Container(
-                                  height: 48,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.darkBlue.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.access_time_outlined,
-                                        color: Colors.black45,
+                                }
+                                while (_selectedTimes.length > _timesPerDay) {
+                                  _selectedTimes.removeLast();
+                                }
+                              });
+                            },
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // TIME PICKERS FOR EACH OCCURRENCE
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: List.generate(_timesPerDay, (i) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final t = await showTimePicker(
+                                      context: context,
+                                      initialTime: _selectedTimes[i],
+                                      initialEntryMode:
+                                          TimePickerEntryMode.input,
+                                      builder: (context, child) {
+                                        return Theme(
+                                          data: Theme.of(context).copyWith(
+                                            colorScheme:
+                                                const ColorScheme.light(
+                                                  primary: AppColors.primary,
+                                                  onSurface: Colors.black,
+                                                ),
+                                            timePickerTheme:
+                                                TimePickerThemeData(
+                                                  backgroundColor: Theme.of(
+                                                    context,
+                                                  ).colorScheme.surface,
+                                                  dialBackgroundColor: Theme.of(
+                                                    context,
+                                                  ).colorScheme.surface,
+                                                  dialHandColor:
+                                                      AppColors.primary,
+                                                  hourMinuteColor: Theme.of(
+                                                    context,
+                                                  ).colorScheme.surface,
+                                                  hourMinuteTextColor:
+                                                      AppColors.primary,
+                                                  entryModeIconColor:
+                                                      AppColors.primary,
+                                                ),
+                                          ),
+                                          child: child!,
+                                        );
+                                      },
+                                    );
+                                    if (t != null) {
+                                      setState(() => _selectedTimes[i] = t);
+                                    }
+                                  },
+                                  child: Container(
+                                    height: 48,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.transparent
+                                          : AppColors.darkBlue.withOpacity(
+                                              0.05,
+                                            ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white24
+                                            : Colors.transparent,
+                                        width: 1.5,
                                       ),
-                                      const SizedBox(width: 12),
-                                      Text(_selectedTimes[i].format(context)),
-                                      const Spacer(),
-                                      const Icon(
-                                        Icons.edit,
-                                        size: 18,
-                                        color: Colors.black45,
-                                      ),
-                                    ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.access_time_outlined,
+                                          color: Colors.black45,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(_selectedTimes[i].format(context)),
+                                        const Spacer(),
+                                        const Icon(
+                                          Icons.edit,
+                                          size: 18,
+                                          color: Colors.black45,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }),
-                        ),
+                              );
+                            }),
+                          ),
 
-                        const SizedBox(height: 12),
-
+                          const SizedBox(height: 12),
+                        ], // End of times per day section for non-Per week frequencies
                         // START & END DATE -------------------------
                         Text(
                           AppLocalizations.of(context)!.startDate,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () async {
+                            final today = DateTime.now();
                             final picked = await showDatePicker(
                               context: context,
-                              initialDate: _startDate ?? DateTime.now(),
-                              firstDate: DateTime(2020),
+                              initialDate:
+                                  _startDate != null &&
+                                      _startDate!.isAfter(today)
+                                  ? _startDate!
+                                  : today,
+                              firstDate: DateTime(
+                                today.year,
+                                today.month,
+                                today.day,
+                              ),
                               lastDate: DateTime(2100),
                               builder: (context, child) {
+                                final isDark =
+                                    Theme.of(context).brightness ==
+                                    Brightness.dark;
                                 return Theme(
                                   data: Theme.of(context).copyWith(
-                                    colorScheme: const ColorScheme.light(
-                                      primary: AppColors.primary,
-                                    ),
+                                    colorScheme: isDark
+                                        ? const ColorScheme.dark(
+                                            primary: AppColors.primary,
+                                            surface: Colors.black,
+                                            background: Colors.black,
+                                            onSurface: Colors.white,
+                                            onBackground: Colors.white,
+                                          )
+                                        : const ColorScheme.light(
+                                            primary: AppColors.primary,
+                                          ),
+                                    dialogBackgroundColor: isDark
+                                        ? Colors.black
+                                        : null,
                                   ),
                                   child: child!,
                                 );
                               },
                             );
-                            if (picked != null)
+                            if (picked != null) {
                               setState(() => _startDate = picked);
+                            }
                           },
                           child: Container(
                             height: 48,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: AppColors.darkBlue.withOpacity(0.05),
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.transparent
+                                  : AppColors.darkBlue.withOpacity(0.05),
                               borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white24
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             child: Row(
                               children: [
@@ -768,7 +955,11 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                         )!.select_start_date
                                       : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
                                   style: AppText.regular.copyWith(
-                                    color: AppColors.darkBlue.withOpacity(0.8),
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white70
+                                        : AppColors.darkBlue.withOpacity(0.8),
                                   ),
                                 ),
                               ],
@@ -781,7 +972,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           AppLocalizations.of(context)!.endDate,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -803,15 +994,28 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                 );
                               },
                             );
-                            if (picked != null)
+                            if (picked != null) {
                               setState(() => _endDate = picked);
+                            }
                           },
                           child: Container(
                             height: 48,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: AppColors.darkBlue.withOpacity(0.05),
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.transparent
+                                  : AppColors.darkBlue.withOpacity(0.05),
                               borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white24
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
                             ),
                             child: Row(
                               children: [
@@ -827,7 +1031,11 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                         )!.select_end_date
                                       : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
                                   style: AppText.regular.copyWith(
-                                    color: AppColors.darkBlue.withOpacity(0.8),
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white70
+                                        : AppColors.darkBlue.withOpacity(0.8),
                                   ),
                                 ),
                               ],
@@ -840,7 +1048,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           AppLocalizations.of(context)!.importance,
                           style: AppText.medium.copyWith(
                             fontSize: 14,
-                            color: AppColors.darkBlue,
+                            color: isDark ? Colors.white : AppColors.darkBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -873,9 +1081,11 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                         : null,
                                   ),
                                   child: selected
-                                      ? const Icon(
+                                      ? Icon(
                                           Icons.check,
-                                          color: Colors.white,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                         )
                                       : null,
                                 ),
@@ -919,8 +1129,10 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                 onPressed: _isSaving
                                     ? null
                                     : () async {
-                                        if (!_formKey.currentState!.validate())
+                                        if (!_formKey.currentState!
+                                            .validate()) {
                                           return;
+                                        }
                                         // validate dates
                                         if (_startDate == null ||
                                             _endDate == null) {
@@ -953,7 +1165,29 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                         }
                                         setState(() => _isSaving = true);
 
+                                        // Get current user ID
+                                        final prefs =
+                                            await SharedPreferences.getInstance();
+                                        final userId = prefs.getInt('user_id');
+
+                                        if (userId == null) {
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'User not logged in',
+                                                ),
+                                              ),
+                                            );
+                                            setState(() => _isSaving = false);
+                                          }
+                                          return;
+                                        }
+
                                         final tracking = MedicineTracking(
+                                          userId: userId,
                                           name: _nameController.text.trim(),
                                           type: _selectedType ?? '',
                                           dosage:
@@ -1004,16 +1238,53 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                               : null,
                                           monthDays: null,
                                           customDates: freqType == 'custom'
-                                              ? <String>[]
+                                              ? _customDates
+                                                    .map(
+                                                      (d) => d
+                                                          .toIso8601String()
+                                                          .split('T')
+                                                          .first,
+                                                    )
+                                                    .toList()
                                               : null,
                                         );
 
-                                        final times = _selectedTimes
-                                            .map(
-                                              (t) =>
-                                                  '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
-                                            )
-                                            .toList();
+                                        // Collect times based on frequency type
+                                        List<String> times;
+                                        if (freqType == 'weekly') {
+                                          // For weekly: collect all times from all selected weekdays
+                                          final allTimes = <TimeOfDay>{};
+                                          for (final day in _weekDays) {
+                                            if (_selectedWeekDays[day] ==
+                                                true) {
+                                              final dayTimes =
+                                                  _weekDayTimes[day];
+                                              if (dayTimes != null &&
+                                                  dayTimes.isNotEmpty) {
+                                                allTimes.addAll(dayTimes);
+                                              }
+                                            }
+                                          }
+                                          times = allTimes
+                                              .map(
+                                                (t) =>
+                                                    '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
+                                              )
+                                              .toList();
+                                          if (times.isEmpty) {
+                                            times = [
+                                              '09:00',
+                                            ]; // Default fallback
+                                          }
+                                        } else {
+                                          // For other frequencies: use _selectedTimes
+                                          times = _selectedTimes
+                                              .map(
+                                                (t) =>
+                                                    '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
+                                              )
+                                              .toList();
+                                        }
 
                                         final repo = MedicineRepository();
                                         try {
@@ -1078,8 +1349,9 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                                             );
                                           }
                                         } finally {
-                                          if (mounted)
+                                          if (mounted) {
                                             setState(() => _isSaving = false);
+                                          }
                                         }
                                       },
                                 style: ElevatedButton.styleFrom(
@@ -1118,41 +1390,81 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   }
 
   InputDecoration _inputDecoration(String hint, IconData icon) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InputDecoration(
       hintText: hint,
       hintStyle: AppText.regular.copyWith(
-        color: AppColors.darkBlue.withOpacity(0.4),
+        color: isDark ? Colors.white54 : AppColors.darkBlue.withOpacity(0.4),
         fontSize: 14,
       ),
-      prefixIcon: Icon(icon, color: AppColors.darkBlue.withOpacity(0.5)),
+      prefixIcon: Icon(
+        icon,
+        color: isDark ? Colors.white54 : AppColors.darkBlue.withOpacity(0.5),
+      ),
       filled: true,
-      fillColor: AppColors.darkBlue.withOpacity(0.05),
+      fillColor: isDark
+          ? Colors.transparent
+          : AppColors.darkBlue.withOpacity(0.05),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(
+          color: isDark ? Colors.white24 : Colors.transparent,
+          width: 1.5,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(
+          color: isDark ? Colors.white24 : Colors.transparent,
+          width: 1.5,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        borderSide: BorderSide(
+          color: isDark ? Colors.white : AppColors.primary,
+          width: 2,
+        ),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 
   InputDecoration _dropdownDecoration({IconData? icon}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InputDecoration(
       filled: true,
-      fillColor: AppColors.darkBlue.withOpacity(0.05),
+      fillColor: isDark
+          ? Colors.transparent
+          : AppColors.darkBlue.withOpacity(0.05),
       prefixIcon: icon != null
-          ? Icon(icon, color: AppColors.darkBlue.withOpacity(0.5))
+          ? Icon(
+              icon,
+              color: isDark
+                  ? Colors.white54
+                  : AppColors.darkBlue.withOpacity(0.5),
+            )
           : null,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(
+          color: isDark ? Colors.white24 : Colors.transparent,
+          width: 1.5,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: isDark ? Colors.white24 : Colors.transparent,
+          width: 1.5,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: isDark ? Colors.white : AppColors.primary,
+          width: 2,
+        ),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     );

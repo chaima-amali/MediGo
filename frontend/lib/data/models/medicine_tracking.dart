@@ -1,5 +1,6 @@
-class MedicineTracking {
+﻿class MedicineTracking {
   final int? id;
+  final int? userId;
   final String name;
   final String type;
   final double dosage;
@@ -7,6 +8,7 @@ class MedicineTracking {
 
   MedicineTracking({
     this.id,
+    this.userId,
     required this.name,
     required this.type,
     required this.dosage,
@@ -16,6 +18,7 @@ class MedicineTracking {
   Map<String, dynamic> toMap() {
     return {
       'medicine_track_id': id,
+      'user_id': userId,
       'name': name,
       'type': type,
       'dosage': dosage,
@@ -36,6 +39,7 @@ class MedicineTracking {
 
     return MedicineTracking(
       id: map['medicine_track_id'] ?? map['id'],
+      userId: map['user_id'],
       name: map['name'] ?? '',
       type: map['type'] ?? '',
       dosage: parsedDosage,

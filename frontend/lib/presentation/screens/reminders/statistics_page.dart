@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
@@ -16,12 +16,12 @@ import 'package:frontend/data/repositories/occurrence_repository.dart';
 import 'package:frontend/logic/cubits/tracking_cubit.dart';
 
 /// =============================================================
-/// MAIN STATISTICS PAGE — ALWAYS WRAPPED WITH BLOC PROVIDER
+/// MAIN STATISTICS PAGE ÔÇö ALWAYS WRAPPED WITH BLOC PROVIDER
 /// =============================================================
 class StatisticsPage extends StatelessWidget {
   final VoidCallback? onBack;
 
-  const StatisticsPage({Key? key, this.onBack}) : super(key: key);
+  const StatisticsPage({super.key, this.onBack});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class StatisticsPage extends StatelessWidget {
 /// Embeddable panel version of statistics (no Scaffold) suitable for inline
 /// embedding inside other screens such as `TrackingPage`.
 class StatisticsPanel extends StatelessWidget {
-  const StatisticsPanel({Key? key}) : super(key: key);
+  const StatisticsPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,149 +49,178 @@ class StatisticsPanel extends StatelessWidget {
         );
       }
       if (state is MSLoaded) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: SizedBox(
-                height: 160,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 140,
-                      height: 140,
-                      child: CircularProgressIndicator(
-                        value: state.todayProgress.clamp(0.0, 1.0),
-                        strokeWidth: 12,
-                        color: state.todayProgress >= 1.0
-                            ? AppColors.success
-                            : AppColors.warning,
-                        backgroundColor: AppColors.lightBlue.withOpacity(0.4),
+        return SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: SizedBox(
+                  height: 125,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 110,
+                        height: 110,
+                        child: CircularProgressIndicator(
+                          value: state.todayProgress.clamp(0.0, 1.0),
+                          strokeWidth: 9,
+                          color: state.todayProgress >= 1.0
+                              ? AppColors.success
+                              : AppColors.warning,
+                          backgroundColor: AppColors.lightBlue.withOpacity(0.4),
+                        ),
                       ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "${(state.todayProgress * 100).round()}%",
-                          style: AppText.bold.copyWith(fontSize: 26),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          AppLocalizations.of(context)!.today_taken,
-                          style: AppText.medium.copyWith(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "${(state.todayProgress * 100).round()}%",
+                            style: AppText.bold.copyWith(
+                              fontSize: 24,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            AppLocalizations.of(context)!.today_taken,
+                            style: AppText.medium.copyWith(
+                              fontSize: 13,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              AppLocalizations.of(context)!.medicines_progress,
-              style: AppText.bold.copyWith(fontSize: 16),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
+              Text(
+                AppLocalizations.of(context)!.medicines_progress,
+                style: AppText.bold.copyWith(
+                  fontSize: 16,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
 
-            // When embedded inside a scrollable parent (TrackingPage uses
-            // SingleChildScrollView) we must avoid `Expanded`. Use a
-            // shrink-wrapped ListView instead so the panel lays out correctly.
-            state.items.isEmpty
-                ? Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.no_medicines_for_this_day,
-                      style: AppText.regular,
-                    ),
-                  )
-                : ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: state.items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, idx) {
-                      final it = state.items[idx];
-                      final medicineColors = [
-                        AppColors.primary,
-                        AppColors.pinkCard,
-                        AppColors.yellowCard,
-                        AppColors.blueCard,
-                        AppColors.coralCard,
-                        AppColors.lavenderCard,
-                        AppColors.mint,
-                      ];
-                      final colorHex =
-                          medicineColors[idx % medicineColors.length].value
-                              .toRadixString(16)
-                              .padLeft(8, '0');
-                      return InkWell(
-                        onTap: () async {
-                          TrackingCubit? trackingCubit;
-                          try {
-                            trackingCubit = BlocProvider.of<TrackingCubit>(
+              // When embedded inside a scrollable parent (TrackingPage uses
+              // SingleChildScrollView) we must avoid `Expanded`. Use a
+              // shrink-wrapped ListView instead so the panel lays out correctly.
+              state.items.isEmpty
+                  ? Center(
+                      child: Text(
+                        AppLocalizations.of(context)!.no_medicines_for_this_day,
+                        style: AppText.regular.copyWith(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : null,
+                        ),
+                      ),
+                    )
+                  : ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: state.items.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, idx) {
+                        final it = state.items[idx];
+                        final medicineColors = [
+                          AppColors.primary,
+                          AppColors.pinkCard,
+                          AppColors.yellowCard,
+                          AppColors.blueCard,
+                          AppColors.coralCard,
+                          AppColors.lavenderCard,
+                          AppColors.mint,
+                        ];
+                        final colorHex =
+                            medicineColors[idx % medicineColors.length].value
+                                .toRadixString(16)
+                                .padLeft(8, '0');
+                        return InkWell(
+                          onTap: () async {
+                            TrackingCubit? trackingCubit;
+                            try {
+                              trackingCubit = BlocProvider.of<TrackingCubit>(
+                                context,
+                              );
+                            } catch (_) {
+                              trackingCubit = null;
+                            }
+
+                            final tc =
+                                trackingCubit ??
+                                (TrackingCubit(OccurrenceRepository())
+                                  ..loadDay(DateTime.now()));
+
+                            Navigator.push(
                               context,
+                              MaterialPageRoute(
+                                builder: (ctx) =>
+                                    BlocProvider<EditMedicineCubit>(
+                                      create: (_) => EditMedicineCubit(
+                                        MedicineRepository(),
+                                        tc,
+                                      ),
+                                      child: EditMedicinePage(
+                                        planId: it.planId,
+                                        occurrenceId: null,
+                                      ),
+                                    ),
+                              ),
                             );
-                          } catch (_) {
-                            trackingCubit = null;
-                          }
-
-                          final tc =
-                              trackingCubit ??
-                              (TrackingCubit(OccurrenceRepository())
-                                ..loadDay(DateTime.now()));
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (ctx) => BlocProvider<EditMedicineCubit>(
-                                create: (_) =>
-                                    EditMedicineCubit(MedicineRepository(), tc),
-                                child: EditMedicinePage(
-                                  planId: it.planId,
-                                  occurrenceId: null,
+                          },
+                          child: Row(
+                            children: [
+                              MedicineRing(
+                                size: 72,
+                                percent: it.progress,
+                                colorHex: colorHex,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      it.name.isNotEmpty ? it.name : "Unnamed",
+                                      style: AppText.medium,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    LinearProgressIndicator(
+                                      value: it.progress.clamp(0.0, 1.0),
+                                      color: AppColors.primary,
+                                      backgroundColor: AppColors.lightBlue
+                                          .withOpacity(0.2),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            MedicineRing(
-                              size: 72,
-                              percent: it.progress,
-                              colorHex: colorHex,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    it.name.isNotEmpty ? it.name : "Unnamed",
-                                    style: AppText.medium,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  LinearProgressIndicator(
-                                    value: it.progress.clamp(0.0, 1.0),
-                                    color: AppColors.primary,
-                                    backgroundColor: AppColors.lightBlue
-                                        .withOpacity(0.2),
-                                  ),
-                                ],
+                              const SizedBox(width: 12),
+                              Text(
+                                "${(it.progress * 100).round()}%",
+                                style: AppText.regular,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              "${(it.progress * 100).round()}%",
-                              style: AppText.regular,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ],
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ],
+          ),
         );
       }
       return const SizedBox.shrink();
@@ -214,15 +243,16 @@ class StatisticsPanel extends StatelessWidget {
 }
 
 /// =============================================================
-/// INTERNAL CONTENT — must only be used inside StatisticsPage
+/// INTERNAL CONTENT ÔÇö must only be used inside StatisticsPage
 /// =============================================================
 class _StatisticsContent extends StatelessWidget {
   final VoidCallback? onBack;
 
-  const _StatisticsContent({Key? key, this.onBack}) : super(key: key);
+  const _StatisticsContent({super.key, this.onBack});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: AppColors.lightBlue,
       body: SafeArea(
@@ -237,7 +267,10 @@ class _StatisticsContent extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     'Statistics',
-                    style: AppText.bold.copyWith(fontSize: 22),
+                    style: AppText.bold.copyWith(
+                      fontSize: 22,
+                      color: isDark ? Colors.white : null,
+                    ),
                   ),
                   const Spacer(),
                 ],
@@ -248,14 +281,27 @@ class _StatisticsContent extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF222222) : Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    if (!isDark)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                  ],
                 ),
-
                 // Detect if a provider already exists above
-                child: _buildStatisticsBloc(context),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  child: _buildStatisticsBloc(context),
+                ),
               ),
             ),
           ],
@@ -297,80 +343,104 @@ class _StatisticsContent extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (state is MSError) {
       return Center(
-        child: Text("Error: ${state.message}", style: AppText.medium),
+        child: Text(
+          "Error: ${state.message}",
+          style: AppText.medium.copyWith(color: isDark ? Colors.white : null),
+        ),
       );
     }
 
     if (state is MSLoaded) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// TODAY CIRCLE PROGRESS
-          Center(
-            child: SizedBox(
-              height: 160,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 140,
-                    height: 140,
-                    child: CircularProgressIndicator(
-                      value: state.todayProgress.clamp(0.0, 1.0),
-                      strokeWidth: 12,
-                      color: state.todayProgress >= 1.0
-                          ? AppColors.success
-                          : AppColors.warning,
-                      backgroundColor: AppColors.lightBlue.withOpacity(0.4),
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// TODAY CIRCLE PROGRESS
+            Center(
+              child: SizedBox(
+                height: 140,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: CircularProgressIndicator(
+                        value: state.todayProgress.clamp(0.0, 1.0),
+                        strokeWidth: 10,
+                        color: state.todayProgress >= 1.0
+                            ? AppColors.success
+                            : AppColors.warning,
+                        backgroundColor: AppColors.lightBlue.withOpacity(0.4),
+                      ),
                     ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "${(state.todayProgress * 100).round()}%",
-                        style: AppText.bold.copyWith(fontSize: 26),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        AppLocalizations.of(context)!.today_taken,
-                        style: AppText.medium.copyWith(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ],
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "${(state.todayProgress * 100).round()}%",
+                          style: AppText.bold.copyWith(
+                            fontSize: 24,
+                            color: isDark ? Colors.white : null,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!.today_taken,
+                          style: AppText.medium.copyWith(
+                            fontSize: 13,
+                            color: isDark ? Colors.white : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 24),
-          Text(
-            AppLocalizations.of(context)!.medicines_progress,
-            style: AppText.bold.copyWith(fontSize: 16),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 16),
+            Text(
+              AppLocalizations.of(context)!.medicines_progress,
+              style: AppText.bold.copyWith(
+                fontSize: 16,
+                color: isDark ? Colors.white : null,
+              ),
+            ),
+            const SizedBox(height: 10),
 
-          /// MEDICINES LIST
-          Expanded(
-            child: state.items.isEmpty
+            /// MEDICINES LIST
+            state.items.isEmpty
                 ? Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.no_medicines_for_this_day,
-                      style: AppText.regular,
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Text(
+                        AppLocalizations.of(context)!.no_medicines_for_this_day,
+                        style: AppText.regular.copyWith(
+                          color: isDark ? Colors.white : null,
+                        ),
+                      ),
                     ),
                   )
                 : ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: state.items.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, idx) {
                       final it = state.items[idx];
-                      return _medicineTile(context, it, idx);
+                      return _medicineTile(context, it, idx, isDark: isDark);
                     },
                   ),
-          ),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       );
     }
 
@@ -380,7 +450,12 @@ class _StatisticsContent extends StatelessWidget {
   /// =============================================================
   /// ONE MEDICINE PROGRESS ROW
   /// =============================================================
-  Widget _medicineTile(BuildContext context, dynamic it, int idx) {
+  Widget _medicineTile(
+    BuildContext context,
+    dynamic it,
+    int idx, {
+    bool isDark = false,
+  }) {
     final medicineColors = [
       AppColors.primary,
       AppColors.pinkCard,
@@ -429,7 +504,9 @@ class _StatisticsContent extends StatelessWidget {
               children: [
                 Text(
                   it.name.isNotEmpty ? it.name : "Unnamed",
-                  style: AppText.medium,
+                  style: AppText.medium.copyWith(
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 LinearProgressIndicator(
@@ -442,7 +519,12 @@ class _StatisticsContent extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          Text("${(it.progress * 100).round()}%", style: AppText.regular),
+          Text(
+            "${(it.progress * 100).round()}%",
+            style: AppText.regular.copyWith(
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
         ],
       ),
     );

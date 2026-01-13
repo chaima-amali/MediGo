@@ -108,6 +108,9 @@
   "billedAnnually": "Billed annually",
   "yearly": "Yearly", 
   "monthly": "Monthly",
+  "premiumFeature": "Premium Feature",
+  "premiumFeatureMessage": "Pre-order and reservation is a premium feature. Upgrade to Premium to unlock this feature and enjoy an ad-free experience with instant restock alerts.",
+  "later": "Later",
   "billedMonthly": "Billed monthly",
   "perMonth": "/month",
   "perYear": "per year",   
@@ -185,7 +188,6 @@
   "nextButton": "Next",
   "pickupCode": "Pickup Code",
   "copyCode": "Copy Code",
-  "showQRCode": "Show QR Code for Scanning",
   "showQrCode": "Show QR Code for Scanning",
   "showCodeAtPickup": "Show this code at pickup.",
   "readyForPickup": "Ready for Pickup",
@@ -299,11 +301,163 @@
   "view_report": "View Report",
   "no_medicine_records_for_this_date": "No medicine records for this date",
   "howManyTimesOnDay": "How many times on {day}?",
+  "invalidQuantity": "Please enter a valid quantity (at least 1)",
   "@howManyTimesOnDay": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
-  }
+  },
+  "cannot_mark_future_time": "Cannot mark future time",
+  "notifications": "Notifications",
+  "all": "All",
+  "reminders": "Reminders",
+  "medstock_reserv": "medstock/Reserv",
+  "no_notifications_yet": "No notifications yet",
+  "add_medicines_to_see_reminders": "Add medicines to see reminders here",
+  "no_medstock_or_reservation_notifications": "No medicine stock or reservation notifications",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "days_ago": "{count} days ago",
+  "@days_ago": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "delete_medicine": "Delete Medicine",
+  "confirm_delete_medicine": "Are you sure you want to delete this medicine and its entire schedule?",
+  "delete": "Delete",
+  "medicine_deleted": "Medicine deleted successfully",
+  "medicine_name": "Medicine Name",
+  "medicine_type": "Medicine Type",
+  "dosage": "Dosage",
+  "unit": "Unit",
+  "frequency": "Frequency",
+  "times_per_day": "Times Per Day",
+  "medicine_times": "Medicine Times",
+  "start_date": "Start Date",
+  "end_date": "End Date",
+  "save": "Save",
+  "notification_message_1": "Time for your medicine \"{medicineName}\" — your health will thank you",
+  "notification_message_2": "Hey there! Don't forget your dose of \"{medicineName}\" small steps for a healthier you.",
+  "notification_message_3": "It's time to take your medicine \"{medicineName}\" and stay healthy.",
+  "notification_message_4": "Good reminder! Take your \"{medicineName}\" as scheduled.",
+  "notification_message_5": "Don't miss your dose of \"{medicineName}\" — your wellness matters!",
+  "@notification_message_1": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_2": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_3": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_4": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "@notification_message_5": {
+    "placeholders": {
+      "medicineName": {
+        "type": "String"
+      }
+    }
+  },
+  "unableToValidatePharmacyHours": "Unable to validate pharmacy hours",
+  "pickupTimeCannotBeInPast": "Pickup time cannot be in the past",
+  "userNotAuthenticated": "User not authenticated",
+  "codeCopiedToClipboard": "Code copied to clipboard",
+  "qrCode": "QR Code",
+  "close": "Close",
+  "markAsCompleted": "Mark as Completed",
+  "confirmReservationQuestion": "Confirm Reservation?",
+  "confirmReservationMessage": "Are you sure you want to confirm this reservation?",
+  "yesConfirm": "Yes, Confirm",
+  "reservationConfirmedSuccess": "Reservation confirmed successfully",
+  "deleteReservationQuestion": "Delete Reservation?",
+  "deleteReservationMessage": "Are you sure you want to delete this reservation? This action cannot be undone.",
+  "yesDelete": "Yes, Delete",
+  "reservationDeletedSuccess": "Reservation deleted successfully",
+  "medicine": "Medicine",
+  "pharmacy": "Pharmacy",
+  "pharmacyNotAvailable": "Pharmacy not available",
+  "reservationCancelled": "Reservation Cancelled",
+  "reservationCancelledMessage": "This reservation has been cancelled. You can delete it from your records.",
+  "awaitingPharmacyConfirmation": "Awaiting Pharmacy Confirmation",
+  "medicationReports": "Medication Reports",
+  "adherenceReports": "Adherence Reports",
+  "trackMedicationAdherence": "Track your medication adherence over time",
+  "weeklyReport": "Weekly Report",
+  "viewAdherenceLast7Days": "View adherence data for the last 7 days",
+  "monthlyReport": "Monthly Report",
+  "viewAdherenceLast30Days": "View adherence data for the last 30 days",
+  "customReport": "Custom Report",
+  "generateCustomDateRange": "Generate a report for a custom date range",
+  "patientInformation": "Patient Information",
+  "reportGeneratedOn": "Report Generated On",
+  "reportPeriod": "Report Period",
+  "adherenceSummary": "Adherence Summary",
+  "medicinesNotTaken": "Medicines Not Taken",
+  "averageTaken": "Average Taken",
+  "fullyAdherent": "Fully Adherent",
+  "medicinesMissed": "Medicines Missed",
+  "weeklyProgress": "Weekly Progress",
+  "medicationSummary": "Medication Summary",
+  "dosage": "Dosage",
+  "frequency": "Frequency",
+  "duration": "Duration",
+  "status": "Status",
+  "detailedIntakeLog": "Detailed Intake Log",
+  "date": "Date",
+  "time": "Time",
+  "taken": "Taken",
+  "missed": "Missed",
+  "skipped": "Skipped",
+  "scheduled": "Scheduled",
+  "ongoing": "Ongoing",
+  "completed": "Completed",
+  "share": "Share",
+  "download": "Download",
+  "noMedicationDataFound": "No medication data found for this period.\n\nPlease add medicines and mark them as taken/missed to see reports.",
+  "noUserDataFound": "No user data found. Please add your profile information first.",
+  "loadingReport": "Loading Report...",
+  "selectDateRange": "Select Date Range",
+  "selectStartDate": "Select Start Date",
+  "selectEndDate": "Select End Date",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "generateReport": "Generate Report",
+  "quickSelect": "Quick Select",
+  "lastWeek": "Last Week",
+  "lastMonth": "Last Month",
+  "last3Months": "Last 3 Months",
+  "cancel": "Cancel",
+  "medicineAdherenceReport": "Medicine Adherence Report",
+  "generatingPDF": "Generating PDF...",
+  "pdfGeneratedSuccessfully": "PDF generated successfully!",
+  "failedToGeneratePDF": "Failed to generate PDF",
+  "totalScheduled": "Total Scheduled",
+  "shareReportDescription": "Export your reports to share with your doctor or family members",
+  "retry": "Retry",
+  "comingSoon": "Coming Soon",
+  "shareReports": "Share Reports",
+  "delayed": "Delayed"
 }

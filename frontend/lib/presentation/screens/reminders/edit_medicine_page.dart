@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text.dart';
 import '../../widgets/back_arrow.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/logic/cubits/tracking_cubit.dart';
 import 'package:frontend/logic/cubits/edit_medicine_cubit.dart';
 import 'package:frontend/data/repositories/medicine_repository.dart';
@@ -16,6 +16,7 @@ class EditMedicinePage extends StatefulWidget {
   final int? planId;
   final int? occurrenceId;
   final Occurrence? occurrence;
+
   const EditMedicinePage({
     super.key,
     this.planId,
@@ -38,6 +39,8 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
 
   late EditMedicineCubit _cubit;
   bool _createdLocalCubit = false;
+  bool _isForever = false;
+  List<TimeOfDay> _medicineTimes = [];
 
   final List<String> medicineTypes = [
     'Tablet',
@@ -92,9 +95,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
   DateTime? endDate = DateTime.now().add(const Duration(days: 30));
 
   String _localizedError(String? error, AppLocalizations l10n) {
-    if (error == null || error.trim().isEmpty) {
-      return l10n.unexpected_error;
-    }
+    if (error == null || error.trim().isEmpty) return l10n.unexpected_error;
     final normalized = error.trim().toLowerCase();
     if (normalized == 'plan not found') return l10n.plan_not_found;
     if (normalized == 'failed to save') return l10n.failed_to_save;
@@ -104,8 +105,8 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
   @override
   void initState() {
     super.initState();
-    // Try to obtain a provided EditMedicineCubit from the ancestor. If none,
-    // create a local one and remember to close it on dispose.
+
+    // Initialize cubit
     try {
       _cubit = BlocProvider.of<EditMedicineCubit>(context);
       _createdLocalCubit = false;
@@ -118,121 +119,116 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
       _createdLocalCubit = true;
     }
 
-    // Always clear controllers to avoid showing stale data from previous opens.
     medicineNameController.clear();
     dosageController.clear();
     timesController.clear();
 
-    // If the navigator passed an Occurrence, prefill the medicine name immediately
-    // so the user sees something while the repository/cubit load completes.
     if (widget.occurrence != null) {
       medicineNameController.text = widget.occurrence!.medicineName ?? '';
     }
 
-    // Load plan if provided. Use a post-frame callback to ensure context is ready.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Determine a usable planId. If widget.planId is not provided or 0,
-      // try to resolve it from the supplied occurrenceId using OccurrenceRepository.
-      () async {
-        int? planId = widget.planId;
-        if (planId == null || planId == 0) {
-          if (widget.occurrenceId != null) {
-            try {
-              final occRepo = OccurrenceRepository();
-              final fetched = await occRepo.getPlanIdForOccurrence(
-                widget.occurrenceId!,
-              );
-              if (fetched != null && fetched > 0) planId = fetched;
-            } catch (_) {}
-          }
-        }
-        if (planId != null && planId > 0) {
-          _cubit.load(planId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      int? planId = widget.planId;
 
-          // Short fallback: populate fields quickly from repo if available.
+      if (planId == null || planId == 0) {
+        if (widget.occurrenceId != null) {
           try {
-            final plan = await _repo.getPlanById(planId);
-            if (plan != null) {
-              final tracking = await _repo.getTrackingById(plan.trackingId);
-              // infer times-per-day from occurrences for this plan
-              final occRepo = OccurrenceRepository();
-              final times = await occRepo.getDistinctTimesForPlan(plan.id!);
-
-              if (!mounted) return;
-              setState(() {
-                _plan = plan;
-                _tracking = tracking;
-
-                // populate tracking fields if available
-                if (tracking != null) {
-                  medicineNameController.text = tracking.name;
-                  selectedMedicineType = tracking.type;
-                  selectedUnit = tracking.unit;
-                  try {
-                    dosage = tracking.dosage.toInt();
-                  } catch (_) {
-                    dosage = tracking.dosage.round();
-                  }
-                  dosageController.text = dosage.toString();
-                } else {
-                  // keep occurrence-provided name if tracking row not found
-                  if (widget.occurrence != null &&
-                      (medicineNameController.text.isEmpty)) {
-                    medicineNameController.text =
-                        widget.occurrence!.medicineName ?? '';
-                  }
-                }
-
-                // set times-per-day based on distinct times found
-                timesPerDay = times.length > 0 ? times.length : timesPerDay;
-                timesController.text = timesPerDay.toString();
-
-                startDate = plan.startDate;
-                endDate = plan.endDate;
-                selectedImportanceColor = _colorFromImportance(plan.importance);
-                switch (plan.frequencyType) {
-                  case 'daily':
-                    selectedFrequency = 'Per day';
-                    break;
-                  case 'weekly':
-                    selectedFrequency = 'Per week';
-                    break;
-                  case 'monthly':
-                    selectedFrequency = 'Per month';
-                    break;
-                  case 'yearly':
-                    selectedFrequency = 'Per year';
-                    break;
-                }
-              });
-            }
-          } catch (_) {}
-        } else {
-          // couldn't resolve planId - show visible feedback and log
-          // ignore: avoid_print
-          print(
-            'EditMedicinePage: could not resolve planId for widget.planId=${widget.planId} occurrenceId=${widget.occurrenceId}',
-          );
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(
-                    context,
-                  )!.could_not_find_plan_for_occurrence,
-                ),
-              ),
+            final occRepo = OccurrenceRepository();
+            final fetched = await occRepo.getPlanIdForOccurrence(
+              widget.occurrenceId!,
             );
-          }
+            if (fetched != null && fetched > 0) planId = fetched;
+          } catch (_) {}
         }
-      }();
+      }
+
+      if (planId != null && planId > 0) {
+        _cubit.load(planId);
+
+        try {
+          final plan = await _repo.getPlanById(planId);
+          if (plan != null) {
+            final tracking = await _repo.getTrackingById(plan.trackingId);
+            final occRepo = OccurrenceRepository();
+            final times = await occRepo.getDistinctTimesForPlan(plan.id!);
+
+            if (!mounted) return;
+            setState(() {
+              _plan = plan;
+              _tracking = tracking;
+
+              if (tracking != null) {
+                medicineNameController.text = tracking.name;
+                // Validate dropdown values exist in the lists before setting
+                selectedMedicineType = medicineTypes.contains(tracking.type)
+                    ? tracking.type
+                    : 'Tablet';
+                selectedUnit = units.contains(tracking.unit)
+                    ? tracking.unit
+                    : 'mg';
+                dosage = tracking.dosage.toInt();
+                dosageController.text = dosage.toString();
+              }
+
+              timesPerDay = times.isNotEmpty ? times.length : timesPerDay;
+              timesController.text = timesPerDay.toString();
+
+              _medicineTimes.clear();
+              for (final timeStr in times) {
+                try {
+                  final parts = timeStr.split(':');
+                  if (parts.length >= 2) {
+                    _medicineTimes.add(
+                      TimeOfDay(
+                        hour: int.parse(parts[0]),
+                        minute: int.parse(parts[1]),
+                      ),
+                    );
+                  }
+                } catch (_) {}
+              }
+              _updateTimes();
+
+              startDate = plan.startDate;
+              endDate = plan.endDate;
+              selectedImportanceColor = _colorFromImportance(plan.importance);
+
+              switch (plan.frequencyType) {
+                case 'daily':
+                  selectedFrequency = 'Per day';
+                  break;
+                case 'weekly':
+                  selectedFrequency = 'Per week';
+                  break;
+                case 'monthly':
+                  selectedFrequency = 'Per month';
+                  break;
+                case 'yearly':
+                  selectedFrequency = 'Per year';
+                  break;
+              }
+            });
+          }
+        } catch (_) {}
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(
+                  context,
+                )!.could_not_find_plan_for_occurrence,
+              ),
+            ),
+          );
+        }
+      }
     });
   }
 
   @override
   void didUpdateWidget(covariant EditMedicinePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If planId changes for some reason, reload the cubit and reset fields.
     if (widget.planId != oldWidget.planId) {
       medicineNameController.clear();
       dosageController.clear();
@@ -256,32 +252,90 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
     final initial = isStart
         ? (startDate ?? DateTime.now())
         : (endDate ?? DateTime.now());
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: isDark
+              ? const ColorScheme.dark(
+                  primary: AppColors.primary,
+                  surface: Colors.black,
+                  background: Colors.black,
+                  onSurface: Colors.white,
+                )
+              : const ColorScheme.light(
+                  primary: AppColors.primary,
+                  onSurface: Colors.black,
+                ),
+          dialogBackgroundColor: isDark ? Colors.black : null,
+        ),
+        child: child!,
+      ),
     );
 
-    if (picked != null && mounted) {
-      setState(() {
-        if (isStart) {
-          startDate = picked;
-        } else {
-          endDate = picked;
-        }
-      });
+    if (picked != null) {
+      if (mounted) {
+        setState(() {
+          if (isStart)
+            startDate = picked;
+          else
+            endDate = picked;
+        });
+      }
+    }
+  }
+
+  Future<void> _selectTime(int index) async {
+    final initial = index < _medicineTimes.length
+        ? _medicineTimes[index]
+        : TimeOfDay.now();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: isDark
+              ? const ColorScheme.dark(
+                  primary: AppColors.primary,
+                  surface: Colors.black,
+                  background: Colors.black,
+                  onSurface: Colors.white,
+                )
+              : const ColorScheme.light(
+                  primary: AppColors.primary,
+                  onSurface: Colors.black,
+                ),
+          dialogBackgroundColor: isDark ? Colors.black : null,
+        ),
+        child: child!,
+      ),
+    );
+
+    if (picked != null) {
+      if (mounted) {
+        setState(() {
+          if (index < _medicineTimes.length)
+            _medicineTimes[index] = picked;
+          else
+            _medicineTimes.add(picked);
+        });
+      }
+    }
+  }
+
+  void _updateTimes() {
+    if (_medicineTimes.length < timesPerDay) {
+      for (int i = _medicineTimes.length; i < timesPerDay; i++) {
+        final hour = (i * 24) ~/ timesPerDay;
+        _medicineTimes.add(TimeOfDay(hour: hour, minute: 0));
+      }
+    } else if (_medicineTimes.length > timesPerDay) {
+      _medicineTimes.removeRange(timesPerDay, _medicineTimes.length);
     }
   }
 
@@ -314,30 +368,67 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
     return 'primary';
   }
 
-  void _confirm(String action, VoidCallback onConfirm) {
-    final loc = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(loc.confirm_action_title(action)),
-        content: Text(loc.confirm_action_message(action)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc.no),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              onConfirm();
-            },
-            child: Text(loc.yes),
-          ),
-        ],
-      ),
+  void _handleSave() async {
+    if (_plan == null ||
+        _tracking == null ||
+        startDate == null ||
+        endDate == null) {
+      return;
+    }
+
+    final timeStrings = _medicineTimes
+        .map(
+          (t) =>
+              '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
+        )
+        .toList();
+
+    final updatedTracking = MedicineTracking(
+      id: _tracking!.id,
+      userId: _tracking!.userId,
+      name: medicineNameController.text,
+      type: selectedMedicineType ?? 'Tablet',
+      unit: selectedUnit ?? 'mg',
+      dosage: double.tryParse(dosageController.text) ?? 100,
     );
+
+    final updatedPlan = MedicinePlan(
+      id: _plan!.id,
+      trackingId: _plan!.trackingId,
+      userId: _plan!.userId,
+      importance: _importanceFromColor(selectedImportanceColor),
+      startDate: startDate!,
+      endDate: endDate!,
+      frequencyType: selectedFrequency == 'Per day'
+          ? 'daily'
+          : selectedFrequency == 'Per week'
+          ? 'weekly'
+          : selectedFrequency == 'Per month'
+          ? 'monthly'
+          : 'yearly',
+      intervalDays: _plan!.intervalDays,
+      weekdays: _plan!.weekdays,
+      monthDays: _plan!.monthDays,
+      customDates: _plan!.customDates,
+    );
+
+    await _cubit.save(
+      updatedTracking: updatedTracking,
+      updatedPlan: updatedPlan,
+    );
+
+    // Regenerate occurrences if dates or times changed
+    if (_plan!.id != null) {
+      await _cubit.regenerateOccurrences(
+        planId: _plan!.id!,
+        startDate: startDate!,
+        endDate: endDate!,
+        times: timeStrings,
+      );
+    }
   }
+
+  // Delete action removed: edit page only supports Save/Cancel now.
 
   Widget _field({
     required String label,
@@ -351,10 +442,12 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.darkBlue,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : AppColors.darkBlue,
           ),
         ),
         const SizedBox(height: 8),
@@ -362,20 +455,44 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
           decoration: BoxDecoration(
             color: AppColors.darkBlue.withOpacity(0.08),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white24
+                  : AppColors.primary,
+              width: 1.2,
+            ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(
             children: [
-              Icon(icon, size: 22, color: Colors.black45),
+              Icon(
+                icon,
+                size: 22,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black45,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child:
                     child ??
                     TextField(
                       controller: controller,
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                       decoration: InputDecoration(
                         hintText: hint,
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white54
+                              : Colors.black54,
+                        ),
                         border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
                       ),
                     ),
               ),
@@ -389,59 +506,45 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocProvider.value(
-      /// ✅ Provide the correct cubit to the UI
       value: _cubit,
       child: Scaffold(
         backgroundColor: AppColors.lightBlue,
         body: SafeArea(
           child: BlocListener<EditMedicineCubit, EditMedicineState>(
             listener: (context, state) {
+              if (!mounted) return;
+
               if (state.success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(AppLocalizations.of(context)!.saved)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(l10n.saved)));
                 Navigator.pop(context);
               }
 
               if (state.error != null) {
-                final l10n = AppLocalizations.of(context)!;
                 final message = _localizedError(state.error, l10n);
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(SnackBar(content: Text(message)));
               }
 
-              if (state.plan != null) {
+              if (state.plan != null && mounted) {
                 final plan = state.plan!;
                 final tracking = state.tracking;
-                // debug print
-                // ignore: avoid_print
-                print(
-                  'EditMedicinePage listener -> planId=${plan.id}, trackingId=${tracking?.id}, name=${tracking?.name}',
-                );
-
-                if (!mounted) return;
-
                 setState(() {
                   _plan = plan;
+                  _tracking = tracking;
+
                   if (tracking != null) {
-                    _tracking = tracking;
                     medicineNameController.text = tracking.name;
                     selectedMedicineType = tracking.type;
                     selectedUnit = tracking.unit;
                     dosage = tracking.dosage.toInt();
                     dosageController.text = dosage.toString();
-                    timesController.text = timesPerDay.toString();
-                  } else {
-                    // keep occurrence-provided name if tracking row not found
-                    if (widget.occurrence != null &&
-                        (medicineNameController.text.isEmpty)) {
-                      medicineNameController.text =
-                          widget.occurrence!.medicineName ?? '';
-                    }
                   }
-
                   startDate = plan.startDate;
                   endDate = plan.endDate;
                   selectedImportanceColor = _colorFromImportance(
@@ -465,7 +568,6 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                 });
               }
             },
-
             child: Column(
               children: [
                 Padding(
@@ -475,7 +577,7 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                       const CustomBackArrow(),
                       const Spacer(),
                       Text(
-                        AppLocalizations.of(context)!.edit_medicine,
+                        l10n.edit_medicine,
                         style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
@@ -486,12 +588,11 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                     ],
                   ),
                 ),
-
                 Expanded(
                   child: Container(
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: AppColors.white,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(30),
                       ),
@@ -501,410 +602,200 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                       child: Column(
                         children: [
                           _field(
-                            label:
-                                "${AppLocalizations.of(context)!.medicineName}:",
-                            icon: Icons.medical_services_outlined,
+                            label: l10n.medicine_name,
+                            icon: Icons.medication,
                             controller: medicineNameController,
-                            hint: AppLocalizations.of(
-                              context,
-                            )!.enterMedicineName,
                           ),
-
                           _field(
-                            label:
-                                "${AppLocalizations.of(context)!.medicineType}:",
-                            icon: Icons.category_outlined,
+                            label: l10n.medicine_type,
+                            icon: Icons.category,
                             child: DropdownButton<String>(
-                              isExpanded: true,
                               value: selectedMedicineType,
+                              isExpanded: true,
                               underline: const SizedBox(),
-                              items: medicineTypes.map((e) {
+                              items: medicineTypes.map((type) {
                                 return DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e),
+                                  value: type,
+                                  child: Text(type),
                                 );
                               }).toList(),
-                              onChanged: (v) =>
-                                  setState(() => selectedMedicineType = v),
+                              onChanged: (value) {
+                                setState(() => selectedMedicineType = value);
+                              },
                             ),
                           ),
-
+                          _field(
+                            label: l10n.dosage,
+                            icon: Icons.straighten,
+                            controller: dosageController,
+                          ),
+                          _field(
+                            label: l10n.unit,
+                            icon: Icons.scale,
+                            child: DropdownButton<String>(
+                              value: selectedUnit,
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                              items: units.map((unit) {
+                                return DropdownMenuItem(
+                                  value: unit,
+                                  child: Text(unit),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() => selectedUnit = value);
+                              },
+                            ),
+                          ),
+                          _field(
+                            label: l10n.frequency,
+                            icon: Icons.schedule,
+                            child: DropdownButton<String>(
+                              value: selectedFrequency,
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                              items: frequencies.map((freq) {
+                                return DropdownMenuItem(
+                                  value: freq,
+                                  child: Text(freq),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() => selectedFrequency = value);
+                              },
+                            ),
+                          ),
+                          _field(
+                            label: l10n.times_per_day,
+                            icon: Icons.access_time,
+                            controller: timesController,
+                            hint: '1',
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.medicine_times,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ..._medicineTimes.asMap().entries.map((entry) {
+                                final index = entry.key;
+                                final time = entry.value;
+                                return GestureDetector(
+                                  onTap: () => _selectTime(index),
+                                  child: Container(
+                                    width: double.infinity,
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.darkBlue.withOpacity(
+                                        0.08,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white24
+                                            : AppColors.primary,
+                                        width: 1.2,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : AppColors.darkBlue,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              const SizedBox(height: 20),
+                            ],
+                          ),
+                          _field(
+                            label: l10n.start_date,
+                            icon: Icons.calendar_today,
+                            child: GestureDetector(
+                              onTap: () => _selectDate(true),
+                              child: Text(
+                                startDate?.toString().split(' ')[0] ?? '',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
+                                ),
+                              ),
+                            ),
+                          ),
+                          _field(
+                            label: l10n.end_date,
+                            icon: Icons.event,
+                            child: GestureDetector(
+                              onTap: () => _selectDate(false),
+                              child: Text(
+                                endDate?.toString().split(' ')[0] ?? '',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : AppColors.darkBlue,
+                                ),
+                              ),
+                            ),
+                          ),
                           Row(
                             children: [
                               Expanded(
-                                child: _field(
-                                  label:
-                                      "${AppLocalizations.of(context)!.dose}:",
-                                  icon: Icons.numbers_outlined,
-                                  child: TextField(
-                                    controller: dosageController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                    ),
-                                    onChanged: (v) =>
-                                        dosage = int.tryParse(v) ?? dosage,
+                                child: OutlinedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(l10n.cancel),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: _field(
-                                  label:
-                                      "${AppLocalizations.of(context)!.unit}:",
-                                  icon: Icons.straighten_outlined,
-                                  child: DropdownButton<String>(
-                                    isExpanded: true,
-                                    value: selectedUnit,
-                                    underline: const SizedBox(),
-                                    items: units
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e,
-                                            child: Text(e),
-                                          ),
-                                        )
-                                        .toList(),
-                                    onChanged: (v) =>
-                                        setState(() => selectedUnit = v),
+                                child: ElevatedButton.icon(
+                                  onPressed: _handleSave,
+                                  icon: const Icon(Icons.save),
+                                  label: Text(l10n.save),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-
-                          _field(
-                            label:
-                                "${AppLocalizations.of(context)!.frequency}:",
-                            icon: Icons.access_time_outlined,
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              value: selectedFrequency,
-                              underline: const SizedBox(),
-                              items: frequencies
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e,
-                                      child: Text(e),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (v) =>
-                                  setState(() => selectedFrequency = v),
-                            ),
-                          ),
-
-                          _field(
-                            label:
-                                "${AppLocalizations.of(context)!.timesPerDay}:",
-                            icon: Icons.repeat_on_outlined,
-                            child: TextField(
-                              controller: timesController,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                              ),
-                              onChanged: (v) =>
-                                  timesPerDay = int.tryParse(v) ?? timesPerDay,
-                            ),
-                          ),
-
-                          _field(
-                            label:
-                                "${AppLocalizations.of(context)!.startDate}:",
-                            icon: Icons.calendar_today_outlined,
-                            child: GestureDetector(
-                              onTap: () => _selectDate(true),
-                              child: SizedBox(
-                                height: 40,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    startDate.toString().split(" ")[0],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          _field(
-                            label: "${AppLocalizations.of(context)!.endDate}:",
-                            icon: Icons.event_outlined,
-                            child: GestureDetector(
-                              onTap: () => _selectDate(false),
-                              child: SizedBox(
-                                height: 40,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(endDate.toString().split(" ")[0]),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 30),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () => _confirm(
-                                    AppLocalizations.of(context)!.cancel,
-                                    () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFFC7C7),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.cancel,
-                                    style: AppText.medium.copyWith(
-                                      fontSize: 16,
-                                      color: AppColors.darkBlue,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () => _confirm(
-                                    AppLocalizations.of(context)!.save_changes,
-                                    () async {
-                                      if (_plan == null || _tracking == null) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.nothing_to_save,
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
-
-                                      final name = medicineNameController.text
-                                          .trim();
-                                      if (name.isEmpty) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.name_is_required,
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
-                                      if (dosage <= 0) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.dosage_must_be_greater_than_0,
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
-                                      if (selectedUnit == null ||
-                                          selectedUnit!.isEmpty) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.unit_is_required,
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
-                                      if (timesPerDay <= 0) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.times_per_day_must_be_at_least_1,
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
-                                      if (startDate == null ||
-                                          endDate == null) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.start_end_dates_required,
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
-                                      if (startDate!.isAfter(endDate!)) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.start_date_must_before_end_date,
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
-
-                                      // read latest text values from controllers
-                                      dosage =
-                                          int.tryParse(dosageController.text) ??
-                                          dosage;
-                                      timesPerDay =
-                                          int.tryParse(timesController.text) ??
-                                          timesPerDay;
-
-                                      final updatedTracking = MedicineTracking(
-                                        id: _tracking!.id,
-                                        name: name,
-                                        type:
-                                            selectedMedicineType ??
-                                            _tracking!.type,
-                                        dosage: dosage.toDouble(),
-                                        unit: selectedUnit ?? _tracking!.unit,
-                                      );
-
-                                      String freq = _plan!.frequencyType;
-                                      switch (selectedFrequency) {
-                                        case 'Per day':
-                                          freq = 'daily';
-                                          break;
-                                        case 'Per week':
-                                          freq = 'weekly';
-                                          break;
-                                        case 'Per month':
-                                          freq = 'monthly';
-                                          break;
-                                        case 'Per year':
-                                          freq = 'yearly';
-                                          break;
-                                      }
-
-                                      final updatedPlan = MedicinePlan(
-                                        id: _plan!.id,
-                                        trackingId: _plan!.trackingId,
-                                        frequencyType: freq,
-                                        startDate:
-                                            startDate ?? _plan!.startDate,
-                                        endDate: endDate ?? _plan!.endDate,
-                                        importance: _importanceFromColor(
-                                          selectedImportanceColor,
-                                        ),
-                                        intervalDays: _plan!.intervalDays,
-                                        weekdays: _plan!.weekdays,
-                                        monthDays: _plan!.monthDays,
-                                        customDates: _plan!.customDates,
-                                      );
-
-                                      // Use cubit when available so it notifies TrackingCubit
-                                      if (_cubit != null) {
-                                        await _cubit!.save(
-                                          updatedTracking: updatedTracking,
-                                          updatedPlan: updatedPlan,
-                                        );
-                                      } else {
-                                        // fallback to repository updates
-                                        final ok1 = await _repo
-                                            .updateMedicineTracking(
-                                              updatedTracking,
-                                            );
-                                        final ok2 = await _repo
-                                            .updateMedicinePlan(updatedPlan);
-                                        if (ok1 && ok2) {
-                                          try {
-                                            final cubit =
-                                                BlocProvider.of<TrackingCubit>(
-                                                  context,
-                                                );
-                                            await cubit.loadDay(DateTime.now());
-                                          } catch (_) {}
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                AppLocalizations.of(
-                                                  context,
-                                                )!.saved,
-                                              ),
-                                            ),
-                                          );
-                                          Navigator.pop(context);
-                                        } else {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                AppLocalizations.of(
-                                                  context,
-                                                )!.failed_to_save,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.lightBlue,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.save_changes,
-                                    style: AppText.medium.copyWith(
-                                      fontSize: 16,
-                                      color: AppColors.darkBlue,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),

@@ -9,7 +9,9 @@ class User {
   final double? latitude;
   final double? longitude;
   final String? locationName;
-  final String premium;
+  final bool premium;
+  final bool notificationsEnabled;
+  final String? fcmToken;
 
   User({
     this.userId,
@@ -23,6 +25,8 @@ class User {
     this.longitude,
     this.locationName,
     required this.premium,
+    this.notificationsEnabled = true,
+    this.fcmToken,
   });
 
   User copyWith({
@@ -36,7 +40,9 @@ class User {
     double? latitude,
     double? longitude,
     String? locationName,
-    String? premium,
+    bool? premium,
+    bool? notificationsEnabled,
+    String? fcmToken,
   }) {
     return User(
       userId: userId ?? this.userId,
@@ -50,6 +56,8 @@ class User {
       longitude: longitude ?? this.longitude,
       locationName: locationName ?? this.locationName,
       premium: premium ?? this.premium,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      fcmToken: fcmToken ?? this.fcmToken,
     );
   }
 
@@ -65,7 +73,16 @@ class User {
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),
       locationName: map['location_name'] as String?,
-      premium: map['premium'] as String,
+      premium:
+          map['premium'] == 1 ||
+          map['premium'] == true ||
+          map['premium'] == 'true',
+      notificationsEnabled: map['notifications_enabled'] == null
+          ? true
+          : (map['notifications_enabled'] == 1 ||
+                map['notifications_enabled'] == true ||
+                map['notifications_enabled'] == 'true'),
+      fcmToken: map['fcm_token'] as String?,
     );
   }
 
@@ -81,7 +98,9 @@ class User {
       'latitude': latitude,
       'longitude': longitude,
       'location_name': locationName,
-      'premium': premium,
+      'premium': premium ? 1 : 0,
+      'notifications_enabled': notificationsEnabled ? 1 : 0,
+      'fcm_token': fcmToken,
     };
   }
 }
