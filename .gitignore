@@ -1,0 +1,38 @@
+# Backend secrets and generated files
+backend/.env
+backend/medigo.db
+backend/medigo.db-journal
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/venv/
+backend/.venv/
+backend/medigo/
+backend/firebase-service-account.json
+
+# Python virtual environments (any location)
+venv/
+.venv/
+.venv311/
+medigo/
+env/
+ENV/
+
+# Flutter build outputs
+frontend/build/
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
