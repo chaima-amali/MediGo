@@ -1,16 +1,17 @@
 import '../data/models/pharmacy.dart';
 import '../data/models/user.dart';
 import '../data/repositories/pharmacy_repo.dart';
-import '../services/location_service.dart';
+import '../presentation/services/location_service.dart';
 
 class PharmacyController {
   final PharmacyRepository _repository = PharmacyRepository();
 
   // Get nearest pharmacies based on user location
-  List<PharmacyWithDistance> getNearestPharmacies({
+  Future<List<PharmacyWithDistance>> getNearestPharmacies({
     required User user,
     int limit = 10,
-  }) {
+    double? maxDistanceKm,
+  }) async {
     // Check if user has location data
     if (user.latitude == null || user.longitude == null) {
       print('User location not available');
@@ -18,7 +19,7 @@ class PharmacyController {
     }
 
     // Get all pharmacies
-    final allPharmacies = _repository.getAllPharmacies();
+    final allPharmacies = await _repository.getAllPharmacies();
 
     // Calculate distances and sort
     final nearestPharmacies = LocationService.getPharmaciesByDistance(
@@ -26,23 +27,24 @@ class PharmacyController {
       userLon: user.longitude!,
       pharmacies: allPharmacies,
       limit: limit,
+      maxDistanceKm: maxDistanceKm,
     );
 
     return nearestPharmacies;
   }
 
   // Search pharmacies by name
-  List<Pharmacy> searchPharmacies(String query) {
-    return _repository.searchPharmaciesByName(query);
+  Future<List<Pharmacy>> searchPharmacies(String query) async {
+    return await _repository.searchPharmaciesByName(query);
   }
 
   // Get pharmacy by ID
-  Pharmacy? getPharmacyById(String pharmacyId) {
-    return _repository.getPharmacyById(pharmacyId);
+  Future<Pharmacy?> getPharmacyById(int pharmacyId) async {
+    return await _repository.getPharmacyById(pharmacyId);
   }
 
   // Get all pharmacies
-  List<Pharmacy> getAllPharmacies() {
-    return _repository.getAllPharmacies();
+  Future<List<Pharmacy>> getAllPharmacies() async {
+    return await _repository.getAllPharmacies();
   }
 }

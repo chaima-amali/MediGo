@@ -1,0 +1,19 @@
+Flask==3.1.0
+Flask-CORS==5.0.0
+flask-swagger-ui==4.11.1
+python-dotenv==1.0.1
+APScheduler==3.10.4
+#pydantic==2.5.3
+pydantic==2.11.0
+#pydantic[email]==2.5.3
+pydantic[email]==2.11.0
+# Supabase integration (stable version)
+supabase==2.10.0
+# psycopg2-binary==2.9.9
+# firebase-admin==6.5.0
+
+# Background job scheduler
+APScheduler==3.10.4
+
+# Production server
+gunicorn==23.0.0

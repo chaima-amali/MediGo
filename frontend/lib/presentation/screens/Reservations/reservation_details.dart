@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_text.dart';
-import 'package:frontend/presentation/services/mock_database_service.dart';
 import 'package:frontend/presentation/widgets/back_arrow.dart';
+import 'package:frontend/data/repositories/reservation_repo.dart';
+import 'package:frontend/data/repositories/pharmacy_repo.dart';
+import 'package:frontend/data/models/reservation.dart';
+import 'package:frontend/data/models/pharmacy.dart';
+import 'package:frontend/logic/cubits/reservation_cubit.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
+import 'package:intl/intl.dart';
 import 'reservation_confirm.dart' show ReservationDetailsPage;
-import 'reservation_complete.dart' show ReservationComplete;
+import 'reservation_complete.dart' show ReservationCompletePage;
+import 'reservation_pending.dart';
+import 'reservation_cancelled.dart';
 
 class ReservationDetailsScreen extends StatefulWidget {
   final String reservationId;
@@ -19,8 +28,10 @@ class ReservationDetailsScreen extends StatefulWidget {
 }
 
 class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
-  late Map<String, dynamic>? reservationData;
-  late Map<String, dynamic>? pharmacyData;
+  Reservation? reservationData;
+  Pharmacy? pharmacyData;
+  final ReservationRepository _reservationRepo = ReservationRepository();
+  final PharmacyRepository _pharmacyRepo = PharmacyRepository();
   bool isLoading = true;
 
   @override
@@ -29,47 +40,82 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
     _loadReservationData();
   }
 
-  void _loadReservationData() {
-    // Get reservation details
-    reservationData = MockDataService.getReservationDetails(
-      widget.reservationId,
+  Future<void> _loadReservationData() async {
+    final reservationId = int.tryParse(widget.reservationId);
+
+    if (reservationId == null) {
+      debugPrint('❌ Invalid reservation ID: ${widget.reservationId}');
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    // Get reservation details from database
+    final reservation = await _reservationRepo.getReservationById(
+      reservationId,
     );
 
-    if (reservationData != null) {
-      // Get pharmacy details
-      pharmacyData = MockDataService.getPharmacyDetails(
-        reservationData!['pharmacy_id'],
-      );
+    debugPrint('📋 Reservation loaded: ${reservation?.toMap()}');
+    debugPrint('🏥 Pharmacy ID from reservation: ${reservation?.pharmacyId}');
+
+    // Get pharmacy details if pharmacy_id exists
+    Pharmacy? pharmacy;
+    if (reservation != null && reservation.pharmacyId != null) {
+      debugPrint('🔍 Fetching pharmacy with ID: ${reservation.pharmacyId}');
+      pharmacy = await _pharmacyRepo.getPharmacyById(reservation.pharmacyId!);
+      debugPrint('🏥 Pharmacy loaded: ${pharmacy?.toMap()}');
+    } else {
+      debugPrint('⚠️ No pharmacy ID in reservation');
     }
 
     setState(() {
+      reservationData = reservation;
+      pharmacyData = pharmacy;
       isLoading = false;
     });
 
     // If the reservation is a confirmed/completed type, navigate to the
     // dedicated page so the correct UI is shown (avoid overlapping pending UI).
     if (reservationData != null) {
-      final status = (reservationData!['status'] ?? '').toString();
+      final status = reservationData!.status;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (status == 'confirmed') {
+        if (status == 'pending') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ReservationPendingPage(
+                reservationId: reservationData!.reservationId!,
+              ),
+            ),
+          );
+        } else if (status == 'confirmed') {
           // Open the confirm-style page and replace this route.
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (_) => ReservationDetailsPage(
-                medicineName: reservationData!['medicine_name'] ?? 'Medicine',
-                pharmacyName: pharmacyData?['name'] ?? 'Pharmacy',
-                address: pharmacyData?['address'] ?? '',
-                distance: '${pharmacyData?['distance_km'] ?? 0.0}km',
-                phone: pharmacyData?['phone_number'] ?? '',
-                price: 0.0,
+                reservationId: reservationData!.reservationId!,
               ),
             ),
           );
         } else if (status == 'completed') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const ReservationComplete()),
+            MaterialPageRoute(
+              builder: (_) => ReservationCompletePage(
+                reservationId: reservationData!.reservationId!,
+              ),
+            ),
+          );
+        } else if (status == 'cancelled') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ReservationCancelledPage(
+                reservationId: reservationData!.reservationId!,
+              ),
+            ),
           );
         }
       });
@@ -108,18 +154,42 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Close dialog and update status
+                    onPressed: () async {
+                      // Close dialog
                       Navigator.pop(context);
 
+                      // Get user premium status
+                      final userState = context.read<UserCubit>().state;
+                      bool isPremium = false;
+                      int? userId;
+                      if (userState is UserAuthenticated) {
+                        isPremium = userState.user.premium ?? false;
+                        userId = userState.user.userId;
+                      } else if (userState is UserLoaded) {
+                        isPremium = userState.user.premium ?? false;
+                        userId = userState.user.userId;
+                      }
+
+                      // Update status in database
+                      await _reservationRepo.updateReservationStatus(
+                        reservationData!.reservationId!,
+                        'cancelled',
+                        isPremium: isPremium,
+                        userId: userId,
+                      );
+
                       setState(() {
-                        reservationData!['status'] = 'cancelled';
+                        reservationData = reservationData!.copyWith(
+                          status: 'cancelled',
+                        );
                       });
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            AppLocalizations.of(context)!.reservationCancelledSuccess,
+                            AppLocalizations.of(
+                              context,
+                            )!.reservationCancelledSuccess,
                           ),
                           backgroundColor: AppColors.error,
                           behavior: SnackBarBehavior.floating,
@@ -221,26 +291,42 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
       );
     }
 
-    final String status = (reservationData!['status'] ?? '').toString();
+    final String status = reservationData!.status;
     final bool isPending = status == 'pending';
     final bool isCancelled = status == 'cancelled';
     final bool isCompleted = status == 'completed';
     final bool isConfirmed = status == 'confirmed';
 
-    // Extract data
-    final String medicineName = reservationData!['medicine_name'] ?? 'Unknown';
-    final String dosage = reservationData!['dosage'] ?? '';
-    final int quantity = reservationData!['quantity'] ?? 1;
-    final String pickupDate = reservationData!['pickup_date'] ?? '';
-    final String pickupTime = reservationData!['pickup_time'] ?? '';
-    final String reservationCode = reservationData!['reservation_code'] ?? '';
+    // Extract data from Reservation model
+    final String medicineName =
+        reservationData!.medicineName ??
+        'Reservation #${reservationData!.reservationId}';
+    final int quantity = reservationData!.quantity;
+    final String pickupDate = reservationData!.day;
+    final String pickupTime = reservationData!.time;
 
-    // Pharmacy data
-    final String pharmacyName = pharmacyData?['name'] ?? 'Unknown Pharmacy';
-    final double distanceKm = pharmacyData?['distance_km'] ?? 0.0;
-    final String pharmacyAddress = pharmacyData?['address'] ?? '';
-    final String pharmacyPhone = pharmacyData?['phone_number'] ?? '';
-    final String pharmacyHours = pharmacyData?['opening_hours'] ?? '';
+    // Format creation time
+    String createdAtFormatted = 'N/A';
+    if (reservationData!.createdAt != null) {
+      try {
+        final createdAt = DateTime.parse(reservationData!.createdAt!);
+        createdAtFormatted = DateFormat(
+          'dd/MM/yyyy\nHH:mm:ss',
+        ).format(createdAt);
+      } catch (e) {
+        createdAtFormatted = reservationData!.createdAt!;
+      }
+    }
+
+    // Pharmacy data from fetched pharmacy object
+    final String pharmacyName = pharmacyData?.name ?? 'Pharmacy';
+    final double distanceKm =
+        0.0; // Can calculate from pharmacy lat/lng if needed
+    final String pharmacyAddress = pharmacyData != null
+        ? 'Lat: ${pharmacyData!.latitude}, Lng: ${pharmacyData!.longitude}'
+        : 'Address not available';
+    final String pharmacyPhone = pharmacyData?.phone ?? 'N/A';
+    final String pharmacyHours = pharmacyData?.openingHours ?? 'N/A';
 
     return Scaffold(
       backgroundColor: const Color(0xFFEBF8F9),
@@ -250,7 +336,68 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
             // Custom AppBar
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(children: [CustomBackArrow()]),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomBackArrow(),
+                  // Delete icon for cancelled reservations
+                  if (isCancelled)
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext dialogContext) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              title: Text(
+                                'Delete Reservation',
+                                style: AppText.bold.copyWith(fontSize: 18),
+                              ),
+                              content: Text(
+                                'Are you sure you want to permanently delete this reservation?',
+                                style: AppText.regular,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.cancel,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    Navigator.pop(dialogContext);
+                                    await context
+                                        .read<ReservationCubit>()
+                                        .deleteReservation(
+                                          reservationData!.reservationId!,
+                                        );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Reservation deleted successfully',
+                                        ),
+                                        backgroundColor: AppColors.success,
+                                      ),
+                                    );
+                                    Navigator.pop(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.error,
+                                  ),
+                                  child: Text('Delete'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.delete_outline, color: AppColors.error),
+                    ),
+                ],
+              ),
             ),
             // Content
             Expanded(
@@ -300,7 +447,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                               } else if (isConfirmed) {
                                 label = 'confirmed';
                                 textColor = AppColors.success;
-                                bg = const Color(0xFFD6F5F5);
+                                bg = const Color(0xFFE8F5E9);
                               }
                               return Container(
                                 padding: const EdgeInsets.symmetric(
@@ -355,7 +502,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '$medicineName${dosage.isNotEmpty ? " $dosage" : ""}',
+                                      medicineName,
                                       style: AppText.medium.copyWith(
                                         fontSize: 16,
                                       ),
@@ -559,14 +706,18 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    AppLocalizations.of(context)!.awaitingConfirmation,
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.awaitingConfirmation,
                                     style: AppText.medium.copyWith(
                                       fontSize: 14,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    AppLocalizations.of(context)!.pharmacyWillConfirm,
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.pharmacyWillConfirm,
                                     style: AppText.regular.copyWith(
                                       fontSize: 12,
                                       color: Colors.grey[700],
@@ -580,6 +731,50 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      // Confirm Button (manual confirmation)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await context
+                                .read<ReservationCubit>()
+                                .updateReservationStatus(
+                                  reservationData!.reservationId!,
+                                  'confirmed',
+                                );
+                            setState(() {
+                              reservationData = reservationData!.copyWith(
+                                status: 'confirmed',
+                              );
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Reservation confirmed successfully',
+                                ),
+                                backgroundColor: AppColors.success,
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.success,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'Confirm Reservation',
+                            style: AppText.medium.copyWith(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
                       // Action Buttons
                       SizedBox(
                         width: double.infinity,
@@ -587,7 +782,11 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppLocalizations.of(context)!.openingDirections),
+                                content: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.openingDirections,
+                                ),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
@@ -596,7 +795,9 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                             Icons.location_on_outlined,
                             size: 18,
                           ),
-                          label: Text(AppLocalizations.of(context)!.getDirections),
+                          label: Text(
+                            AppLocalizations.of(context)!.getDirections,
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
@@ -614,13 +815,17 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('${AppLocalizations.of(context)!.calling} $pharmacyPhone...'),
+                                content: Text(
+                                  '${AppLocalizations.of(context)!.calling} $pharmacyPhone...',
+                                ),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
                           },
                           icon: const Icon(Icons.phone_outlined, size: 18),
-                          label: Text(AppLocalizations.of(context)!.contactPharmacy),
+                          label: Text(
+                            AppLocalizations.of(context)!.contactPharmacy,
+                          ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.darkBlue,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -669,12 +874,12 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                             ),
                           ),
                           Text(
-                            reservationCode,
+                            'RES-${reservationData!.reservationId}',
                             style: AppText.medium.copyWith(fontSize: 13),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${AppLocalizations.of(context)!.created}: 28/10/2025\n16:24:06',
+                            '${AppLocalizations.of(context)!.created}: $createdAtFormatted',
                             textAlign: TextAlign.center,
                             style: AppText.regular.copyWith(
                               fontSize: 12,

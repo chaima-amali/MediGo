@@ -718,6 +718,24 @@ abstract class AppLocalizations {
   /// **'Monthly'**
   String get monthly;
 
+  /// No description provided for @premiumFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Feature'**
+  String get premiumFeature;
+
+  /// No description provided for @premiumFeatureMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-order and reservation is a premium feature. Upgrade to Premium to unlock this feature and enjoy an ad-free experience with instant restock alerts.'**
+  String get premiumFeatureMessage;
+
+  /// No description provided for @later.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get later;
+
   /// No description provided for @billedMonthly.
   ///
   /// In en, this message translates to:
@@ -1179,12 +1197,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy Code'**
   String get copyCode;
-
-  /// No description provided for @showQRCode.
-  ///
-  /// In en, this message translates to:
-  /// **'Show QR Code for Scanning'**
-  String get showQRCode;
 
   /// No description provided for @showQrCode.
   ///
@@ -1839,6 +1851,594 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How many times on {day}?'**
   String howManyTimesOnDay(String day);
+
+  /// No description provided for @invalidQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid quantity (at least 1)'**
+  String get invalidQuantity;
+
+  /// No description provided for @cannot_mark_future_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot mark future time'**
+  String get cannot_mark_future_time;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get reminders;
+
+  /// No description provided for @medstock_reserv.
+  ///
+  /// In en, this message translates to:
+  /// **'medstock/Reserv'**
+  String get medstock_reserv;
+
+  /// No description provided for @no_notifications_yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get no_notifications_yet;
+
+  /// No description provided for @add_medicines_to_see_reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Add medicines to see reminders here'**
+  String get add_medicines_to_see_reminders;
+
+  /// No description provided for @no_medstock_or_reservation_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicine stock or reservation notifications'**
+  String get no_medstock_or_reservation_notifications;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @days_ago.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String days_ago(int count);
+
+  /// No description provided for @delete_medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Medicine'**
+  String get delete_medicine;
+
+  /// No description provided for @confirm_delete_medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this medicine and its entire schedule?'**
+  String get confirm_delete_medicine;
+
+  /// No description provided for @medicine_deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine deleted successfully'**
+  String get medicine_deleted;
+
+  /// No description provided for @medicine_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Name'**
+  String get medicine_name;
+
+  /// No description provided for @medicine_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Type'**
+  String get medicine_type;
+
+  /// No description provided for @dosage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage'**
+  String get dosage;
+
+  /// No description provided for @times_per_day.
+  ///
+  /// In en, this message translates to:
+  /// **'Times Per Day'**
+  String get times_per_day;
+
+  /// No description provided for @medicine_times.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Times'**
+  String get medicine_times;
+
+  /// No description provided for @start_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get start_date;
+
+  /// No description provided for @end_date.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get end_date;
+
+  /// No description provided for @notification_message_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for your medicine \"{medicineName}\" — your health will thank you'**
+  String notification_message_1(String medicineName);
+
+  /// No description provided for @notification_message_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey there! Don\'t forget your dose of \"{medicineName}\" small steps for a healthier you.'**
+  String notification_message_2(String medicineName);
+
+  /// No description provided for @notification_message_3.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time to take your medicine \"{medicineName}\" and stay healthy.'**
+  String notification_message_3(String medicineName);
+
+  /// No description provided for @notification_message_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Good reminder! Take your \"{medicineName}\" as scheduled.'**
+  String notification_message_4(String medicineName);
+
+  /// No description provided for @notification_message_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t miss your dose of \"{medicineName}\" — your wellness matters!'**
+  String notification_message_5(String medicineName);
+
+  /// No description provided for @unableToValidatePharmacyHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to validate pharmacy hours'**
+  String get unableToValidatePharmacyHours;
+
+  /// No description provided for @pickupTimeCannotBeInPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup time cannot be in the past'**
+  String get pickupTimeCannotBeInPast;
+
+  /// No description provided for @userNotAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'User not authenticated'**
+  String get userNotAuthenticated;
+
+  /// No description provided for @codeCopiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied to clipboard'**
+  String get codeCopiedToClipboard;
+
+  /// No description provided for @qrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Code'**
+  String get qrCode;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @markAsCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Completed'**
+  String get markAsCompleted;
+
+  /// No description provided for @confirmReservationQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Reservation?'**
+  String get confirmReservationQuestion;
+
+  /// No description provided for @confirmReservationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to confirm this reservation?'**
+  String get confirmReservationMessage;
+
+  /// No description provided for @yesConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Confirm'**
+  String get yesConfirm;
+
+  /// No description provided for @reservationConfirmedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation confirmed successfully'**
+  String get reservationConfirmedSuccess;
+
+  /// No description provided for @deleteReservationQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Reservation?'**
+  String get deleteReservationQuestion;
+
+  /// No description provided for @deleteReservationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this reservation? This action cannot be undone.'**
+  String get deleteReservationMessage;
+
+  /// No description provided for @yesDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Delete'**
+  String get yesDelete;
+
+  /// No description provided for @reservationDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation deleted successfully'**
+  String get reservationDeletedSuccess;
+
+  /// No description provided for @medicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine'**
+  String get medicine;
+
+  /// No description provided for @pharmacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy'**
+  String get pharmacy;
+
+  /// No description provided for @pharmacyNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy not available'**
+  String get pharmacyNotAvailable;
+
+  /// No description provided for @reservationCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation Cancelled'**
+  String get reservationCancelled;
+
+  /// No description provided for @reservationCancelledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This reservation has been cancelled. You can delete it from your records.'**
+  String get reservationCancelledMessage;
+
+  /// No description provided for @awaitingPharmacyConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting Pharmacy Confirmation'**
+  String get awaitingPharmacyConfirmation;
+
+  /// No description provided for @medicationReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Reports'**
+  String get medicationReports;
+
+  /// No description provided for @adherenceReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence Reports'**
+  String get adherenceReports;
+
+  /// No description provided for @trackMedicationAdherence.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your medication adherence over time'**
+  String get trackMedicationAdherence;
+
+  /// No description provided for @weeklyReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Report'**
+  String get weeklyReport;
+
+  /// No description provided for @viewAdherenceLast7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'View adherence data for the last 7 days'**
+  String get viewAdherenceLast7Days;
+
+  /// No description provided for @monthlyReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Report'**
+  String get monthlyReport;
+
+  /// No description provided for @viewAdherenceLast30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'View adherence data for the last 30 days'**
+  String get viewAdherenceLast30Days;
+
+  /// No description provided for @customReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Report'**
+  String get customReport;
+
+  /// No description provided for @generateCustomDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a report for a custom date range'**
+  String get generateCustomDateRange;
+
+  /// No description provided for @patientInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Information'**
+  String get patientInformation;
+
+  /// No description provided for @reportGeneratedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Generated On'**
+  String get reportGeneratedOn;
+
+  /// No description provided for @reportPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Period'**
+  String get reportPeriod;
+
+  /// No description provided for @adherenceSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence Summary'**
+  String get adherenceSummary;
+
+  /// No description provided for @medicinesNotTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines Not Taken'**
+  String get medicinesNotTaken;
+
+  /// No description provided for @averageTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Taken'**
+  String get averageTaken;
+
+  /// No description provided for @fullyAdherent.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully Adherent'**
+  String get fullyAdherent;
+
+  /// No description provided for @medicinesMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines Missed'**
+  String get medicinesMissed;
+
+  /// No description provided for @weeklyProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Progress'**
+  String get weeklyProgress;
+
+  /// No description provided for @medicationSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Summary'**
+  String get medicationSummary;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @detailedIntakeLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed Intake Log'**
+  String get detailedIntakeLog;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get taken;
+
+  /// No description provided for @missed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get missed;
+
+  /// No description provided for @skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skipped;
+
+  /// No description provided for @scheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get scheduled;
+
+  /// No description provided for @ongoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get ongoing;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @noMedicationDataFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No medication data found for this period.\n\nPlease add medicines and mark them as taken/missed to see reports.'**
+  String get noMedicationDataFound;
+
+  /// No description provided for @noUserDataFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No user data found. Please add your profile information first.'**
+  String get noUserDataFound;
+
+  /// No description provided for @loadingReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Report...'**
+  String get loadingReport;
+
+  /// No description provided for @selectDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date Range'**
+  String get selectDateRange;
+
+  /// No description provided for @selectStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Start Date'**
+  String get selectStartDate;
+
+  /// No description provided for @selectEndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select End Date'**
+  String get selectEndDate;
+
+  /// No description provided for @generateReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Report'**
+  String get generateReport;
+
+  /// No description provided for @quickSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Select'**
+  String get quickSelect;
+
+  /// No description provided for @lastWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Week'**
+  String get lastWeek;
+
+  /// No description provided for @lastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Month'**
+  String get lastMonth;
+
+  /// No description provided for @last3Months.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 3 Months'**
+  String get last3Months;
+
+  /// No description provided for @medicineAdherenceReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Adherence Report'**
+  String get medicineAdherenceReport;
+
+  /// No description provided for @generatingPDF.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating PDF...'**
+  String get generatingPDF;
+
+  /// No description provided for @pdfGeneratedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF generated successfully!'**
+  String get pdfGeneratedSuccessfully;
+
+  /// No description provided for @failedToGeneratePDF.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to generate PDF'**
+  String get failedToGeneratePDF;
+
+  /// No description provided for @totalScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Scheduled'**
+  String get totalScheduled;
+
+  /// No description provided for @shareReportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export your reports to share with your doctor or family members'**
+  String get shareReportDescription;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
+
+  /// No description provided for @shareReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Reports'**
+  String get shareReports;
+
+  /// No description provided for @delayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delayed'**
+  String get delayed;
 }
 
 class _AppLocalizationsDelegate

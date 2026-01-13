@@ -327,6 +327,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monthly => 'Monthly';
 
   @override
+  String get premiumFeature => 'Premium Feature';
+
+  @override
+  String get premiumFeatureMessage =>
+      'Pre-order and reservation is a premium feature. Upgrade to Premium to unlock this feature and enjoy an ad-free experience with instant restock alerts.';
+
+  @override
+  String get later => 'Later';
+
+  @override
   String get billedMonthly => 'Billed monthly';
 
   @override
@@ -572,9 +582,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copyCode => 'Copy Code';
-
-  @override
-  String get showQRCode => 'Show QR Code for Scanning';
 
   @override
   String get showQrCode => 'Show QR Code for Scanning';
@@ -931,4 +938,325 @@ class AppLocalizationsEn extends AppLocalizations {
   String howManyTimesOnDay(String day) {
     return 'How many times on $day?';
   }
+
+  @override
+  String get invalidQuantity => 'Please enter a valid quantity (at least 1)';
+
+  @override
+  String get cannot_mark_future_time => 'Cannot mark future time';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get reminders => 'Reminders';
+
+  @override
+  String get medstock_reserv => 'medstock/Reserv';
+
+  @override
+  String get no_notifications_yet => 'No notifications yet';
+
+  @override
+  String get add_medicines_to_see_reminders =>
+      'Add medicines to see reminders here';
+
+  @override
+  String get no_medstock_or_reservation_notifications =>
+      'No medicine stock or reservation notifications';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String days_ago(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String get delete_medicine => 'Delete Medicine';
+
+  @override
+  String get confirm_delete_medicine =>
+      'Are you sure you want to delete this medicine and its entire schedule?';
+
+  @override
+  String get medicine_deleted => 'Medicine deleted successfully';
+
+  @override
+  String get medicine_name => 'Medicine Name';
+
+  @override
+  String get medicine_type => 'Medicine Type';
+
+  @override
+  String get dosage => 'Dosage';
+
+  @override
+  String get times_per_day => 'Times Per Day';
+
+  @override
+  String get medicine_times => 'Medicine Times';
+
+  @override
+  String get start_date => 'Start Date';
+
+  @override
+  String get end_date => 'End Date';
+
+  @override
+  String notification_message_1(String medicineName) {
+    return 'Time for your medicine \"$medicineName\" — your health will thank you';
+  }
+
+  @override
+  String notification_message_2(String medicineName) {
+    return 'Hey there! Don\'t forget your dose of \"$medicineName\" small steps for a healthier you.';
+  }
+
+  @override
+  String notification_message_3(String medicineName) {
+    return 'It\'s time to take your medicine \"$medicineName\" and stay healthy.';
+  }
+
+  @override
+  String notification_message_4(String medicineName) {
+    return 'Good reminder! Take your \"$medicineName\" as scheduled.';
+  }
+
+  @override
+  String notification_message_5(String medicineName) {
+    return 'Don\'t miss your dose of \"$medicineName\" — your wellness matters!';
+  }
+
+  @override
+  String get unableToValidatePharmacyHours =>
+      'Unable to validate pharmacy hours';
+
+  @override
+  String get pickupTimeCannotBeInPast => 'Pickup time cannot be in the past';
+
+  @override
+  String get userNotAuthenticated => 'User not authenticated';
+
+  @override
+  String get codeCopiedToClipboard => 'Code copied to clipboard';
+
+  @override
+  String get qrCode => 'QR Code';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get markAsCompleted => 'Mark as Completed';
+
+  @override
+  String get confirmReservationQuestion => 'Confirm Reservation?';
+
+  @override
+  String get confirmReservationMessage =>
+      'Are you sure you want to confirm this reservation?';
+
+  @override
+  String get yesConfirm => 'Yes, Confirm';
+
+  @override
+  String get reservationConfirmedSuccess =>
+      'Reservation confirmed successfully';
+
+  @override
+  String get deleteReservationQuestion => 'Delete Reservation?';
+
+  @override
+  String get deleteReservationMessage =>
+      'Are you sure you want to delete this reservation? This action cannot be undone.';
+
+  @override
+  String get yesDelete => 'Yes, Delete';
+
+  @override
+  String get reservationDeletedSuccess => 'Reservation deleted successfully';
+
+  @override
+  String get medicine => 'Medicine';
+
+  @override
+  String get pharmacy => 'Pharmacy';
+
+  @override
+  String get pharmacyNotAvailable => 'Pharmacy not available';
+
+  @override
+  String get reservationCancelled => 'Reservation Cancelled';
+
+  @override
+  String get reservationCancelledMessage =>
+      'This reservation has been cancelled. You can delete it from your records.';
+
+  @override
+  String get awaitingPharmacyConfirmation => 'Awaiting Pharmacy Confirmation';
+
+  @override
+  String get medicationReports => 'Medication Reports';
+
+  @override
+  String get adherenceReports => 'Adherence Reports';
+
+  @override
+  String get trackMedicationAdherence =>
+      'Track your medication adherence over time';
+
+  @override
+  String get weeklyReport => 'Weekly Report';
+
+  @override
+  String get viewAdherenceLast7Days =>
+      'View adherence data for the last 7 days';
+
+  @override
+  String get monthlyReport => 'Monthly Report';
+
+  @override
+  String get viewAdherenceLast30Days =>
+      'View adherence data for the last 30 days';
+
+  @override
+  String get customReport => 'Custom Report';
+
+  @override
+  String get generateCustomDateRange =>
+      'Generate a report for a custom date range';
+
+  @override
+  String get patientInformation => 'Patient Information';
+
+  @override
+  String get reportGeneratedOn => 'Report Generated On';
+
+  @override
+  String get reportPeriod => 'Report Period';
+
+  @override
+  String get adherenceSummary => 'Adherence Summary';
+
+  @override
+  String get medicinesNotTaken => 'Medicines Not Taken';
+
+  @override
+  String get averageTaken => 'Average Taken';
+
+  @override
+  String get fullyAdherent => 'Fully Adherent';
+
+  @override
+  String get medicinesMissed => 'Medicines Missed';
+
+  @override
+  String get weeklyProgress => 'Weekly Progress';
+
+  @override
+  String get medicationSummary => 'Medication Summary';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get detailedIntakeLog => 'Detailed Intake Log';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get taken => 'Taken';
+
+  @override
+  String get missed => 'Missed';
+
+  @override
+  String get skipped => 'Skipped';
+
+  @override
+  String get scheduled => 'Scheduled';
+
+  @override
+  String get ongoing => 'Ongoing';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get noMedicationDataFound =>
+      'No medication data found for this period.\n\nPlease add medicines and mark them as taken/missed to see reports.';
+
+  @override
+  String get noUserDataFound =>
+      'No user data found. Please add your profile information first.';
+
+  @override
+  String get loadingReport => 'Loading Report...';
+
+  @override
+  String get selectDateRange => 'Select Date Range';
+
+  @override
+  String get selectStartDate => 'Select Start Date';
+
+  @override
+  String get selectEndDate => 'Select End Date';
+
+  @override
+  String get generateReport => 'Generate Report';
+
+  @override
+  String get quickSelect => 'Quick Select';
+
+  @override
+  String get lastWeek => 'Last Week';
+
+  @override
+  String get lastMonth => 'Last Month';
+
+  @override
+  String get last3Months => 'Last 3 Months';
+
+  @override
+  String get medicineAdherenceReport => 'Medicine Adherence Report';
+
+  @override
+  String get generatingPDF => 'Generating PDF...';
+
+  @override
+  String get pdfGeneratedSuccessfully => 'PDF generated successfully!';
+
+  @override
+  String get failedToGeneratePDF => 'Failed to generate PDF';
+
+  @override
+  String get totalScheduled => 'Total Scheduled';
+
+  @override
+  String get shareReportDescription =>
+      'Export your reports to share with your doctor or family members';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
+  String get shareReports => 'Share Reports';
+
+  @override
+  String get delayed => 'Delayed';
 }

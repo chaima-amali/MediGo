@@ -25,9 +25,19 @@ class AppColors {
   static const Color inStock = Color(0xFF4CAF50);
   static const Color outOfStock = Color(0xFFFF5252);
 
+  // Text colors
+  static const Color textDark = Color(0xFF2D3436);
+  static const Color textLight = Color(0xFF636E72);
+
   // Subscription badges
   static const Color premiumOrange = Color(0xFFFF9800);
   static const Color premiumGold = Color(0xFFFFD700);
+
+  // Dark mode variants
+  static const Color backgroundDark = Color(0xFF0B0B0B);
+  static const Color surfaceDark = Color(0xFF121212);
+  static const Color onSurfaceDark = Color(0xFFECECEC);
+  static const Color onPrimary = Color(0xFFFFFFFF);
 }
 
 /*
