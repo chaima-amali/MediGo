@@ -38,7 +38,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     try {
       print('🔍 Fetching notifications for user $userId...');
-      
+
       // Fetch notifications from Supabase API
       final notificationsData = await _repository.getUserNotifications(
         userId: userId,
@@ -48,23 +48,27 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       print('✅ Fetched ${notificationsData.length} notifications from API');
 
       // Convert to NotificationItem objects
-      final List<NotificationItem> allNotifications = notificationsData
-          .map((data) {
-            final notif = NotificationItem.fromJson(data);
-            print('   📬 Notification ${notif.notificationId}: ${notif.type} - ${notif.createdAt}');
-            return notif;
-          })
-          .toList();
+      final List<NotificationItem> allNotifications = notificationsData.map((
+        data,
+      ) {
+        final notif = NotificationItem.fromJson(data);
+        print(
+          '   📬 Notification ${notif.notificationId}: ${notif.type} - ${notif.createdAt}',
+        );
+        return notif;
+      }).toList();
 
       // Sort by created_at descending (newest first)
       allNotifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       // Group notifications by day
       final grouped = _groupNotificationsByDay(allNotifications);
-      
+
       print('📊 Grouped into ${grouped.length} groups:');
       for (final group in grouped) {
-        print('   - ${group.label}: ${group.notifications.length} notifications');
+        print(
+          '   - ${group.label}: ${group.notifications.length} notifications',
+        );
       }
 
       emit(state.copyWith(groupedNotifications: grouped, isLoading: false));
