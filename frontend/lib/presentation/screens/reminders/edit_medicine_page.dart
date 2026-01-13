@@ -277,13 +277,15 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
       ),
     );
 
-    if (picked != null && mounted) {
-      setState(() {
-        if (isStart)
-          startDate = picked;
-        else
-          endDate = picked;
-      });
+    if (picked != null) {
+      if (mounted) {
+        setState(() {
+          if (isStart)
+            startDate = picked;
+          else
+            endDate = picked;
+        });
+      }
     }
   }
 
@@ -314,13 +316,15 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
       ),
     );
 
-    if (picked != null && mounted) {
-      setState(() {
-        if (index < _medicineTimes.length)
-          _medicineTimes[index] = picked;
-        else
-          _medicineTimes.add(picked);
-      });
+    if (picked != null) {
+      if (mounted) {
+        setState(() {
+          if (index < _medicineTimes.length)
+            _medicineTimes[index] = picked;
+          else
+            _medicineTimes.add(picked);
+        });
+      }
     }
   }
 
@@ -511,6 +515,8 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
         body: SafeArea(
           child: BlocListener<EditMedicineCubit, EditMedicineState>(
             listener: (context, state) {
+              if (!mounted) return;
+
               if (state.success) {
                 ScaffoldMessenger.of(
                   context,
@@ -525,10 +531,9 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
                 ).showSnackBar(SnackBar(content: Text(message)));
               }
 
-              if (state.plan != null) {
+              if (state.plan != null && mounted) {
                 final plan = state.plan!;
                 final tracking = state.tracking;
-                if (!mounted) return;
                 setState(() {
                   _plan = plan;
                   _tracking = tracking;

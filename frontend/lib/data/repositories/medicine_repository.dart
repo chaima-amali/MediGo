@@ -262,11 +262,7 @@ class MedicineRepository {
 
       // No extra local insert after successful remote sync. We already
       // upserted the remote tracking and plan to keep IDs consistent.
-
-      // Also save to local database as a backup
-      // ignore: avoid_print
-      print('­ƒÆ¥ Saving to local database as backup...');
-      await _saveMedicineLocal(tracking, plan, times);
+      // Notifications were already scheduled above.
 
       // Notify listeners
       try {
@@ -274,7 +270,7 @@ class MedicineRepository {
       } catch (_) {}
 
       // ignore: avoid_print
-      print('Ô£à Medicine saved successfully to both remote and local!');
+      print('✅ Medicine saved successfully to remote!');
       return;
     } catch (e, stackTrace) {
       // ignore: avoid_print
