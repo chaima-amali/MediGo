@@ -76,7 +76,9 @@ class OccurrenceRepository {
                       conflictAlgorithm: ConflictAlgorithm.replace,
                     );
                   } catch (e) {
-                    print('ÔÜá´©Å  Failed to upsert medicine_tracking locally: $e');
+                    print(
+                      'ÔÜá´©Å  Failed to upsert medicine_tracking locally: $e',
+                    );
                     // fallback: filtered insert based on PRAGMA
                     try {
                       final cols = await db.rawQuery(
@@ -214,14 +216,14 @@ class OccurrenceRepository {
 
       final sql = userId != null
           ? '''
-        SELECT o.*, mt.name AS medicine_name, mp.importance AS importance
+        SELECT DISTINCT o.*, mt.name AS medicine_name, mp.importance AS importance
         FROM occurrence_plan o
         LEFT JOIN medicine_plan mp ON o.plan_id = mp.plan_id
         LEFT JOIN medicine_tracking mt ON mp.medicine_track_id = mt.medicine_track_id
         WHERE o.date = ? AND mt.user_id = ?
       '''
           : '''
-        SELECT o.*, mt.name AS medicine_name, mp.importance AS importance
+        SELECT DISTINCT o.*, mt.name AS medicine_name, mp.importance AS importance
         FROM occurrence_plan o
         LEFT JOIN medicine_plan mp ON o.plan_id = mp.plan_id
         LEFT JOIN medicine_tracking mt ON mp.medicine_track_id = mt.medicine_track_id
@@ -463,13 +465,17 @@ class OccurrenceRepository {
             try {
               await _apiService.deleteOccurrence(occId as int);
             } catch (e) {
-              print('ÔÜá´©Å  Failed to delete occurrence $occId from remote: $e');
+              print(
+                'ÔÜá´©Å  Failed to delete occurrence $occId from remote: $e',
+              );
             }
           }
         }
         print('Ô£à Remote: Deleted ${occRows.length} occurrences');
       } catch (e) {
-        print('ÔÜá´©Å  Remote API delete failed: $e, continuing with local delete');
+        print(
+          'ÔÜá´©Å  Remote API delete failed: $e, continuing with local delete',
+        );
       }
 
       // Delete from local database
@@ -530,7 +536,9 @@ class OccurrenceRepository {
         await _apiService.deleteOccurrence(occurrenceId);
         print('Ô£à Remote: Occurrence deleted successfully');
       } catch (e) {
-        print('ÔÜá´©Å  Remote API delete failed: $e, continuing with local delete');
+        print(
+          'ÔÜá´©Å  Remote API delete failed: $e, continuing with local delete',
+        );
       }
 
       // Delete from local database
@@ -678,7 +686,9 @@ class OccurrenceRepository {
           try {
             await _syncOccurrencesToLocal(occurrences);
           } catch (e) {
-            print('ÔÜá´©Å  Failed to sync remote plan occurrences to local: $e');
+            print(
+              'ÔÜá´©Å  Failed to sync remote plan occurrences to local: $e',
+            );
           }
 
           final times =

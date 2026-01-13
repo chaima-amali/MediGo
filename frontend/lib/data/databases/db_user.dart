@@ -12,7 +12,9 @@ class DBUserTable {
  latitude REAL,
  longitude REAL,
  location_name TEXT,
- premium INTEGER DEFAULT 0
+ premium INTEGER DEFAULT 0,
+ notifications_enabled INTEGER DEFAULT 1,
+ fcm_token TEXT
  )
  ''';
 }

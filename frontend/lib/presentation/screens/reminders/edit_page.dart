@@ -145,7 +145,8 @@ class _EditContentState extends State<EditContent> {
               return Column(
                 children: occs.map((occ) {
                   final statusColor = _colorForOccurrence(occ);
-                  final cardBackgroundColor = occ.importanceColor ?? AppColors.primary;
+                  final cardBackgroundColor =
+                      occ.importanceColor ?? AppColors.primary;
                   final pillBg = cardBackgroundColor.withOpacity(0.6);
                   final textColor =
                       Theme.of(context).brightness == Brightness.dark
@@ -189,7 +190,9 @@ class _EditContentState extends State<EditContent> {
                                   borderRadius: BorderRadius.circular(14),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: cardBackgroundColor.withOpacity(0.18),
+                                      color: cardBackgroundColor.withOpacity(
+                                        0.18,
+                                      ),
                                       blurRadius: 12,
                                       spreadRadius: 1,
                                       offset: const Offset(0, 6),
@@ -213,7 +216,7 @@ class _EditContentState extends State<EditContent> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            '${occ.dateString} ÔÇó ${occ.time}',
+                                            '${occ.dateString} ${occ.time}',
                                             style: TextStyle(
                                               fontSize: 13,
                                               color:
@@ -357,8 +360,10 @@ class _EditContentState extends State<EditContent> {
                                         child: Text(localizations.cancel),
                                       ),
                                       TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, 'occurrence'),
+                                        onPressed: () => Navigator.pop(
+                                          context,
+                                          'occurrence',
+                                        ),
                                         child: const Text('Delete Occurrence'),
                                       ),
                                       ElevatedButton(
@@ -367,19 +372,22 @@ class _EditContentState extends State<EditContent> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: AppColors.error,
                                         ),
-                                        child: const Text('Delete All at This Time'),
+                                        child: const Text(
+                                          'Delete All at This Time',
+                                        ),
                                       ),
                                     ],
                                   ),
                                 );
-                                
+
                                 if (deleteOption == null) return;
-                                
+
                                 // Second dialog: Confirm deletion
-                                final confirmMessage = deleteOption == 'all_time'
+                                final confirmMessage =
+                                    deleteOption == 'all_time'
                                     ? 'This will delete all occurrences of ${occ.medicineName ?? "this medicine"} at ${occ.time} for all days. This action cannot be undone.'
                                     : localizations.delete_occurrence_text;
-                                
+
                                 final confirm = await showDialog<bool>(
                                   context: context,
                                   builder: (_) => AlertDialog(
@@ -402,9 +410,9 @@ class _EditContentState extends State<EditContent> {
                                     ],
                                   ),
                                 );
-                                
+
                                 if (confirm != true) return;
-                                
+
                                 if (deleteOption == 'all_time') {
                                   await _cubit!.deleteOccurrencesByTime(
                                     occ.planId,

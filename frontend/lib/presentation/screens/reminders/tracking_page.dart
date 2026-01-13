@@ -670,7 +670,7 @@ class _TrackingPageContentState extends State<_TrackingPageContent>
                                 // debug id/plan display removed
                                 const SizedBox(height: 6),
                                 Text(
-                                  '${occ.dateString} ÔÇó ${occ.time}',
+                                  '${occ.dateString} ${occ.time}',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: textColor.withOpacity(0.85),

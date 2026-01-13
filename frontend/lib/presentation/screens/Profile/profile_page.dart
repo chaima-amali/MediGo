@@ -35,12 +35,30 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadCurrentLanguage();
+    _loadNotificationPreference();
     // Load reservations after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _loadActiveReservations();
       }
     });
+  }
+
+  Future<void> _loadNotificationPreference() async {
+    final userCubit = context.read<UserCubit>();
+    final userState = userCubit.state;
+
+    if (userState is UserAuthenticated || userState is UserLoaded) {
+      final user = userState is UserAuthenticated
+          ? userState.user
+          : (userState as UserLoaded).user;
+
+      if (mounted) {
+        setState(() {
+          _notificationsEnabled = user.notificationsEnabled;
+        });
+      }
+    }
   }
 
   Future<void> _loadActiveReservations() async {
@@ -390,10 +408,40 @@ class _ProfilePageState extends State<ProfilePage> {
                         subtitle: loc.receiveMedicineReminders,
                         showSwitch: true,
                         switchValue: _notificationsEnabled,
-                        onSwitchChanged: (value) {
-                          setState(() {
-                            _notificationsEnabled = value;
-                          });
+                        onSwitchChanged: (value) async {
+                          final userCubit = context.read<UserCubit>();
+                          final userState = userCubit.state;
+
+                          if (userState is UserAuthenticated ||
+                              userState is UserLoaded) {
+                            final user = userState is UserAuthenticated
+                                ? userState.user
+                                : (userState as UserLoaded).user;
+
+                            if (user.userId != null) {
+                              // Update user in database
+                              await userCubit.updateUserFields(user.userId!, {
+                                'notifications_enabled': value,
+                              });
+
+                              setState(() {
+                                _notificationsEnabled = value;
+                              });
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      value
+                                          ? 'Notifications enabled'
+                                          : 'Notifications disabled',
+                                    ),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            }
+                          }
                         },
                         onTap: () {},
                       ),

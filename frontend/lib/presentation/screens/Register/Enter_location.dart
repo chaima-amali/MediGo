@@ -10,6 +10,7 @@ import '../../../logic/cubits/user_cubit.dart';
 import '../../../data/models/user.dart';
 import '../Home/home_page.dart';
 import '../../widgets/back_arrow.dart';
+import 'notification_permission_page.dart';
 
 class EnterLocationPage extends StatefulWidget {
   final String email;
@@ -18,8 +19,8 @@ class EnterLocationPage extends StatefulWidget {
   final int? currentUserId;
 
   const EnterLocationPage({
-    Key? key, 
-    required this.email, 
+    Key? key,
+    required this.email,
     this.userData,
     this.isEditMode = false,
     this.currentUserId,
@@ -63,33 +64,37 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> features = data['features'] ?? [];
-        
+
         setState(() {
-          searchResults = features.where((item) {
-            // Filter only Algeria results
-            final props = item['properties'];
-            return props['country'] == 'Algeria' || 
-                   props['country'] == 'Algérie' ||
-                   props['countrycode'] == 'DZ';
-          }).map((item) {
-            final props = item['properties'];
-            final coords = item['geometry']['coordinates'];
-            
-            // Build display name
-            String displayName = props['name'] ?? '';
-            if (props['city'] != null && props['city'] != displayName) {
-              displayName += ', ${props['city']}';
-            } else if (props['state'] != null && props['state'] != displayName) {
-              displayName += ', ${props['state']}';
-            }
-            displayName += ', Algeria';
-            
-            return {
-              'display_name': displayName,
-              'lat': coords[1].toString(),
-              'lon': coords[0].toString(),
-            };
-          }).toList();
+          searchResults = features
+              .where((item) {
+                // Filter only Algeria results
+                final props = item['properties'];
+                return props['country'] == 'Algeria' ||
+                    props['country'] == 'Algérie' ||
+                    props['countrycode'] == 'DZ';
+              })
+              .map((item) {
+                final props = item['properties'];
+                final coords = item['geometry']['coordinates'];
+
+                // Build display name
+                String displayName = props['name'] ?? '';
+                if (props['city'] != null && props['city'] != displayName) {
+                  displayName += ', ${props['city']}';
+                } else if (props['state'] != null &&
+                    props['state'] != displayName) {
+                  displayName += ', ${props['state']}';
+                }
+                displayName += ', Algeria';
+
+                return {
+                  'display_name': displayName,
+                  'lat': coords[1].toString(),
+                  'lon': coords[0].toString(),
+                };
+              })
+              .toList();
           _isLoading = false;
         });
       } else {
@@ -115,7 +120,9 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Location services are disabled. Please enable them in settings.'),
+              content: Text(
+                'Location services are disabled. Please enable them in settings.',
+              ),
               duration: Duration(seconds: 3),
             ),
           );
@@ -143,7 +150,9 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Location permission permanently denied. Please enable it in app settings.'),
+              content: Text(
+                'Location permission permanently denied. Please enable it in app settings.',
+              ),
               duration: Duration(seconds: 3),
             ),
           );
@@ -158,21 +167,26 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      print('🌍 GPS Location Retrieved: Latitude=${position.latitude}, Longitude=${position.longitude}');
-      
+      print(
+        '🌍 GPS Location Retrieved: Latitude=${position.latitude}, Longitude=${position.longitude}',
+      );
+
       final userCubit = BlocProvider.of<UserCubit>(context);
-      
+
       if (widget.userData != null) {
         // New signup: Save user with location to database
         // Reverse geocode GPS coordinates to get location name
         String? locationName;
         try {
-          final response = await http.get(Uri.parse(
-            'https://photon.komoot.io/reverse?lat=${position.latitude}&lon=${position.longitude}&limit=1&countrycodes=dz'
-          ));
+          final response = await http.get(
+            Uri.parse(
+              'https://photon.komoot.io/reverse?lat=${position.latitude}&lon=${position.longitude}&limit=1&countrycodes=dz',
+            ),
+          );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
-            if (data['features'] != null && (data['features'] as List).isNotEmpty) {
+            if (data['features'] != null &&
+                (data['features'] as List).isNotEmpty) {
               locationName = data['features'][0]['properties']['display_name'];
               print('🌍 Reverse geocoded location: $locationName');
             }
@@ -180,27 +194,35 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         } catch (e) {
           print('⚠️ Reverse geocoding failed: $e');
         }
-        
+
         final userWithLocation = widget.userData!.copyWith(
           latitude: position.latitude,
           longitude: position.longitude,
           locationName: locationName,
         );
-        print('💾 Saving new user to database with location: ${locationName ?? "GPS coordinates only"}');
+        print(
+          '💾 Saving new user to database with location: ${locationName ?? "GPS coordinates only"}',
+        );
         await userCubit.registerUser(userWithLocation);
-        
+
         if (context.mounted) {
           final state = userCubit.state;
           if (state is UserOperationSuccess) {
-            print('✅ User registered successfully with location: $locationName');
+            print(
+              '✅ User registered successfully with location: $locationName',
+            );
+            // Navigate to notification permission page for new registrations
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MainScreen()),
+              MaterialPageRoute(
+                builder: (context) =>
+                    NotificationPermissionPage(userData: userWithLocation),
+              ),
             );
           } else if (state is UserError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error)));
           }
         }
       } else {
@@ -208,12 +230,15 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         // Reverse geocode GPS coordinates to get location name
         String? locationName;
         try {
-          final response = await http.get(Uri.parse(
-            'https://photon.komoot.io/reverse?lat=${position.latitude}&lon=${position.longitude}&limit=1&countrycodes=dz'
-          ));
+          final response = await http.get(
+            Uri.parse(
+              'https://photon.komoot.io/reverse?lat=${position.latitude}&lon=${position.longitude}&limit=1&countrycodes=dz',
+            ),
+          );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
-            if (data['features'] != null && (data['features'] as List).isNotEmpty) {
+            if (data['features'] != null &&
+                (data['features'] as List).isNotEmpty) {
               locationName = data['features'][0]['properties']['display_name'];
               print('🌍 Reverse geocoded location: $locationName');
             }
@@ -221,19 +246,26 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         } catch (e) {
           print('⚠️ Reverse geocoding failed: $e');
         }
-        
+
         // Use currentUserId if in edit mode, otherwise get from email
         int? userId = widget.currentUserId;
         if (userId == null) {
-          final user = await userCubit.userRepository.getUserByEmail(widget.email);
+          final user = await userCubit.userRepository.getUserByEmail(
+            widget.email,
+          );
           userId = user?.userId;
         }
-        
+
         print('👤 Updating location for user: ID=$userId');
         if (userId != null && context.mounted) {
-          await userCubit.updateUserLocation(userId, position.latitude, position.longitude, locationName: locationName);
+          await userCubit.updateUserLocation(
+            userId,
+            position.latitude,
+            position.longitude,
+            locationName: locationName,
+          );
           print('✅ Location saved to database for user $userId: $locationName');
-          
+
           if (widget.isEditMode) {
             // Return to edit profile
             Navigator.pop(context, true);
@@ -248,9 +280,9 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error getting location: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error getting location: $e')));
       }
       print('❌ Error getting location: $e');
     }
@@ -263,12 +295,12 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
       final latitude = double.parse(lat);
       final longitude = double.parse(lon);
       final locationName = location['display_name']!;
-      
+
       print('📍 Manual Location Selected: $locationName');
       print('🌍 Coordinates: Latitude=$latitude, Longitude=$longitude');
-      
+
       final userCubit = BlocProvider.of<UserCubit>(context);
-      
+
       if (widget.userData != null) {
         // New signup: Save user with location to database
         final userWithLocation = widget.userData!.copyWith(
@@ -278,19 +310,25 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         );
         print('💾 Saving new user to database with location: $locationName');
         await userCubit.registerUser(userWithLocation);
-        
+
         if (context.mounted) {
           final state = userCubit.state;
           if (state is UserOperationSuccess) {
-            print('✅ User registered successfully with location: $locationName');
+            print(
+              '✅ User registered successfully with location: $locationName',
+            );
+            // Navigate to notification permission page for new registrations
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MainScreen()),
+              MaterialPageRoute(
+                builder: (context) =>
+                    NotificationPermissionPage(userData: userWithLocation),
+              ),
             );
           } else if (state is UserError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error)));
           }
         }
       } else {
@@ -298,15 +336,22 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         // Use currentUserId if in edit mode, otherwise get from email
         int? userId = widget.currentUserId;
         if (userId == null) {
-          final user = await userCubit.userRepository.getUserByEmail(widget.email);
+          final user = await userCubit.userRepository.getUserByEmail(
+            widget.email,
+          );
           userId = user?.userId;
         }
-        
+
         print('👤 Updating location for user: ID=$userId');
         if (userId != null && context.mounted) {
-          await userCubit.updateUserLocation(userId, latitude, longitude, locationName: locationName);
+          await userCubit.updateUserLocation(
+            userId,
+            latitude,
+            longitude,
+            locationName: locationName,
+          );
           print('✅ Location saved to database for user $userId');
-          
+
           if (widget.isEditMode) {
             // Return to edit profile
             Navigator.pop(context, true);
@@ -320,9 +365,9 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving location: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error saving location: $e')));
     }
   }
 
@@ -345,9 +390,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
               // Back button and title
               Row(
                 children: [
-                  CustomBackArrow(
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  CustomBackArrow(onPressed: () => Navigator.pop(context)),
                   const SizedBox(width: 8),
                   Text(
                     AppLocalizations.of(context)!.searchYourLocation,
@@ -401,11 +444,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
                 onTap: _useCurrentLocation,
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.my_location,
-                      color: AppColors.primary,
-                      size: 22,
-                    ),
+                    Icon(Icons.my_location, color: AppColors.primary, size: 22),
                     const SizedBox(width: 12),
                     Text(
                       AppLocalizations.of(context)!.useCurrentLocation,
@@ -423,9 +462,7 @@ class _EnterLocationPageState extends State<EnterLocationPage> {
               // Search results
               if (_isLoading)
                 Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                  ),
+                  child: CircularProgressIndicator(color: AppColors.primary),
                 ),
               if (_isSearching && searchResults.isNotEmpty && !_isLoading) ...[
                 Text(

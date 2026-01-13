@@ -87,8 +87,12 @@ def register():
         # Try Supabase first
         if supabase:
             try:
+                print(f"☁️  Attempting to register user in Supabase: {user_data.email}")
+                
                 # Check if email exists in Supabase
+                print(f"📊 Checking if email exists: {user_data.email}")
                 existing = supabase.table('users').select('*').eq('email', user_data.email).execute()
+                print(f"📊 Email check result: {len(existing.data) if existing.data else 0} records found")
                 
                 if existing.data and len(existing.data) > 0:
                     return jsonify({
@@ -97,7 +101,9 @@ def register():
                     }), 409
                 
                 # Check if phone exists in Supabase
+                print(f"📞 Checking if phone exists: {user_data.phone}")
                 existing_phone = supabase.table('users').select('*').eq('phone', user_data.phone).execute()
+                print(f"📞 Phone check result: {len(existing_phone.data) if existing_phone.data else 0} records found")
                 
                 if existing_phone.data and len(existing_phone.data) > 0:
                     return jsonify({
@@ -119,15 +125,24 @@ def register():
                     'latitude': user_data.latitude,
                     'longitude': user_data.longitude,
                     'location_name': user_data.location_name,
-                    'premium': user_data.premium
+                    'premium': user_data.premium,
+                    'notifications_enabled': user_data.notifications_enabled if user_data.notifications_enabled is not None else True
                 }
                 
+                # Only include fcm_token if it's provided
+                if user_data.fcm_token:
+                    new_user['fcm_token'] = user_data.fcm_token
+                
+                print(f"💾 Inserting user into Supabase: {user_data.email}")
                 response = supabase.table('users').insert(new_user).execute()
+                print(f"✅ Supabase insert response: {len(response.data) if response.data else 0} records inserted")
                 
                 if response.data and len(response.data) > 0:
                     user = response.data[0]
                     # Remove password from response
                     user.pop('password', None)
+                    
+                    print(f"✅ User registered successfully in Supabase: user_id={user.get('user_id')}")
                     
                     return jsonify({
                         'success': True,
@@ -171,8 +186,9 @@ def register():
         # Insert into local database
         query = """
             INSERT INTO users (name, email, phone, password, gender, dob, 
-                            latitude, longitude, location_name, premium)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            latitude, longitude, location_name, premium, 
+                            fcm_token, notifications_enabled)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         params = (
             user_data.name,
@@ -184,7 +200,9 @@ def register():
             user_data.latitude,
             user_data.longitude,
             user_data.location_name,
-            user_data.premium
+            user_data.premium,
+            user_data.fcm_token,
+            1 if (user_data.notifications_enabled if user_data.notifications_enabled is not None else True) else 0
         )
         
         user_id = execute_insert(query, params)
@@ -210,6 +228,7 @@ def register():
             }), 500
         
     except ValidationError as e:
+        print(f"❌ Validation error during registration: {e.errors()}")
         return jsonify({
             'success': False,
             'error': 'Validation error',

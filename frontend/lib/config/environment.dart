@@ -9,7 +9,9 @@ class Environment {
        // 'http://localhost:5000/api', // Works with ADB reverse or emulator or desktop
     // 'http://10.0.2.2:5000/api', // For Android emulator (maps to localhost)
     // 'http://10.66.113.1:5000/api', // For physical device on same WiFi
-     'http://10.66.113.125:5000/api',
+     //'http://10.66.113.125:5000/api',
+      'http://192.168.1.5:5000/api',
+     
   );
 
   // App Configuration

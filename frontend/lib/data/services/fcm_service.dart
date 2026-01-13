@@ -17,6 +17,9 @@ class FCMService {
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
 
+  // Callback for token refresh
+  Function(String)? _onTokenRefreshCallback;
+
   /// Initialize FCM
   Future<void> initialize() async {
     try {
@@ -60,6 +63,10 @@ class FCMService {
         _messaging.onTokenRefresh.listen((newToken) {
           _fcmToken = newToken;
           debugPrint('🔄 FCM Token refreshed: $newToken');
+          // Call the callback if set
+          if (_onTokenRefreshCallback != null) {
+            _onTokenRefreshCallback!(newToken);
+          }
         });
       } else {
         debugPrint('⚠️ FCM permission denied');
@@ -197,5 +204,10 @@ class FCMService {
     } catch (e) {
       debugPrint('❌ Failed to delete FCM token: $e');
     }
+  }
+
+  /// Set callback for token refresh
+  void onTokenRefresh(Function(String) callback) {
+    _onTokenRefreshCallback = callback;
   }
 }

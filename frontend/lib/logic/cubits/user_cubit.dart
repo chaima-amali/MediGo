@@ -499,6 +499,33 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
+  // Update specific user fields by userId
+  Future<void> updateUserFields(int userId, Map<String, dynamic> fields) async {
+    try {
+      emit(UserLoading());
+
+      print('🔄 Updating user fields for userId $userId: $fields');
+
+      // Get current user
+      final currentUser = await userRepository.getUserById(userId);
+      if (currentUser == null) {
+        emit(const UserError('User not found'));
+        return;
+      }
+
+      // Create updated user with new fields
+      final updatedUserMap = currentUser.toMap();
+      updatedUserMap.addAll(fields);
+      final updatedUser = User.fromMap(updatedUserMap);
+
+      // Use the main updateUser method
+      await updateUser(updatedUser);
+    } catch (e) {
+      print('❌ Update fields error: $e');
+      emit(UserError('Update failed: $e'));
+    }
+  }
+
   // Update user location
   Future<void> updateUserLocation(
     int userId,
@@ -564,6 +591,34 @@ class UserCubit extends Cubit<UserState> {
       }
     } catch (e) {
       emit(UserError('Premium status update failed: $e'));
+    }
+  }
+
+  // Update FCM token
+  Future<void> updateFCMToken(int userId, String fcmToken) async {
+    try {
+      print('📱 Updating FCM token for user $userId');
+
+      // Update FCM token via API
+      await _apiService.updateFCMToken(userId, fcmToken);
+
+      // Update local user if currently loaded
+      final currentState = state;
+      if (currentState is UserAuthenticated || currentState is UserLoaded) {
+        final user = currentState is UserAuthenticated
+            ? currentState.user
+            : (currentState as UserLoaded).user;
+
+        if (user.userId == userId) {
+          final updatedUser = user.copyWith(fcmToken: fcmToken);
+          await userRepository.updateUser(updatedUser);
+
+          print('✅ FCM token updated successfully');
+        }
+      }
+    } catch (e) {
+      print('❌ FCM token update failed: $e');
+      // Don't emit error state as this is a background operation
     }
   }
 

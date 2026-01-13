@@ -2,8 +2,8 @@
 User API Schemas - Request/Response validation using Pydantic
 """
 
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from typing import Optional, Union
 
 class UserCreate(BaseModel):
     """Schema for creating a new user"""
@@ -16,7 +16,23 @@ class UserCreate(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     location_name: Optional[str] = None
-    premium: Optional[str] = Field('false', pattern='^(true|false)$')
+    premium: Optional[Union[str, int, bool]] = 'false'
+    fcm_token: Optional[str] = None
+    notifications_enabled: Optional[bool] = True
+    
+    @field_validator('premium')
+    @classmethod
+    def normalize_premium(cls, v):
+        """Convert premium to string 'true' or 'false'"""
+        if v is None:
+            return 'false'
+        if isinstance(v, bool):
+            return 'true' if v else 'false'
+        if isinstance(v, int):
+            return 'true' if v == 1 else 'false'
+        if isinstance(v, str):
+            return v.lower()
+        return 'false'
     
     class Config:
         json_schema_extra = {
@@ -28,7 +44,9 @@ class UserCreate(BaseModel):
                 "gender": "male",
                 "latitude": 40.7128,
                 "longitude": -74.0060,
-                "location_name": "New York, NY"
+                "location_name": "New York, NY",
+                "fcm_token": "fcm_token_here",
+                "notifications_enabled": True
             }
         }
 
@@ -42,7 +60,23 @@ class UserUpdate(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     location_name: Optional[str] = None
-    premium: Optional[str] = None
+    premium: Optional[Union[str, int, bool]] = None
+    fcm_token: Optional[str] = None
+    notifications_enabled: Optional[bool] = None
+    
+    @field_validator('premium')
+    @classmethod
+    def normalize_premium(cls, v):
+        """Convert premium to string 'true' or 'false'"""
+        if v is None:
+            return None
+        if isinstance(v, bool):
+            return 'true' if v else 'false'
+        if isinstance(v, int):
+            return 'true' if v == 1 else 'false'
+        if isinstance(v, str):
+            return v.lower()
+        return None
 
 class UserResponse(BaseModel):
     """Schema for user response"""
@@ -56,6 +90,8 @@ class UserResponse(BaseModel):
     longitude: Optional[float]
     location_name: Optional[str]
     premium: Optional[str]
+    fcm_token: Optional[str]
+    notifications_enabled: Optional[bool]
     
     class Config:
         from_attributes = True

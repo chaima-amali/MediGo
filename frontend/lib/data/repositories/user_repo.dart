@@ -13,9 +13,35 @@ class UserRepository {
   // Get database instance
   Future<Database> get _db async => await DBHelper.getDatabase();
 
+  // Migrate database to add notifications_enabled column if it doesn't exist
+  Future<void> _ensureNotificationsColumnExists() async {
+    final db = await _db;
+    try {
+      // Check if column exists
+      final result = await db.rawQuery(
+        'PRAGMA table_info(${DBUserTable.table})',
+      );
+      final hasColumn = result.any(
+        (col) => col['name'] == 'notifications_enabled',
+      );
+
+      if (!hasColumn) {
+        print('🔄 Adding notifications_enabled column to user table...');
+        await db.execute(
+          'ALTER TABLE ${DBUserTable.table} ADD COLUMN notifications_enabled INTEGER DEFAULT 1',
+        );
+        print('✅ notifications_enabled column added successfully');
+      }
+    } catch (e) {
+      print('⚠️ Error checking/adding notifications_enabled column: $e');
+    }
+  }
+
   // CREATE - Insert a new user
   Future<int> insertUser(User user) async {
     final db = await _db;
+    await _ensureNotificationsColumnExists();
+
     final userData = user.toMap();
     print('💾 Inserting user data: $userData');
 

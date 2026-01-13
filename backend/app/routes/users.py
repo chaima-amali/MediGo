@@ -365,6 +365,93 @@ def update_user_premium(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/users/<int:user_id>/fcm-token', methods=['POST'])
+def update_fcm_token(user_id):
+    """
+    Update user FCM token for push notifications
+    ---
+    tags:
+      - Users
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: User ID
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - token
+          properties:
+            token:
+              type: string
+              description: FCM device token
+    responses:
+      200:
+        description: FCM token updated successfully
+      404:
+        description: User not found
+      500:
+        description: Server error
+    """
+    try:
+        data = request.json
+        fcm_token = data.get('token')
+        
+        if not fcm_token:
+            return jsonify({'error': 'FCM token is required'}), 400
+        
+        print(f"📱 Updating FCM token for user {user_id}")
+        
+        # Try Supabase first
+        if supabase:
+            try:
+                response = supabase.table('users').update({
+                    'fcm_token': fcm_token
+                }).eq('user_id', user_id).execute()
+                
+                if response.data and len(response.data) > 0:
+                    print(f"✅ FCM token updated in Supabase for user {user_id}")
+                    # Also update local database
+                    try:
+                        execute_update(
+                            "UPDATE users SET fcm_token = ? WHERE user_id = ?",
+                            (fcm_token, user_id)
+                        )
+                        print(f"✅ FCM token synced to local database")
+                    except Exception as local_error:
+                        print(f"⚠️  Failed to sync FCM token to local: {local_error}")
+                    
+                    return jsonify({
+                        'success': True,
+                        'message': 'FCM token updated successfully'
+                    }), 200
+            except Exception as supabase_error:
+                print(f"⚠️  Supabase update failed: {supabase_error}")
+                print("📍 Falling back to local database...")
+        
+        # Fallback to local database
+        affected = execute_update(
+            "UPDATE users SET fcm_token = ? WHERE user_id = ?",
+            (fcm_token, user_id)
+        )
+        
+        if affected == 0:
+            return jsonify({'error': 'User not found'}), 404
+        
+        print(f"✅ FCM token updated in local database")
+        return jsonify({
+            'success': True,
+            'message': 'FCM token updated successfully'
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Error updating FCM token: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @bp.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     """
