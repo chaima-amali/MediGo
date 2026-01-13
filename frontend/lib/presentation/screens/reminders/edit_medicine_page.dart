@@ -412,12 +412,15 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
       customDates: _plan!.customDates,
     );
 
+    // First save tracking and plan updates (skip reload since we'll regenerate occurrences)
     await _cubit.save(
       updatedTracking: updatedTracking,
       updatedPlan: updatedPlan,
+      skipReload: true,
     );
 
-    // Regenerate occurrences if dates or times changed
+    // Then regenerate occurrences with new schedule
+    // This deletes old occurrences and creates new ones, then reloads the UI
     if (_plan!.id != null) {
       await _cubit.regenerateOccurrences(
         planId: _plan!.id!,
@@ -425,6 +428,12 @@ class _EditMedicinePageState extends State<EditMedicinePage> {
         endDate: endDate!,
         times: timeStrings,
       );
+    }
+
+    // Force a final reload to ensure UI shows updated data
+    if (mounted) {
+      final trackingCubit = context.read<TrackingCubit>();
+      trackingCubit.loadDay(trackingCubit.state.selectedDate ?? DateTime.now());
     }
   }
 

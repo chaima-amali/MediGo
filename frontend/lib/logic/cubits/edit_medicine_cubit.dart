@@ -76,6 +76,7 @@ class EditMedicineCubit extends Cubit<EditMedicineState> {
   Future<void> save({
     required MedicineTracking updatedTracking,
     required MedicinePlan updatedPlan,
+    bool skipReload = false,
   }) async {
     emit(state.copyWith(saving: true, error: null, success: false));
     try {
@@ -102,16 +103,19 @@ class EditMedicineCubit extends Cubit<EditMedicineState> {
       if (ok1 && ok2) {
         // ignore: avoid_print
         print('EditMedicineCubit.save: both updates succeeded');
-        // notify tracking cubit to reload today's occurrences if available
-        try {
-          // reload the currently selected date in the tracking cubit
-          final sel = _trackingCubit?.state.selectedDate;
-          if (sel != null) {
-            _trackingCubit?.loadDay(sel);
-          } else {
-            _trackingCubit?.loadDay(DateTime.now());
-          }
-        } catch (_) {}
+        // Skip reload if regenerateOccurrences will be called immediately after
+        if (!skipReload) {
+          // notify tracking cubit to reload today's occurrences if available
+          try {
+            // reload the currently selected date in the tracking cubit
+            final sel = _trackingCubit?.state.selectedDate;
+            if (sel != null) {
+              _trackingCubit?.loadDay(sel);
+            } else {
+              _trackingCubit?.loadDay(DateTime.now());
+            }
+          } catch (_) {}
+        }
         // ensure listeners (statistics cubit etc.) are notified in case
         // repositories missed notifying for some edge case
         try {

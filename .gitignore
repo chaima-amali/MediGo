@@ -1,12 +1,20 @@
 # Backend secrets and generated files
 backend/.env
 backend/medigo.db
+backend/medigo.db-journal
 backend/__pycache__/
 backend/**/__pycache__/
 backend/*.pyc
 backend/venv/
 backend/.venv/
 backend/firebase-service-account.json
+
+# Python virtual environments (any location)
+venv/
+.venv/
+.venv311/
+env/
+ENV/
 
 # Flutter build outputs
 frontend/build/
