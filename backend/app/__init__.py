@@ -8,6 +8,9 @@ from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 from app.core.config import settings
 from app.core.database import init_db
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+import atexit
 
 def create_app():
     """Create and configure Flask application"""
@@ -32,12 +35,37 @@ def create_app():
     # Register error handlers
     register_error_handlers(app)
     
+    # Initialize background scheduler
+    init_scheduler(app)
+    
     return app
+
+
+def init_scheduler(app):
+    """Initialize and start background job scheduler"""
+    from app.jobs.reservation_reminders import check_and_send_reservation_reminders
+    
+    scheduler = BackgroundScheduler()
+    
+    # Run reservation reminder job every 30 minutes
+    scheduler.add_job(
+        func=check_and_send_reservation_reminders,
+        trigger=IntervalTrigger(minutes=30),
+        id='reservation_reminders_job',
+        name='Check and send reservation reminders',
+        replace_existing=True
+    )
+    
+    scheduler.start()
+    print("✅ Background scheduler started - Reservation reminders will run every 30 minutes")
+    
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
 
 def register_routes(app):
     """Register all API route blueprints"""
     
-    from app.routes import users, medicines, auth, pharmacies, reservations, medicine_search_history
+    from app.routes import users, medicines, auth, pharmacies, reservations, medicine_search_history, admin, notifications
     
     # Root endpoint
     @app.route('/')
@@ -55,6 +83,8 @@ def register_routes(app):
     app.register_blueprint(pharmacies.pharmacies_bp, url_prefix='/api/pharmacies')
     app.register_blueprint(reservations.bp, url_prefix='/api')
     app.register_blueprint(medicine_search_history.bp, url_prefix='/api')
+    app.register_blueprint(admin.bp, url_prefix='/api')
+    app.register_blueprint(notifications.notifications_bp)
 
 def register_swagger(app):
     """Register Swagger UI for API documentation"""
