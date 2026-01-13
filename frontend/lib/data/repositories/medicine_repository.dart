@@ -83,7 +83,6 @@ class MedicineRepository {
         // ignore scheduling errors per-occurrence
         print('⚠️ _scheduleLocalNotifications error for occ $occ : $e');
       }
-
     }
   }
 
@@ -205,7 +204,6 @@ class MedicineRepository {
               .toList();
 
       if (occurrencesData.isNotEmpty) {
-
         final occResp = await _apiService.createOccurrencesBatch(
           occurrencesData,
         );
@@ -264,43 +262,6 @@ class MedicineRepository {
 
       // No extra local insert after successful remote sync. We already
       // upserted the remote tracking and plan to keep IDs consistent.
-        await _apiService.createOccurrencesBatch(occurrencesData);
-        // ignore: avoid_print
-        print('Ô£à Remote: ${occurrencesData.length} occurrences created');
-      }
-
-      // Also upsert remote plan/tracking into local DB for consistency
-      try {
-        final db = await dbFuture;
-        await _safeUpsert(db, 'medicine_tracking', {
-          'medicine_track_id': remoteMedicineId,
-          'user_id': tracking.userId,
-          'name': tracking.name,
-          'type': tracking.type,
-          'dosage': tracking.dosage,
-          'unit': tracking.unit ?? '',
-        });
-        await _safeUpsert(db, 'medicine_plan', {
-          'plan_id': planIdInt,
-          'medicine_track_id': remoteMedicineId,
-          'user_id': tracking.userId,
-          'importance': plan.importance,
-          'start_date': plan.startDate.toIso8601String().split('T')[0],
-          'end_date': plan.endDate?.toIso8601String().split('T')[0],
-          'frequency_type': plan.frequencyType,
-          'interval_days': plan.intervalDays,
-          'weekdays': plan.weekdays != null ? jsonEncode(plan.weekdays) : null,
-          'month_days': plan.monthDays != null
-              ? jsonEncode(plan.monthDays)
-              : null,
-          'custom_dates': plan.customDates != null
-              ? jsonEncode(plan.customDates)
-              : null,
-        });
-      } catch (e) {
-        // ignore: avoid_print
-        print('ÔÜá´©Å  Failed to upsert remote plan/tracking locally: $e');
-      }
 
       // Also save to local database as a backup
       // ignore: avoid_print

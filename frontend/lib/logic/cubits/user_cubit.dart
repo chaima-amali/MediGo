@@ -5,6 +5,7 @@ import '../../data/models/user.dart';
 import '../../data/repositories/user_repo.dart';
 import '../../data/services/api_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import '../../data/databases/db_helper.dart';
 
 // States
 abstract class UserState extends Equatable {
@@ -642,7 +643,8 @@ class UserCubit extends Cubit<UserState> {
       if (previousUserId != null && previousUserId != userId) {
         print('🔄 Switching users: $previousUserId -> $userId');
         print('🗑️ Clearing previous user medicine data...');
-        await DBHelper.clearUserMedicineData(previousUserId);
+        // await DBHelper.clearUserMedicineData(previousUserId);
+        // TODO: Implement clearUserMedicineData method in DBHelper
       }
 
       await prefs.setInt('user_id', userId);

@@ -2,7 +2,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
-
 import 'package:flutter/foundation.dart';
 
 /// Service for local scheduled notifications (medicine reminders)
@@ -114,44 +113,6 @@ class LocalNotificationService {
 
     // Schedule at exact time
     await _scheduleIfFuture(id, tzDate);
-  final FlutterLocalNotificationsPlugin _notifications =
-      FlutterLocalNotificationsPlugin();
-
-  bool _initialized = false;
-
-  /// Initialize local notifications
-  Future<void> initialize() async {
-    if (_initialized) return;
-
-    try {
-      // Initialize timezone data
-      tz.initializeTimeZones();
-
-      const AndroidInitializationSettings androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
-
-      const DarwinInitializationSettings iosSettings =
-          DarwinInitializationSettings(
-            requestAlertPermission: true,
-            requestBadgePermission: true,
-            requestSoundPermission: true,
-          );
-
-      const InitializationSettings initSettings = InitializationSettings(
-        android: androidSettings,
-        iOS: iosSettings,
-      );
-
-      await _notifications.initialize(
-        initSettings,
-        onDidReceiveNotificationResponse: _onNotificationTapped,
-      );
-
-      _initialized = true;
-      debugPrint('✅ Local notifications initialized');
-    } catch (e) {
-      debugPrint('❌ Local notification initialization error: $e');
-    }
   }
 
   /// Schedule a medicine reminder notification
@@ -193,7 +154,7 @@ class LocalNotificationService {
 
       // Only schedule if time is in the future
       if (scheduledDate.isAfter(tz.TZDateTime.now(tz.local))) {
-        await _notifications.zonedSchedule(
+        await _plugin.zonedSchedule(
           id,
           '💊 Time to take your medicine',
           '$medicineName - $dosage',
@@ -216,7 +177,7 @@ class LocalNotificationService {
   /// Cancel a specific notification
   Future<void> cancelNotification(int id) async {
     try {
-      await _notifications.cancel(id);
+      await _plugin.cancel(id);
       debugPrint('✅ Cancelled notification ID: $id');
     } catch (e) {
       debugPrint('❌ Failed to cancel notification: $e');
@@ -226,7 +187,7 @@ class LocalNotificationService {
   /// Cancel all notifications
   Future<void> cancelAllNotifications() async {
     try {
-      await _notifications.cancelAll();
+      await _plugin.cancelAll();
       debugPrint('✅ Cancelled all notifications');
     } catch (e) {
       debugPrint('❌ Failed to cancel all notifications: $e');
@@ -262,7 +223,7 @@ class LocalNotificationService {
         iOS: iosDetails,
       );
 
-      await _notifications.show(id, title, body, notificationDetails);
+      await _plugin.show(id, title, body, notificationDetails);
 
       debugPrint('✅ Showed notification: $title');
     } catch (e) {
@@ -272,7 +233,7 @@ class LocalNotificationService {
 
   /// Get pending notifications (for debugging)
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
-    return await _notifications.pendingNotificationRequests();
+    return await _plugin.pendingNotificationRequests();
   }
 
   /// Handle notification tap

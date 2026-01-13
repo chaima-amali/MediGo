@@ -191,7 +191,6 @@ class MediGoAppState extends State<MediGoApp> {
     _loadSavedLanguage();
     // Note: FCM message handling is done in FCMService
     // which is initialized after user login/registration in localization.dart
- develop
   }
 
   Future<void> _loadSavedLanguage() async {
