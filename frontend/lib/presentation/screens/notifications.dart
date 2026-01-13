@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/logic/cubits/notifications_cubit.dart';
-import 'package:frontend/data/repositories/occurrence_repository.dart';
+import 'package:frontend/logic/cubits/user_cubit.dart';
+import 'package:frontend/data/repositories/notification_repository.dart';
 import 'package:frontend/data/models/notification_item.dart';
 import 'package:frontend/src/generated/l10n/app_localizations.dart';
 
@@ -10,9 +11,26 @@ class NotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the userId from UserCubit
+    final userState = context.watch<UserCubit>().state;
+
+    int userId = 0;
+    if (userState is UserLoaded) {
+      userId = userState.user.userId ?? 0;
+    } else if (userState is UserAuthenticated) {
+      userId = userState.user.userId ?? 0;
+    }
+
+    if (userId == 0) {
+      return Scaffold(
+        body: Center(child: Text('Please log in to view notifications')),
+      );
+    }
+
     return BlocProvider(
       create: (context) =>
-          NotificationsCubit(OccurrenceRepository())..loadNotifications(),
+          NotificationsCubit(NotificationRepository(), userId)
+            ..loadNotifications(),
       child: const _NotificationsView(),
     );
   }
@@ -213,43 +231,51 @@ class _NotificationsViewState extends State<_NotificationsView> {
                             ),
                             SizedBox(height: 12),
                             ...group.notifications.map((notification) {
-                              // Get the localized message based on messageIndex
-                              String message = '';
-                              switch (notification.messageIndex) {
-                                case 1:
-                                  message = l10n.notification_message_1(
-                                    notification.medicineName,
-                                  );
-                                  break;
-                                case 2:
-                                  message = l10n.notification_message_2(
-                                    notification.medicineName,
-                                  );
-                                  break;
-                                case 3:
-                                  message = l10n.notification_message_3(
-                                    notification.medicineName,
-                                  );
-                                  break;
-                                case 4:
-                                  message = l10n.notification_message_4(
-                                    notification.medicineName,
-                                  );
-                                  break;
-                                case 5:
-                                  message = l10n.notification_message_5(
-                                    notification.medicineName,
-                                  );
-                                  break;
-                                default:
-                                  message = l10n.notification_message_1(
-                                    notification.medicineName,
-                                  );
+                              // Use the message from the notification if available,
+                              // otherwise use localized fallback messages
+                              String message = notification.message;
+
+                              // If message is empty, use fallback
+                              if (message.isEmpty &&
+                                  notification.medicineName != null) {
+                                switch (notification.messageIndex) {
+                                  case 1:
+                                    message = l10n.notification_message_1(
+                                      notification.medicineName!,
+                                    );
+                                    break;
+                                  case 2:
+                                    message = l10n.notification_message_2(
+                                      notification.medicineName!,
+                                    );
+                                    break;
+                                  case 3:
+                                    message = l10n.notification_message_3(
+                                      notification.medicineName!,
+                                    );
+                                    break;
+                                  case 4:
+                                    message = l10n.notification_message_4(
+                                      notification.medicineName!,
+                                    );
+                                    break;
+                                  case 5:
+                                    message = l10n.notification_message_5(
+                                      notification.medicineName!,
+                                    );
+                                    break;
+                                  default:
+                                    message = l10n.notification_message_1(
+                                      notification.medicineName!,
+                                    );
+                                }
                               }
 
                               return NotificationCard(
                                 time: notification.formattedTime,
                                 message: message,
+                                title: notification.title,
+                                isRead: notification.isRead,
                               );
                             }).toList(),
                           ],
@@ -317,18 +343,37 @@ class FilterButton extends StatelessWidget {
 class NotificationCard extends StatelessWidget {
   final String time;
   final String message;
+  final String? title;
+  final bool isRead;
 
-  const NotificationCard({Key? key, required this.time, required this.message})
-    : super(key: key);
+  const NotificationCard({
+    Key? key,
+    required this.time,
+    required this.message,
+    this.title,
+    this.isRead = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isRead
+            ? (isDark ? Colors.grey[850] : Colors.grey[100])
+            : (isDark ? Colors.grey[900] : Colors.white),
         borderRadius: BorderRadius.circular(12),
+        border: isRead
+            ? null
+            : Border.all(
+                color: isDark
+                    ? Color(0xFF4DD0E1).withOpacity(0.3)
+                    : Color(0xFF4DD0E1).withOpacity(0.2),
+                width: 1,
+              ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -340,23 +385,51 @@ class NotificationCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Unread indicator
+          if (!isRead)
+            Container(
+              width: 8,
+              height: 8,
+              margin: EdgeInsets.only(right: 12, top: 4),
+              decoration: BoxDecoration(
+                color: Color(0xFF4DD0E1),
+                shape: BoxShape.circle,
+              ),
+            ),
           Text(
             time,
             style: TextStyle(
               fontSize: 13,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white70 : Colors.grey[600],
+              fontWeight: isRead ? FontWeight.w400 : FontWeight.w600,
             ),
           ),
           SizedBox(width: 16),
           Expanded(
-            child: Text(
-              message,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                height: 1.4,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (title != null && title!.isNotEmpty) ...[
+                  Text(
+                    title!,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                ],
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white70 : Colors.black87,
+                    height: 1.4,
+                    fontWeight: isRead ? FontWeight.w400 : FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

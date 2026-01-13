@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/data/repositories/occurrence_repository.dart';
+import 'package:frontend/data/repositories/notification_repository.dart';
 import '../../data/models/notification_item.dart';
 
 class NotificationsState {
@@ -27,53 +27,62 @@ class NotificationsState {
 }
 
 class NotificationsCubit extends Cubit<NotificationsState> {
-  final OccurrenceRepository _repository;
+  final NotificationRepository _repository;
+  final int userId;
 
-  NotificationsCubit(this._repository) : super(NotificationsState());
+  NotificationsCubit(this._repository, this.userId)
+    : super(NotificationsState());
 
   Future<void> loadNotifications() async {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
+      // Fetch notifications from Supabase API
+      final notificationsData = await _repository.getUserNotifications(
+        userId: userId,
+        limit: 100,
+      );
 
-      // Get notifications for last 3 days
-      final List<NotificationItem> allNotifications = [];
+      // Convert to NotificationItem objects
+      final List<NotificationItem> allNotifications = notificationsData
+          .map((data) => NotificationItem.fromJson(data))
+          .toList();
 
-      for (int i = 0; i < 3; i++) {
-        final date = today.subtract(Duration(days: i));
-        final occurrences = await _repository.getOccurrencesByDate(date);
-
-        for (final occurrence in occurrences) {
-          // Create notification item
-          final notification = NotificationItem(
-            occurrenceId: occurrence.id ?? 0,
-            medicineName: occurrence.medicineName ?? 'Medicine',
-            time: occurrence.time,
-            date: occurrence.date,
-            isTaken: occurrence.isTaken == 1,
-            importance: occurrence.importance,
-          );
-
-          // Only include past notifications (not future times)
-          if (notification.isPast) {
-            allNotifications.add(notification);
-          }
-        }
-      }
+      // Sort by created_at descending (newest first)
+      allNotifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       // Group notifications by day
       final grouped = _groupNotificationsByDay(allNotifications);
 
       emit(state.copyWith(groupedNotifications: grouped, isLoading: false));
     } catch (e) {
+      print('❌ Error loading notifications: $e');
       emit(
         state.copyWith(
           isLoading: false,
           error: 'Failed to load notifications: $e',
         ),
       );
+    }
+  }
+
+  Future<void> markNotificationRead(int notificationId) async {
+    try {
+      await _repository.markNotificationRead(notificationId);
+      // Reload notifications to reflect the change
+      await loadNotifications();
+    } catch (e) {
+      print('❌ Error marking notification as read: $e');
+    }
+  }
+
+  Future<void> markAllNotificationsRead() async {
+    try {
+      await _repository.markAllNotificationsRead(userId);
+      // Reload notifications to reflect the change
+      await loadNotifications();
+    } catch (e) {
+      print('❌ Error marking all notifications as read: $e');
     }
   }
 
@@ -93,9 +102,9 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     for (final notification in notifications) {
       final notifDate = DateTime(
-        notification.date.year,
-        notification.date.month,
-        notification.date.day,
+        notification.notificationDate.year,
+        notification.notificationDate.month,
+        notification.notificationDate.day,
       );
 
       if (notifDate == today) {
@@ -111,15 +120,28 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     for (final group in groups.values) {
       group.sort((a, b) {
         try {
-          final aHour = int.parse(a.time.split(':')[0]);
-          final aMinute = int.parse(a.time.split(':')[1]);
-          final bHour = int.parse(b.time.split(':')[0]);
-          final bMinute = int.parse(b.time.split(':')[1]);
+          // Use datetime for sorting if available, otherwise fallback to time
+          if (a.datetime != null && b.datetime != null) {
+            return DateTime.parse(
+              b.datetime!,
+            ).compareTo(DateTime.parse(a.datetime!));
+          }
 
-          final aTotal = aHour * 60 + aMinute;
-          final bTotal = bHour * 60 + bMinute;
+          // Use time field if available
+          if (a.time != null && b.time != null) {
+            final aHour = int.parse(a.time!.split(':')[0]);
+            final aMinute = int.parse(a.time!.split(':')[1]);
+            final bHour = int.parse(b.time!.split(':')[0]);
+            final bMinute = int.parse(b.time!.split(':')[1]);
 
-          return bTotal.compareTo(aTotal); // Descending order
+            final aTotal = aHour * 60 + aMinute;
+            final bTotal = bHour * 60 + bMinute;
+
+            return bTotal.compareTo(aTotal); // Descending order
+          }
+
+          // Fallback to createdAt
+          return b.createdAt.compareTo(a.createdAt);
         } catch (_) {
           return 0;
         }
